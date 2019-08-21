@@ -16,7 +16,7 @@ L.GridLayer.NumData = L.GridLayer.extend({
     var d_imgData, v_imgData;
     var numData;  //sizeX * sizeY 個の配列
     var sum_w = [], sum_h = [];
-    var k = this;
+    var self = this;
     this._ave_w = [], this._ave_h = [];
 
     for(var i = 0; i < 240; i++){
@@ -34,30 +34,30 @@ L.GridLayer.NumData = L.GridLayer.extend({
     img.onload = function(){
       d_ctx.drawImage(img, 0, 0, tileSize.x, tileSize.y);//canvasオブジェクトの左上から画像を貼り付け
       d_imgData = d_ctx.getImageData(0, 0, tileSize.x, tileSize.y);
-      numData = k._getNumData(d_imgData.data);
+      numData = self._rgbToNumData(d_imgData.data);
       for(var i = 0; i < tileSize.y * tileSize.x; i++){
         //sum_w[ parseInt(i/tileSize.y) ] += numData[i];
         //sum_h[ parseInt(i%tileSize.x) ] += numData[i];
-        if(k.options.operation == "log10"){
-          if(Math.log10(numData[i]) > k.max){
-            k.max = Math.log10(numData[i]);
+        if(self.options.operation == "log10"){
+          if(Math.log10(numData[i]) > self.max){
+            self.max = Math.log10(numData[i]);
           }
-          else if(Math.log10(numData[i]) < k.min){
-            k.min = Math.log10(numData[i]);
+          else if(Math.log10(numData[i]) < self.min){
+            self.min = Math.log10(numData[i]);
           }
-        }else if(k.options.operation == "sqrt"){
-          if(Math.sqrt(numData[i]) > k.max){
-            k.max = Math.sqrt(numData[i]);
+        }else if(self.options.operation == "sqrt"){
+          if(Math.sqrt(numData[i]) > self.max){
+            self.max = Math.sqrt(numData[i]);
           }
-          else if(Math.sqrt(numData[i]) < k.min){
-            k.min = Math.sqrt(numData[i]);
+          else if(Math.sqrt(numData[i]) < self.min){
+            self.min = Math.sqrt(numData[i]);
           }
         }else{
-          if(numData[i] > k.max){
-            k.max = numData[i];
+          if(numData[i] > self.max){
+            self.max = numData[i];
           }
-          else if(numData[i] < k.min){
-            k.min = numData[i];
+          else if(numData[i] < self.min){
+            self.min = numData[i];
           }
         }
       }
@@ -81,7 +81,7 @@ L.GridLayer.NumData = L.GridLayer.extend({
     }
     return {r:255, g:255, b:255, a:255};
   },
-  _getNumData: function(rgba){
+  _rgbToNumData: function(rgba){
     var tileSize = this.getTileSize();
     var numData = [];
     var idx;
@@ -105,7 +105,7 @@ L.GridLayer.NumData = L.GridLayer.extend({
     tile.setAttribute('height', tileSize.y);
     var ctx = tile.getContext('2d');
 
-    var k = this;
+    var self = this;
 
     /*canvasインスタンス初期化*/
     var numData = document.createElement('canvas');
@@ -122,24 +122,24 @@ L.GridLayer.NumData = L.GridLayer.extend({
       d_imgData = d_ctx.getImageData(0,0,tileSize.x,tileSize.y);
       imgData = ctx.getImageData(0,0,tileSize.x,tileSize.y);
 
-      num = k._getNumData(d_imgData.data);
+      num = self._rgbToNumData(d_imgData.data);
       /*実数値から塗りつぶす色決定しイメージデータを書き換え*/
       for(var i = 0; i < tileSize.y * tileSize.x; i++){
         idx = i * 4;
         imgData.data[idx + 3] = 255;
-        if(k.options.shade){
+        if(self.options.shade){
           imgData.data[idx    ] = 255;
           imgData.data[idx + 1] = 255;
           imgData.data[idx + 2] = 255;
         }else{
           imgData.data[idx + 3] = 0;
         }
-        if(k.options.operation == "log10"){
-          color = k._getColor(Math.log10(num[i])); //数値に対して色を決める
-        }else if(k.options.operation == "sqrt"){
-          color = k._getColor(Math.sqrt(num[i])); //数値に対して色を決める
+        if(self.options.operation == "log10"){
+          color = self._getColor(Math.log10(num[i])); //数値に対して色を決める
+        }else if(self.options.operation == "sqrt"){
+          color = self._getColor(Math.sqrt(num[i])); //数値に対して色を決める
         }else{
-          color = k._getColor(num[i]); //数値に対して色を決める
+          color = self._getColor(num[i]); //数値に対して色を決める
         }
         imgData.data[idx    ] = color.r;
         imgData.data[idx + 1] = color.g;
@@ -147,13 +147,13 @@ L.GridLayer.NumData = L.GridLayer.extend({
 
       }
       /*等高線描画*/
-      if(k.options.contour){
-        imgData.data = k._drawContour(num, imgData.data);
+      if(self.options.contour){
+        imgData.data = self._drawContour(num, imgData.data);
       }
       /*canvasにイメージデータを貼り付ける*/
       ctx.putImageData(imgData, 0, 0);
       /*タイルの縁を描く*/
-      if(k.options.isGrid){
+      if(self.options.isGrid){
         ctx.strokeRect(0, 0, tileSize.x, tileSize.y);
       }
       /*タイル座標をかく*/
@@ -170,7 +170,7 @@ L.GridLayer.NumData = L.GridLayer.extend({
     tile.setAttribute('width', tileSize.x); //canvasの大きさ定義
     tile.setAttribute('height', tileSize.y);
     var ctx = tile.getContext('2d');
-    var k = this;
+    var self = this;
     var img = new Image();
     img.src = `${this._url}${coords.z}/${coords.x}/${coords.y}.png`;
     img.onload = function(){
