@@ -15,66 +15,14 @@ var map = L.map('map',{
   zoom: 0,
 });
 /*データタイル、ビュータイルのインスタンス生成*/
-var dataLayer_U = L.gridLayer.data('dataTile/U/',{
-  tileSize : new L.Point(240, 240)
-});
 
-var dataLayer_V = L.gridLayer.data('dataTile/V/',{
-  tileSize : new L.Point(240, 240)
-});
-
-var dataLayer_W = L.gridLayer.data('dataTile/W/',{
-  tileSize : new L.Point(240, 240)
-});
-
-var dataLayer_PT = L.gridLayer.data('dataTile/PT/',{
-  tileSize : new L.Point(240, 240)
-});
-
-var dataLayer_DENS = L.gridLayer.data('dataTile/DENS/',{
-  tileSize : new L.Point(240, 240)
-});
-
-var viewLayer_U = L.gridLayer.view({
+var layer_PT = L.gridLayer.numData('dataTile/PT/',{
   tileSize : new L.Point(240, 240),
-  dtLayerObj : dataLayer_U,
-  name: "U",
-  isGrid : true
-});
-
-var viewLayer_V = L.gridLayer.view({
-  tileSize : new L.Point(240, 240),
-  dtLayerObj : dataLayer_V,
-  name: "V",
-  isGrid : true
-});
-
-var viewLayer_W = L.gridLayer.view({
-  tileSize : new L.Point(240, 240),
-  dtLayerObj : dataLayer_W,
-  name: "W",
-  contour: true,
-  shade:   false,
-  isGrid : false
-});
-
-var viewLayer_PT = L.gridLayer.view({
-  tileSize : new L.Point(240, 240),
-  dtLayerObj : dataLayer_PT,
   name: "PT",
   operation: "",
   contour: false,
   shade:   true,
   isGrid : false
-});
-
-var viewLayer_DENS = L.gridLayer.view({
-  tileSize : new L.Point(240, 240),
-  dtLayerObj : dataLayer_DENS,
-  name: "DENS",
-  contour: false,
-  shade:   true,
-  isGrid : true
 });
 
 /*クロスヘアインスタンス生成*/
@@ -88,44 +36,29 @@ var cross = L.crosshairs({
   }
 });
 
-var dataLayer = [viewLayer_W,dataLayer_PT];
-var viewLayer = [viewLayer_W,viewLayer_PT];
+var layer = [layer_PT];
+var layerNum = layer.length;
+var activeLayer = 0;
 
-/*var dataLayer = [dataLayer_U,dataLayer_V,dataLayer_W,dataLayer_PT,dataLayer_DENS];
-var viewLayer = [viewLayer_U,viewLayer_V,viewLayer_W,viewLayer_PT,viewLayer_DENS];*/
-
-if(dataLayer.length == viewLayer.length){
-  var layerNum = dataLayer.length;
-  var activeLayer = 0;
-}else{
-  console.log("miss match data/view");
-  //return 1;
-}
 for(var i = layerNum - 1; i >= 0; i--){
-  map.addLayer(dataLayer[i]);
-}
-for(var i = layerNum - 1; i >= 0; i--){
-  map.addLayer(viewLayer[i]);
+  map.addLayer(layer[i]);
 }
 cross.addTo(map);
-drawText(viewLayer[activeLayer]);
+drawText(layer[activeLayer]);
 
 /*イベント*/
 /*クリック時　対象ピクセルの値を表示*/
+
 map.on('click', function(e){
-  var coords = lonlatToCoords(e.latlng.lat, e.latlng.lng, dataLayer[activeLayer]);
-  //var coords  = new L.Point(tmp.x, tmp.y);
-  //coords.z = tmp.z;
-  var point  = lonlatToTlPoint(e.latlng.lat, e.latlng.lng, dataLayer[activeLayer]);
-  var canvasElement = dataLayer[activeLayer].getCanvasElement( coords );
-  var canvasElement_view = viewLayer[activeLayer].getCanvasElement( coords );
-  var pixelData = getPixelData( canvasElement, point );
-  compRGB(canvasElement, canvasElement_view, point, e.latlng);
-  //console.log(canvasElement.getContext('2d').getImageData(0,0,240,240));
+  var coords = lonlatToCoords(e.latlng.lat, e.latlng.lng, layer[activeLayer]);
+  var point  = lonlatToTlPoint(e.latlng.lat, e.latlng.lng, layer[activeLayer]);
+  var pixelData = layer[activeLayer].getNum(coords, point);
   console.log( pixelData.toPrecision(5) );
 });
-var tmpOpacity = viewLayer_PT.options.opacity;
+
+var tmpOpacity = layer_PT.options.opacity;
 var flag = 1;
+/*
 /*キー押下時　諸々処理*/
 map.on('keypress', function(e){
   /*アクティブレイヤ切り替え*/
@@ -185,6 +118,8 @@ map.on('keypress', function(e){
   }
   drawText(viewLayer[activeLayer]);
 });
+
+
 
 /*memo*/
 /*dataLayer[0].on('load', function(e) {
