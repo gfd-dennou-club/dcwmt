@@ -118,7 +118,6 @@ L.GridLayer.NumData = L.GridLayer.extend({
     img.src = `${this._url}${coords.z}/${coords.x}/${coords.y}.png`;
     img.onload = function(){
       d_ctx.drawImage(img, 0, 0);//canvasオブジェクトの左上から画像を貼り付け
-
       d_imgData = d_ctx.getImageData(0,0,tileSize.x,tileSize.y);
       imgData = ctx.getImageData(0,0,tileSize.x,tileSize.y);
 
