@@ -15,7 +15,10 @@ var map = L.map('map',{
   zoom: 0,
 });
 /*データタイル、ビュータイルのインスタンス生成*/
-
+/*var dataLayer_U = L.gridLayer.numata('dataTile/U/',{
+  tileSize : new L.Point(240, 240)
+});
+map.addLayer(dataLayer_U);*/
 var layer_PT = L.gridLayer.numData('dataTile/PT/',{
   tileSize : new L.Point(240, 240),
   name: "PT",
@@ -24,7 +27,6 @@ var layer_PT = L.gridLayer.numData('dataTile/PT/',{
   shade:   true,
   isGrid : false
 });
-
 /*クロスヘアインスタンス生成*/
 var cross = L.crosshairs({
   style: {
@@ -122,7 +124,12 @@ map.on('keypress', function(e){
 
 
 /*memo*/
-/*dataLayer[0].on('load', function(e) {
-   console.log(e);
-
- }); //タイル読み込み時に発火*/
+layer[0].on('tileloadstart', function(e) {
+   console.log("開始");
+}); //タイル読み込み時に発火*/
+layer[0].on('tileunload', function(e) {
+    console.log("消");
+});
+layer[0].on('tileload', function(e) {
+   console.log("読");
+});
