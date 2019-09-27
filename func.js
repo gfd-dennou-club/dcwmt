@@ -81,7 +81,7 @@ function drawText(viewLayer){
 
   ctx_text.fillText("Active : "+viewLayer.options.name+"  (opacity : "+viewLayer.options.opacity+")",10, window.innerHeight-50);
   ctx_text.fillText("Range:["+viewLayer.min+", "+viewLayer.max+"]",10, window.innerHeight-30);
-
+  console.log(viewLayer);
 }
 /*1->01と表示する関数*/
 function get2digitsNum(number){
