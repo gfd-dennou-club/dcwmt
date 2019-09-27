@@ -12,19 +12,30 @@ var map = L.map('map',{
   //crs:L.CRS.Simple,
   maxZoom: 4,
   minZoom: 0,
-  zoom: 0,
+  zoom: 1,
 });
-/*データタイル、ビュータイルのインスタンス生成*/
-/*var dataLayer_U = L.gridLayer.numata('dataTile/U/',{
-  tileSize : new L.Point(240, 240)
-});
-map.addLayer(dataLayer_U);*/
+
 var layer_PT = L.gridLayer.numData('dataTile/PT/',{
   tileSize : new L.Point(240, 240),
   name: "PT",
   operation: "",
   contour: false,
   shade:   true,
+  isGrid : false
+});
+/*var layer_U = L.gridLayer.numData('dataTile/V/',{
+  tileSize : new L.Point(240, 240),
+  name: "U",
+  operation: "",
+  contour: false,
+  shade:   true,
+  isGrid : false
+});*/
+var layer_UV = L.gridLayer.vectorNumData('dataTile/U/','dataTile/V/',{
+  tileSize : new L.Point(240, 240),
+  name: "U-V",
+  size : 6, //矢印の長さ倍率
+  dens : 6, //1タイル中に描く矢印の本数(1〜15のうち 7,9,11,13,14でバグることを確認)
   isGrid : false
 });
 /*クロスヘアインスタンス生成*/
@@ -37,16 +48,26 @@ var cross = L.crosshairs({
     radius: 15
   }
 });
-
-var layer = [layer_PT];
-var layerNum = layer.length;
-var activeLayer = 0;
-
-for(var i = layerNum - 1; i >= 0; i--){
-  map.addLayer(layer[i]);
+var layer, layerNum, activeLayer
+layer = [layer_PT, layer_UV];
+var flag = 1;  //仮フラグ 0: トーン図同士の重ね合わせ　　1:　トーン図とベクトルの重ね合わせ
+if(flag == 0){
+  layerNum = layer.length;
+  activeLayer = 0;
+  for(var i = layerNum - 1; i >= 0; i--){
+    map.addLayer(layer[i]);
+  }
+}
+if(flag == 1){
+    map.addLayer(layer_PT);
+    map.addLayer(layer_UV);
+    layerNum = 1;
+    activeLayer = 0;
 }
 cross.addTo(map);
-drawText(layer[activeLayer]);
+//gridLayer.numData内で画像読み込み後に実行
+//値をreturnできないので画像を読み込んだ時点で実行しないといけない
+//drawText(layer[activeLayer]);
 
 /*イベント*/
 /*クリック時　対象ピクセルの値を表示*/
@@ -54,8 +75,8 @@ drawText(layer[activeLayer]);
 map.on('click', function(e){
   var coords = lonlatToCoords(e.latlng.lat, e.latlng.lng, layer[activeLayer]);
   var point  = lonlatToTlPoint(e.latlng.lat, e.latlng.lng, layer[activeLayer]);
-  var pixelData = layer[activeLayer].getNum(coords, point);
-  console.log( pixelData.toPrecision(5) );
+  layer[activeLayer].getNum(coords, point);
+  //  console.log( pixelData.toPrecision(5) );
 });
 
 var tmpOpacity = layer_PT.options.opacity;
@@ -69,7 +90,7 @@ map.on('keypress', function(e){
       if( activeLayer >= layerNum ){
         activeLayer = 0;
       }
-      viewLayer[activeLayer].bringToFront();
+      layer[activeLayer].bringToFront();
   }
   /*アクティブレイヤ切り替え*/
   if(e.originalEvent.key === "a"){
@@ -77,19 +98,23 @@ map.on('keypress', function(e){
       if( activeLayer < 0 ){
         activeLayer = layerNum - 1;
       }
-      viewLayer[activeLayer].bringToFront();
+      layer[activeLayer].bringToFront();
   }
   /*カラーマップのレンジ変更*/
   if(e.originalEvent.key === "r"){
-      updateClrmapRange(viewLayer[activeLayer]);
+      updateClrmapRange(layer[activeLayer]);
   }
   /*不透明度 入力&変更*/
   if(e.originalEvent.key === "t"){
       var opacity = window.prompt('不透明度');
       if(0 <= opacity && opacity <= 1){
-        viewLayer[activeLayer].options.opacity = opacity; //要注意 アクセス権限ガバガバ
+        layer[activeLayer].options.opacity = opacity; //要注意 アクセス権限ガバガバ
         //tmpOpacity = opacity; //不透明度強制0 On-Offを有効にするならコメント解除
       }
+  }
+  if(e.originalEvent.key === "q"){
+      alert(layer[activeLayer].max);
+      alert(layer[activeLayer].min);
   }
   /*不透明度強制0 On Off*/
   /*
@@ -108,28 +133,14 @@ map.on('keypress', function(e){
       var input = get2digitsNum( window.prompt('colormap') );
       try{
         console.log(eval( "clrmap_"+input ));
-        viewLayer[activeLayer]._colormap = eval( "clrmap_"+input );
+        layer[activeLayer]._colormap = eval( "clrmap_"+input );
       }catch{
         console.log("無効な値が入力されました");
       }
   }
 
   for(var i = 0; i < layerNum; i++){
-    dataLayer[i].redraw();
-    viewLayer[i].redraw();
+    layer[i].redraw();
   }
-  drawText(viewLayer[activeLayer]);
-});
-
-
-
-/*memo*/
-layer[0].on('tileloadstart', function(e) {
-   console.log("開始");
-}); //タイル読み込み時に発火*/
-layer[0].on('tileunload', function(e) {
-    console.log("消");
-});
-layer[0].on('tileload', function(e) {
-   console.log("読");
+  drawText(layer[activeLayer]);
 });
