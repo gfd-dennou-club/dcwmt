@@ -27,8 +27,9 @@ L.GridLayer.NumData = L.GridLayer.extend({
        ctx.drawImage(img, 0, 0);
        imgData = ctx.getImageData(0, 0, size.x, size.y);
        rgba = imgData.data;
+       //console.log(rgba);
        num = self._getNumData(rgba);
-       if(self.options.operation == "eddy_y" || self.options.operation == "eddy_x"){
+       if(self.options.operation == "eddy" || self.options.operation == "eddy_y" || self.options.operation == "eddy_x"){
          this._mean = self._getMean(num);
          num = self._getNumDataDiff(num);
          //console.log(mean);
@@ -42,6 +43,7 @@ L.GridLayer.NumData = L.GridLayer.extend({
            self.min = num[i];
          }
       }
+      //alert(self.min);
       drawText(self);
     }
      //alert("init");
@@ -51,7 +53,15 @@ L.GridLayer.NumData = L.GridLayer.extend({
     var i,x,y,size;
     size = this.getTileSize();
 
-    if(this.options.operation == "eddy_y"){
+    if(this.options.operation == "eddy"){
+      this._mean = 0;
+
+        for(var i = 0; i < size.y * size.x; i++){
+            this._mean += num[i];
+        }
+        this._mean /= size.y * size.x;
+        //console.log(this._mean);
+    }else if(this.options.operation == "eddy_y"){
       for(i = 0; i < size.x; i++){    //配列の初期化
         this._mean[i] = 0;
       }
@@ -85,10 +95,12 @@ L.GridLayer.NumData = L.GridLayer.extend({
   _getNumDataDiff : function(num){
     var size, i;
     size = this.getTileSize();
-    //console.log(mean);
+    //console.log(this._mean);
     //console.log(num);
     for(var i = 0; i < size.y * size.x; i++){
-      if(this.options.operation == "eddy_y"){
+      if(this.options.operation == "eddy"){
+        num[i] = num[i] - this._mean;
+      }else if(this.options.operation == "eddy_y"){
         num[i] = num[i] - this._mean[i%size.x];
       }else if(this.options.operation == "eddy_x"){
         num[i] = num[i] - this._mean[i%size.x];
@@ -98,6 +110,7 @@ L.GridLayer.NumData = L.GridLayer.extend({
         alert("Error");
       }
     }
+    //console.log(num);
     return num;
   },
   _loader : function(expectedCnt, callback){
@@ -188,12 +201,33 @@ L.GridLayer.NumData = L.GridLayer.extend({
         imgData = ctx.getImageData(point.x, point.y, 1, 1);
         rgba = imgData.data;
         num = self._getNumData(rgba);
-        if(self.options.operation == "eddy_y" || self.options.operation == "eddy_x"){
+        if(self.options.operation == "eddy" || self.options.operation == "eddy_y" || self.options.operation == "eddy_x"){
           num = self._getNumDataDiff(num);
           //console.log(mean);
         }
         alert( num[0].toPrecision(5) );
     }
+  },
+  _drawContour: function(numData, color_array){
+    var tileSize = this.getTileSize();
+    var idx;
+    var numData_sub = [];
+    for(var i = 0; i < tileSize.y * tileSize.x; i++){
+      numData_sub[i] = Math.floor(numData[i]/10);
+    }
+    for(var i = 0; i < tileSize.y * tileSize.x; i++){
+      idx = i * 4;
+      if((i + 1)%tileSize.x == 0 || i/tileSize.y >= tileSize.y-1 ){
+        continue;
+      }
+      if(numData_sub[i] !== numData_sub[i+1] || numData_sub[i] !== numData_sub[i+tileSize.x] || numData_sub[i] !== numData_sub[i+tileSize.x+1]){
+        color_array[idx    ] = 0;
+        color_array[idx + 1] = 0;
+        color_array[idx + 2] = 0;
+        color_array[idx + 3] = 255;
+      }
+    }
+    return color_array;
   },
   /*tileにrgbaデータを元に描画*/
   _draw: function(tile, rgba){
@@ -203,20 +237,36 @@ L.GridLayer.NumData = L.GridLayer.extend({
     imgData = ctx.getImageData(0, 0, size.x, size.y);
 
     num = this._getNumData(rgba);
-    if(this.options.operation == "eddy_y" || this.options.operation == "eddy_x"){
+    if(this.options.operation == "eddy" || this.options.operation == "eddy_y" || this.options.operation == "eddy_x"){
       num = this._getNumDataDiff(num);
       //console.log(mean);
     }
 
+    if( this.options.shade ){
+      //実数値から塗りつぶす色決定しイメージデータを書き換
+      for(var i = 0; i < size.y * size.x; i++){
+         idx = i * 4;
+         color = this._getColor(num[i]); //数値に対して色を決める
+         imgData.data[idx + 3] = 255;
+         imgData.data[idx    ] = color.r;
+         imgData.data[idx + 1] = color.g;
+         imgData.data[idx + 2] = color.b;
+       }
+       if(0){
+         for(var y = 0; y < size.y; y+=2){
+           for(var x = 0; x < size.x; x+=2){
+             color = this._getColor(num[i]);
+             imgData.data[idx    ] = color.r;
+             imgData.data[idx + 4] = color.r;
+             imgData.data[idx + 1] = color.g;
+             imgData.data[idx + 2] = color.b;
+           }
+         }
+       }
 
-    //実数値から塗りつぶす色決定しイメージデータを書き換
-    for(var i = 0; i < size.y * size.x; i++){
-       idx = i * 4;
-       color = this._getColor(num[i]); //数値に対して色を決める
-       imgData.data[idx + 3] = 255;
-       imgData.data[idx    ] = color.r;
-       imgData.data[idx + 1] = color.g;
-       imgData.data[idx + 2] = color.b;
+     }
+     if( this.options.contour ){
+      imgData.data = this._drawContour(num, imgData.data);
      }
      ctx.putImageData(imgData, 0, 0);
      if(this.options.isGrid){
