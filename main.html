@@ -29,6 +29,7 @@
         <ul class="dropdwn_menu">
             <li><a id="lnk_set_opacity" href="javascript:void(0);">不透明度</a></li>
             <li><a id="link02" href="javascript:void(0);">トーンの範囲</a></li>
+            <li><a id="lnk_math" href="javascript:void(0);">数学的操作</a></li>
         </ul>
     </li>
     <li id="menu_b">カラーマップ関連
@@ -67,6 +68,19 @@
     <div id="div2" style="display:none;">
       max<input type="text" id="toneRangeMax" size="5" maxlength="5"><br>
       min<input type="text" id="toneRangeMin" size="5" maxlength="5">
+    </div>
+
+    <div id="dlg_math">
+      <form id="target">
+	       <input name="math" type="radio" value="a"> 通常
+	       <input name="math" type="radio" value="b"> log10
+	       <input name="math" type="radio" value="c"> sqrt
+         <br>
+         <input name="math" type="radio" value="d"> eddy_x
+         <input name="math" type="radio" value="e"> eddy_y
+         <br>
+         <input name="math" type="radio" value="f"> eddy_xy
+       </form>
     </div>
 
     <div id="dlg_ch_clrmap">
@@ -183,8 +197,8 @@
   <!-- //////////Leaflet related////////// -->
   <canvas id="text" width="300" height="100"></canvas>
   <div id="map"></div>
+  <script src="define.js"></script>
   <script src="main.js"></script>
-  <script src="define_tile.js"></script>
   <span id = "slider_parent">
 
     <div id="slider_h"></div>

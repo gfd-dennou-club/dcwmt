@@ -160,6 +160,26 @@ $(function() {
     $("#lnk_is_grid").click(function() {
         $("#dlg_is_grid").dialog("open");
     });
+
+    $("#dlg_math").dialog({
+      autoOpen:false, //呼ばれ妻で非表示
+      modal:true, //モーダル表示
+      title:"数学的操作", //タイトル
+      buttons: { //ボタン
+        "決定": function() {
+          
+            layergroup.getActiveLayer().setOperation( $("input[name='math']:checked").val()  );
+            //layergroup.getActiveLayer().setIsGrid($("#check_is_grid").prop('checked'));
+            $(this).dialog("close");
+        },
+        "キャンセル": function() {
+            $(this).dialog("close");
+        }
+      }
+    });
+    $("#lnk_math").click(function() {
+        $("#dlg_math").dialog("open");
+    });
 });
 
 /*

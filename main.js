@@ -2,31 +2,70 @@
 var buf = new ArrayBuffer(4);       //32bitのバッファ用意
 var data_view = new DataView(buf);  //用意したバッファにDataViewクラスを介して入出力
 var min, max;                 //カラーマップの最大、最小、各色の差
-var new_crs_simple = L.Util.extend({}, L.CRS.Simple, {
-  wrapLng: [0,  240],
-  wrapLat: [0, -240]
-});
+var new_crs_simple
+if(typeof continuous !== 'undefined' && continuous){
+  new_crs_simple = L.Util.extend({}, L.CRS.Simple, {
+    wrapLng: [0,  tile_size_x],
+   wrapLat: [0, -tile_size_y]
+  });
+}else{
+  new_crs_simple = L.Util.extend({}, L.CRS.Simple, {
+    wrapLng: [0, tile_size_y]
+  });
+}
+
 var map = L.map('map',{
   center: [0, 0],
   crs:new_crs_simple,
   //crs:L.CRS.Simple,
-  maxZoom: 4,//9以上で表示がおかしくなる?
+  maxZoom: max_zoom,
   minZoom: 0,
   zoom: 0,
 });
 
+var layer=[];
+var layer_vec=[];
+var baseMaps = {};
+var overlayMaps = {};
+
+for(var i = 0; i < value_name.length; i++){
+  layer[i] = L.gridLayer.numData(`${dir_root}/${value_name[i]}`,{
+    tileSize : new L.Point(tile_size_x, tile_size_y),//タイルの大きさを定義 new L.Point(横の解像度, 縦の解像度),
+    dir_t    : dir_time,
+    dir_d    : dir_dim
+  });
+
+  var q=layer[i];
+  eval("baseMaps." + value_name[i]+ "=layer[i];");
+  eval("overlayMaps." + value_name[i]+ "=layer[i];");
+}
+//baseMaps.PTemp = layer[0];
+//baseMaps.VelX = layer[1];
+for(var i = 0; i < value_name_vec.length; i+=2){
+  layer_vec[i/2] = L.gridLayer.vectorNumData(`${dir_root}/${value_name_vec[i+0]}`,`${dir_root}/${value_name_vec[i+1]}`,{
+    tileSize : new L.Point(tile_size_x, tile_size_y),//タイルの大きさを定義 new L.Point(横の解像度, 縦の解像度),
+    dir_t    : dir_time,
+    dir_d    : dir_dim,
+    size : 6, //矢印の長さ倍率
+    dens : 8
+  });
+  //eval("baseMaps." + value_name_vec[i+0] + "=layer_vec[i/2];");
+  eval("overlayMaps.vec_"+ value_name_vec[i+0] +""+value_name_vec[i+1]+ "=layer_vec[i/2];");
+}
+var layergroup = L.layerCtl(baseMaps, overlayMaps);
+layergroup.addTo(map);
 
 
+//以下Leaflet内で呼ばれる関数  そのうちfinc.jsに記述
 map.on('click', function(e){
   var coords = lonlatToCoords(e.latlng.lat, e.latlng.lng, layergroup.getActiveLayer());
   var point  = lonlatToTlPoint(e.latlng.lat, e.latlng.lng, layergroup.getActiveLayer());
   //layer_PT.getNum(coords, point);
-  //layergroup.getActiveLayer().getNum(coords, point);
-  console.log(layergroup.getActiveLayer());
+
   layergroup.getActiveLayer().getNum(coords, point);
 });
 var playback = function(){
-  console.log("dd");
+
   //for( key in baseMaps ) {
   //  if( baseMaps.hasOwnProperty(key) ) {
       //baseMaps[key].switchLayer("t", 1);
@@ -49,8 +88,8 @@ var playback_dim = function(){
       baseMaps[key].redraw();
     }
   }*/
-  layergroup.getActiveLayer().switchLayer("h", 1);
-  $("#slider_h").slider("value",layergroup.getActiveLayer().activeZ);
+  layergroup.getActiveLayer().switchLayer("d", 1);
+  $("#slider_h").slider("value",layergroup.getActiveLayer().activeD);
   //baseMaps[key].redraw();
   layergroup.getActiveLayer().redraw();
 }
@@ -77,7 +116,7 @@ function stopTimer(){
 }
 
 map.on('move', function(e){
-  drawText(pt);
+  drawText(layergroup.getActiveLayer());
 });
 map.on('keypress', function(e){
   var active;
@@ -139,8 +178,8 @@ map.on('keypress', function(e){
   if(e.originalEvent.key === "a"){
 
   }
-  layer_PT.redraw();
+  layergroup.getActiveLayer().redraw();
   //console.log($(".leaflet-control-layers-selector"));
   //console.log($("input[name='leaflet-base-layers']:checked").val());
-  drawText(pt);
+  drawText(layergroup.getActiveLayer());
 });

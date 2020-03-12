@@ -1,12 +1,46 @@
 L.GridLayer.VectorNumData = L.GridLayer.extend({
   initialize: function(url1, url2, options){
+    this.activeT = 0;
+    this.activeD = 0;
     this._url = new Array(2);
-    this._url[0] = url1;
-    this._url[1] = url2;
     L.Util.setOptions(this, options);
+    this._imgRootDir1 = url1;
+    this._imgRootDir2 = url2;
+    this.switchLayer("t",0);
+    this.switchLayer("d",0);
+    this.options.shade=true
+
+    //Z=0のタイル座標の生成
     var coords  = new L.Point(0, 0);
     coords.z = 0;
-    //this.getInitRange(coords);
+
+    //インスタンス変数定義
+//    this.getInitRange(coords);
+//    this._colormap = clrmap_04;
+    this._cnt = 0;
+  },
+  switchLayer : function(dim, num){
+    if(dim == "d"){
+      this.activeD += num;
+      if(this.activeD < 0){
+        this.activeD = this.options.dir_d.length-1;
+      }else if(this.activeD >= this.options.dir_d.length){
+        this.activeD = 0;
+      }
+      this._url[0] = `${this._imgRootDir1}/${this.options.dir_t[this.activeT]}/${this.options.dir_d[this.activeD]}`;
+      this._url[1] = `${this._imgRootDir2}/${this.options.dir_t[this.activeT]}/${this.options.dir_d[this.activeD]}`;
+      return this.activeD;
+    }else if(dim == "t"){
+      this.activeT += num;
+      if(this.activeT < 0){
+        this.activeT = this.options.dir_t.length-1;
+      }else if(this.activeT >=  this.options.dir_t.length){
+        this.activeT = 0;
+      }
+      this._url[0] = `${this._imgRootDir1}/${this.options.dir_t[this.activeT]}/${this.options.dir_d[this.activeD]}`;
+      this._url[1] = `${this._imgRootDir2}/${this.options.dir_t[this.activeT]}/${this.options.dir_d[this.activeD]}`;
+      return this.activeT;
+    }
   },
   /*
   getInitRange: function(coords){
@@ -209,7 +243,7 @@ L.GridLayer.VectorNumData = L.GridLayer.extend({
 
     for(i = 0; i < 2; i++){
       img[i] = new Image();
-      img[i].src = `${this._url[i]}${coords.z}/${coords.x}/${coords.y}.png`;
+      img[i].src = `${this._url[i]}/${coords.z}/${coords.x}/${coords.y}.png`;
       d_tile[i] = L.DomUtil.create('canvas', 'leaflet-tile');
       d_tile[i].width = size.x;
       d_tile[i].height = size.y;

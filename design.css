@@ -27,7 +27,7 @@ html, body{
 #slider_parent{
   position: absolute;
   right: 20px;
-  left: 650px;
+  left: 550px;
 
   bottom: 10px;
   z-index:3;
@@ -44,7 +44,7 @@ html, body{
     width:30px;/*下限有*/
     height:25px;
     position: absolute;
-    left: 590px;
+    left: 490px;
     bottom: 35px;
     z-index: 3;
 }
@@ -52,7 +52,7 @@ html, body{
     width:30px;/*下限有*/
     height:25px;
     position: absolute;
-    left: 590px;
+    left: 490px;
     bottom: 5px;
     z-index: 3;
 }

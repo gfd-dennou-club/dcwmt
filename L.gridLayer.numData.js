@@ -1,4 +1,4 @@
-L.GridLayer.NumDataGroup = L.GridLayer.extend({
+L.GridLayer.NumData = L.GridLayer.extend({
   /*インスタンス変数*/
   // _imgRootDir : 数値データタイルが格納されるディレクトリツリーのトップ
   // cross_sect  : アクティブな断面 0=xy 1=xz 2=yz
@@ -13,13 +13,14 @@ L.GridLayer.NumDataGroup = L.GridLayer.extend({
   // URL : タイルのURL
   initialize: function(url, options){
     //インスタンス変数定義
-
-    this._imgRootDir = url;
-    this.cross_sect=0;
-
-    this.setURL(this.cross_sect);
+    //console.log(url);
+    this.activeT = 0;
+    this.activeD = 0;
     L.Util.setOptions(this, options);
-    this.options.shade=true
+    this._imgRootDir = url;
+    this.switchLayer("t",0);
+    this.switchLayer("d",0);
+    this.options.shade=true;
 
     //Z=0のタイル座標の生成
     var coords  = new L.Point(0, 0);
@@ -71,33 +72,31 @@ L.GridLayer.NumDataGroup = L.GridLayer.extend({
      //alert("init");
   },
 
-  setURL : function(cross_sect){  /*public*/
-    this.cross_sect = cross_sect;
-    if(cross_sect == 0){
-      //this._url = this.base_url+"/xy"
-      this._url = `${this._imgRootDir}`
-    }else if(cross_sect == 1){
-      this._url = `${this._imgRootDir}`
-    }else if(cross_sect == 2){
-      this._url = `${this._imgRootDir}`
-    }
-  },
+
   switchLayer : function(dim, num){
-    if(dim == "h"){
-      this.activeZ += num;
-      if(this.activeZ < 0){
-        this.activeZ = this.Z.length-1;
-      }else if(this.activeZ >=  this.Z.length){
-        this.activeZ = 0;
+    if(dim == "d"){
+      this.activeD += num;
+      if(this.activeD < 0){
+        this.activeD = this.options.dir_d.length-1;
+      }else if(this.activeD >= this.options.dir_d.length){
+        this.activeD = 0;
       }
-      return this.activeH;
+      this._url = `${this._imgRootDir}/${this.options.dir_t[this.activeT]}/${this.options.dir_d[this.activeD]}`;
+      var coords  = new L.Point(0, 0);
+      coords.z = 0;
+      this.getInitRange(coords);
+      return this.activeD;
     }else if(dim == "t"){
       this.activeT += num;
       if(this.activeT < 0){
-        this.activeT = this.T.length-1;
-      }else if(this.activeT >=  this.T.length){
+        this.activeT = this.options.dir_t.length-1;
+      }else if(this.activeT >=  this.options.dir_t.length){
         this.activeT = 0;
       }
+      this._url = `${this._imgRootDir}/${this.options.dir_t[this.activeT]}/${this.options.dir_d[this.activeD]}`;
+      var coords  = new L.Point(0, 0);
+      coords.z = 0;
+      this.getInitRange(coords);
       return this.activeT;
     }
   },
@@ -238,6 +237,25 @@ L.GridLayer.NumDataGroup = L.GridLayer.extend({
       ctx.putImageData(imgData, 0, 0);
       return tile;
    },*/
+  setOperation: function(flag){
+    if(flag=="b"){
+      this.options.operation = "log10";
+    }else if(flag=="c"){
+      this.options.operation = "sqrt";
+    }else if(flag=="d"){
+      this.options.operation = "eddy_x";
+    }else if(flag=="e"){
+      this.options.operation = "eddy_y";
+    }else if(flag=="f"){
+      this.options.operation = "eddy";
+    }else{
+      this.options.operation = "";
+    }
+    var coords  = new L.Point(0, 0);
+    coords.z = 0;
+    this.getInitRange(coords);
+    this.redraw();
+  },
   getNum: function(coords, point){
     var imgData, rgba, num;
     var size, self, canvas, ctx, imgData, rgba, pxNum;
@@ -258,7 +276,7 @@ L.GridLayer.NumDataGroup = L.GridLayer.extend({
           num = self._getNumDataDiff(num);
           //console.log(mean);
         }
-        console.log(map.dragging._enabled);
+        //console.log(map.dragging._enabled);
 
         alert( num[0].toPrecision(5) );
 
@@ -269,10 +287,12 @@ L.GridLayer.NumDataGroup = L.GridLayer.extend({
     var idx;
     var numData_sub = [];
     for(var i = 0; i < tileSize.y * tileSize.x; i++){
-      numData_sub[i] = Math.floor(numData[i]/10);
+      numData_sub[i] = Math.floor(numData[i]);
+      //console.log(numData_sub[i]);
     }
     for(var i = 0; i < tileSize.y * tileSize.x; i++){
       idx = i * 4;
+      //自分の画素と右、右下、下の画素と比較し書くので、右下の辺上のピクセルには書けない
       if((i + 1)%tileSize.x == 0 || i/tileSize.y >= tileSize.y-1 ){
         continue;
       }
@@ -321,8 +341,6 @@ L.GridLayer.NumDataGroup = L.GridLayer.extend({
       //console.log(map.options.maxZoom+"    "+coords.z  );
       //実数値から塗りつぶす色決定しイメージデータを書き換
       if(1){
-        console.log("sss");
-        //console.log("normal zooming");
         for(var i = 0; i < size.y * size.x; i++){
            idx = i * 4;
            color = this._getColor(num[i]); //数値に対して色を決める
@@ -348,6 +366,7 @@ L.GridLayer.NumDataGroup = L.GridLayer.extend({
        }
        //console.log(imgData.data);
      }
+
      if( this.options.contour ){
       imgData.data = this._drawContour(num, imgData.data);
      }
@@ -421,6 +440,6 @@ L.GridLayer.NumDataGroup = L.GridLayer.extend({
 });
 
 
-L.gridLayer.numDataGroup = function(url, opts) {
-  return new L.GridLayer.NumDataGroup(url, opts);
+L.gridLayer.numData = function(url, opts) {
+  return new L.GridLayer.NumData(url, opts);
 };

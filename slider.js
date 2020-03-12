@@ -2,11 +2,13 @@ $(function() {
   $( "#slider_h" ).slider({
     value:0,
     min:0,
-    max:4,
+    max:dir_dim.length-1,
     step:1,
     range:"min",
     change: function (e, ui) {
-      layergroup.getActiveLayer().activeZ = ui.value;
+      layergroup.getActiveLayer().activeD = ui.value;
+      layergroup.getActiveLayer().switchLayer("d",0);
+
       //layergroup.getActiveLayer().setURL();
       layergroup.getActiveLayer().redraw();
 
@@ -20,13 +22,14 @@ $(function() {
   $( "#slider_t" ).slider({
     value:0,
     min:0,
-    max:11,
+    max:dir_time.length-1,
     step:1,
     range:"min",
     change: function (e, ui) {
-      layer_PT.activeT = ui.value;
-      layer_PT.redraw();
-      drawText(layer_PT);
+      layergroup.getActiveLayer().activeT = ui.value;
+      layergroup.getActiveLayer().switchLayer("t",0);
+      layergroup.getActiveLayer().redraw();
+      drawText(layergroup.getActiveLayer());
 
     }
   });
