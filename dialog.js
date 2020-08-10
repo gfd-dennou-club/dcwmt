@@ -106,13 +106,6 @@ $(function() {
                 baseMaps[key].getInitRange(coords);
               }
             }
-            /*for(let i = 0; i < baseMaps.length; i++){
-              layer[i].setURL( obj.value );
-              map.removeLayer(layer[i]);
-              map.addLayer(layer[i]);
-              layer[i].getInitRange(coords);
-              layer[i].redraw();
-            }*/
             //インスタンス変数定義
 				    $(this).dialog("close");
 				},
@@ -169,7 +162,6 @@ $(function() {
         "決定": function() {
           
             layergroup.getActiveLayer().setOperation( $("input[name='math']:checked").val()  );
-            //layergroup.getActiveLayer().setIsGrid($("#check_is_grid").prop('checked'));
             $(this).dialog("close");
         },
         "キャンセル": function() {
@@ -181,18 +173,3 @@ $(function() {
         $("#dlg_math").dialog("open");
     });
 });
-
-/*
-$(function() {
-  // 1アイコンをボタン左に表示
-  $("#play").button({ //classで指定するとなぜか位置が指定できない
-    icons: {
-      primary: 'ui-icon-play'
-    },
-    text: false
-  });
-  $("#play").click(function() {
-    alert("sss");
-  });
-});
-console.log($('button.play'));*/

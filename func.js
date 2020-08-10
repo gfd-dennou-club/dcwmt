@@ -2,8 +2,6 @@
 
 /*カラーマップレンジ変更*/
 function updateClrmapRange(viewLayer){
-  /*let tmp_min = Math.floor( window.prompt('最小値') );
-  let tmp_max = Math.ceil ( window.prompt('最大値') );*/
   let tmp_min = Number(window.prompt('最小値'));
   let tmp_max = Number(window.prompt('最大値'));
   if( tmp_min < tmp_max){ //不正な値・文字列が入った場合に更新しないようにする
@@ -45,8 +43,6 @@ function lonlatToCoords(lat, lon, layer){
     coords.y = parseInt( -lat / dividedSize.y % division);
   }
   coords.z = z;
-  /*console.log(`${lat}/${dividedSize.x}`);
-  console.log(coords);*/
   return coords;
 }
 /*緯度経度をタイル内座標に変換する
@@ -57,7 +53,7 @@ function lonlatToTlPoint(lat, lon, layer){
   let z =layer._tileZoom;	//ズームレベル
   let tlOneSide = 2 ** z; //一辺のタイル分割数
   //ClockTilePoint計算
-  clTlPoint.x = lon < 0 ? (       lon  * tlOneSide % tileSize.x + tileSize.x) % tileSize.x :  lon * tlOneSide % tileSize.x;
+  clTlPoint.x = lon < 0 ? ( lon  * tlOneSide % tileSize.x + tileSize.x) % tileSize.x :  lon * tlOneSide % tileSize.x;
   clTlPoint.y = lat > 0 ? ((tileSize.y - lat) * tlOneSide % tileSize.y + tileSize.y) % tileSize.y : -lat * tlOneSide % tileSize.y;
   return clTlPoint;
 }
@@ -65,7 +61,6 @@ function lonlatToTlPoint(lat, lon, layer){
 引数(canvasオブジェクト, タイル内座標)  戻り値 float数値*/
 function getPixelData(canvasElement, point){
   let ctx = canvasElement.getContext('2d');
-  //ctx.fillRect(0,0,100,100);///////////////////////////for debug(指定キャンバスが取れるか？)
   let pixelColor = ctx.getImageData(point.x, point.y, 1, 1);
   let buf = new ArrayBuffer(4); //32bitのバッファ用意
   let data_view = new DataView(buf); //用意したバッファにDataViewクラスを介して入出力
@@ -112,29 +107,12 @@ function drawText(viewLayer){
   //canvasのサイズを動的に変更（同時に白紙になる）
   canvas.setAttribute("width", window.innerWidth);//-10はスクロールバーを考慮
   canvas.setAttribute("height", window.innerHeight);//上と同様
-	//if( ! canvas || ! canvas.getContext ) { return false; }//canvas要素の存在チェックとCanvas未対応ブラウザの対処
   let ctx = canvas.getContext('2d');
   ctx.font = "bold 16px 'Arial'";
 
-  // ctx.fillText(" "+layergroup.active.name+"  (opacity : "+viewLayer.options.opacity+")", 120, window.innerHeight-20);
   ctx.fillText(" "+viewLayer.options.dir_d[viewLayer.activeD]+"", 380, window.innerHeight-35);
   ctx.fillText(" "+viewLayer.options.dir_t[viewLayer.activeT]+"", 380, window.innerHeight-10);
-//HとTのパラメータ表示
-  //ctx.fillText(layer_PT.H[layer_PT.activeH],580, window.innerHeight-50);
-  //ctx.fillText(layer_PT.T[layer_PT.activeT],600, window.innerHeight-20);
 
-//再生ボタン表示
-/*
-  if(play){
-    ctx.fillText("再生",590, window.innerHeight-5);
-  }else{
-    ctx.fillText("停止",590, window.innerHeight-5);
-  }
-  */
-  //ctx.strokeRect(580, window.innerHeight-40,20,20);
-
-
-  //console.log(viewLayer);
   for(let i = 0; i < viewLayer._colormap.length; i++){
 
     if(i == 0){
@@ -195,7 +173,6 @@ function drawText(viewLayer){
   ctx.fillStyle = "rgb(0,0,0)";		//色指定
     let delta_x_axis = size.x/(2**map.getZoom())/axisNum;//ブラウザ上において何ピクセル毎によこ軸を描くか
     let delta_y_axis = size.y/(2**map.getZoom())/axisNum;//ブラウザ上において何ピクセル毎にたて軸を描くか
-    //let t = ctx.fillRect(0,window.innerHeight-100,1000,1000);
 
   ///////////////draw X axis//////////////
   for(let i = getGoodPlace_X(delta_x_axis);i<Math.floor(bounds.getEast());i+=delta_x_axis){
@@ -217,9 +194,3 @@ function drawText(viewLayer){
 function get2digitsNum(number){
   return ("0" + number).slice(-2);
 }
-/*ボタンのクリックイベントテンプレ
-document.getElementById("button").onclick = function({
-  alert("click");
-  console.log("ddd");
-}
-*/

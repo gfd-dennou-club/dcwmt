@@ -17,7 +17,6 @@ if(typeof continuous !== 'undefined' && continuous){
 let map = L.map('map',{
   center: [0, 0],
   crs:new_crs_simple,
-  //crs:L.CRS.Simple,
   maxZoom: max_zoom,
   minZoom: 0,
   zoom: 0,
@@ -60,50 +59,22 @@ layergroup.addTo(map);
 map.on('click', function(e){
   let coords = lonlatToCoords(e.latlng.lat, e.latlng.lng, layergroup.getActiveLayer());
   let point  = lonlatToTlPoint(e.latlng.lat, e.latlng.lng, layergroup.getActiveLayer());
-  //layer_PT.getNum(coords, point);
 
   layergroup.getActiveLayer().getNum(coords, point);
 });
 let playback = function(){
-
-  //for( key in baseMaps ) {
-  //  if( baseMaps.hasOwnProperty(key) ) {
-      //baseMaps[key].switchLayer("t", 1);
       layergroup.getActiveLayer().switchLayer("t", 1);
       $("#slider_t").slider("value",layergroup.getActiveLayer().activeT);
-      //baseMaps[key].redraw();
       layergroup.getActiveLayer().redraw();
-  //  }
-//  }
-//  $("#slider_t").slider("value",layergroup.getActiveLayer().activeT);
-  //  console.log("11");
-  //console.log($("#slider_t"));
 }
 let playback_dim = function(){
-  /*for( key in baseMaps ) {
-    if( baseMaps.hasOwnProperty(key) ) {
-
-      baseMaps[key].switchLayer("h", 1);
-      $("#slider_h").slider("value", layergroup.getActiveLayer().activeZ);
-      baseMaps[key].redraw();
-    }
-  }*/
   layergroup.getActiveLayer().switchLayer("d", 1);
   $("#slider_h").slider("value",layergroup.getActiveLayer().activeD);
-  //baseMaps[key].redraw();
   layergroup.getActiveLayer().redraw();
 }
-/*
-let rewind = function(){
-  active = layer_PT.switchLayer("t", -1);
-  layer_PT.redraw();
-  $("#slider_t").slider("value", active);
-}
-*/
 
 let testTimer, play = 0;
 function startTimer(dim){
-  //console.trace();
   if(dim=="t"){
     testTimer=setInterval(playback,1000);
   }else{
@@ -161,7 +132,6 @@ map.on('keypress', function(e){
   /*カラーマップの範囲設定*/
   if(e.originalEvent.key === "r"){
       updateClrmapRange(layer_PT);
-      //layer_PT.redraw();
   }
 
   if(e.originalEvent.key === "c"){
@@ -172,14 +142,11 @@ map.on('keypress', function(e){
       }catch{
         console.log("無効な値が入力されました");
       }
-      //layer_PT.redraw();
   }
 
   if(e.originalEvent.key === "a"){
 
   }
   layergroup.getActiveLayer().redraw();
-  //console.log($(".leaflet-control-layers-selector"));
-  //console.log($("input[name='leaflet-base-layers']:checked").val());
   drawText(layergroup.getActiveLayer());
 });

@@ -51,14 +51,11 @@ L.GridLayer.NumData = L.GridLayer.extend({
        ctx.drawImage(img, 0, 0);
        imgData = ctx.getImageData(0, 0, size.x, size.y);
        rgba = imgData.data;
-       //console.log(rgba);
        num = self._getNumData(rgba);
        if(self.options.operation == "eddy" || self.options.operation == "eddy_y" || self.options.operation == "eddy_x"){
          this._mean = self._getMean(num);
          num = self._getNumDataDiff(num);
-         //console.log(mean);
        }
-       //console.log(num);
        for(let i = 0; i < size.y * size.x; i++){
          if(num[i] > self.max ){
            self.max = num[i];
@@ -69,7 +66,6 @@ L.GridLayer.NumData = L.GridLayer.extend({
       }
       drawText(self);
     }
-     //alert("init");
   },
 
 
@@ -101,7 +97,6 @@ L.GridLayer.NumData = L.GridLayer.extend({
     }
   },
   _getMean : function(num){
-    //let mean = [];
     let i,x,y,size;
     size = this.getTileSize();
 
@@ -112,7 +107,6 @@ L.GridLayer.NumData = L.GridLayer.extend({
             this._mean += num[i];
         }
         this._mean /= size.y * size.x;
-        //console.log(this._mean);
     }else if(this.options.operation == "eddy_y"){
       for(i = 0; i < size.x; i++){    //配列の初期化
         this._mean[i] = 0;
@@ -128,27 +122,20 @@ L.GridLayer.NumData = L.GridLayer.extend({
       for(i = 0; i < size.y; i++){  //配列の初期化
         this._mean[i] = 0;
       }
-    //  console.log(mean);
       for(x = 0; x < size.x; x ++){
         for(y = 0; y < size.y; y++){
           this._mean[x] += num[y*size.x+x];
-          if(x == 0){
-            //console.log(y*size.x+x);
-          }
+          if(x == 0){}
         }
         this._mean[x] /= size.y;
       }
-      //console.log(mean[1]);
     }else{
       alert("Error");
     }
-    //console.log(mean)
   },
   _getNumDataDiff : function(num){
     let size, i;
     size = this.getTileSize();
-    //console.log(this._mean);
-    //console.log(num);
     for(let i = 0; i < size.y * size.x; i++){
       if(this.options.operation == "eddy"){
         num[i] = num[i] - this._mean;
@@ -157,12 +144,10 @@ L.GridLayer.NumData = L.GridLayer.extend({
       }else if(this.options.operation == "eddy_x"){
         num[i] = num[i] - this._mean[i%size.x];
         this._cnt++;
-        //if(this._cnt<100)console.log(i%size.x);
       }else{
         alert("Error");
       }
     }
-    //console.log(num);
     return num;
   },
   _loader : function(expectedCnt, callback){
@@ -176,7 +161,6 @@ L.GridLayer.NumData = L.GridLayer.extend({
     let numData = [];
     let idx;
     let r,g,b;
-    //console.log(rgba);
     for(let i = 0; i < tileSize.y * tileSize.x; i++){
       idx = i * 4;
       r = rgba[idx] << 24;
@@ -196,7 +180,6 @@ L.GridLayer.NumData = L.GridLayer.extend({
     return numData;
   },
   _getColor: function(value) {
-    //console.log(this.max);
 
     let diff = (this.max - this.min) / (this._colormap.length - 2);
     if( value === 0.0000000000 ){     //読み込み失敗タイルは白く塗りつぶす
@@ -212,31 +195,8 @@ L.GridLayer.NumData = L.GridLayer.extend({
         }
       }
     }
-    //console.log("a");
     return {r:255, g:255, b:255, a:255};
   },
-   /*_draw: function(rgba){
-     let tile, size, ctx, num;
-     tile = L.DomUtil.create('canvas', 'leaflet-tile');
-     // setup tile width and height according to the options
-     size = this.getTileSize(this.cross_sect);
-     tile.width = size.x;
-     tile.height = size.y;
-     ctx = tile.getContext('2d');
-     imgData = ctx.getImageData(0, 0, size.x, size.y);
-     num = this._getNumData(rgba);
-     //実数値から塗りつぶす色決定しイメージデータを書き換
-     for(let i = 0; i < size.y * size.x; i++){
-        idx = i * 4;
-        color = self._getColor(num[i]); //数値に対して色を決める
-        imgData.data[idx + 3] = 255;
-        imgData.data[idx    ] = color.r;
-        imgData.data[idx + 1] = color.g;
-        imgData.data[idx + 2] = color.b;
-      }
-      ctx.putImageData(imgData, 0, 0);
-      return tile;
-   },*/
   setOperation: function(flag){
     if(flag=="b"){
       this.options.operation = "log10";
@@ -274,9 +234,7 @@ L.GridLayer.NumData = L.GridLayer.extend({
         num = self._getNumData(rgba);
         if(self.options.operation == "eddy" || self.options.operation == "eddy_y" || self.options.operation == "eddy_x"){
           num = self._getNumDataDiff(num);
-          //console.log(mean);
         }
-        //console.log(map.dragging._enabled);
 
         alert( num[0].toPrecision(5) );
 
@@ -288,7 +246,6 @@ L.GridLayer.NumData = L.GridLayer.extend({
     let numData_sub = [];
     for(let i = 0; i < tileSize.y * tileSize.x; i++){
       numData_sub[i] = Math.floor(numData[i]);
-      //console.log(numData_sub[i]);
     }
     for(let i = 0; i < tileSize.y * tileSize.x; i++){
       idx = i * 4;
@@ -338,7 +295,6 @@ L.GridLayer.NumData = L.GridLayer.extend({
     }
 
     if( this.options.shade ){
-      //console.log(map.options.maxZoom+"    "+coords.z  );
       //実数値から塗りつぶす色決定しイメージデータを書き換
       if(1){
         for(let i = 0; i < size.y * size.x; i++){
@@ -350,7 +306,6 @@ L.GridLayer.NumData = L.GridLayer.extend({
            imgData.data[idx + 2] = color.b;
          }
        }else if(  this.options.max_z < coords.z  ){
-         //console.log("over zooming");
          i = 0
          diff_z = coords.z - this.options.max_z;
          div =　2 ** diff_z;
@@ -364,13 +319,11 @@ L.GridLayer.NumData = L.GridLayer.extend({
            }
          }
        }
-       //console.log(imgData.data);
      }
 
      if( this.options.contour ){
       imgData.data = this._drawContour(num, imgData.data);
      }
-     //console.log(imgData)
      ctx.putImageData(imgData, 0, 0);
      if(this.options.isGrid){
        ctx.strokeRect(0, 0, size.x, size.y);
@@ -407,26 +360,12 @@ L.GridLayer.NumData = L.GridLayer.extend({
     d_ctx = d_tile.getContext('2d');
 
     img = new Image();
-    //console.log(map.options.maxZoom + 1+"    "+coords.z);
-    /*if(this.options.max_z >= coords.z ){
-      img.src = `${this._url}/${coords.z}/${coords.x}/${coords.y}.png`;
-    }else if(this.options.max_z < coords.z){
-      //console.log("over");
-      diff_z = coords.z - this.options.max_z;
-      div =　2 ** diff_z;
-      img.src = `${this._url}/${coords.z}/${coords.x}/${coords.y}.png`;
-    }else{
-      console.log("画像がない");
-    }*/
-    //img.src = `${this._imgRootDir}/${this.T[this.activeT]}/${this.Z[this.activeZ]}/${coords.z}/${coords.x}/${coords.y}.png`;
     img.src = `${this._url}/${coords.z}/${coords.x}/${coords.y}.png`;
-    //console.log(img.src);
     img.onload = function(){
       d_ctx.drawImage(img, 0, 0);
       if( self.options.max_z < coords.z ){ //over Zooming
           xstart = size.x * (coords.x % div) / div
           ystart = size.y * (coords.y % div) / div
-          //console.log(xstart+"   "+ystart+"  "+div);
           d_imgData = d_ctx.getImageData(xstart, ystart, size.x/div, size.y/div);
       }else{
         d_imgData = d_ctx.getImageData(0, 0, size.x, size.y);

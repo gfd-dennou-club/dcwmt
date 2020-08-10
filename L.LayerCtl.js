@@ -70,7 +70,6 @@ L.LayerCtl = L.Control.Layers.extend({
         addedLayers.push(layer);
 
         if(input.type==="radio"){
-  //        console.log("アクティブレイヤーは"+obj.name+"です");
           this.active=obj;
 
           return layer;
@@ -98,7 +97,6 @@ L.LayerCtl = L.Control.Layers.extend({
         addedLayers.push(layer);
 
         if(input.type==="radio"){
-          //console.log("アクティブレイヤーは"+obj.name+"です");
           this.active=obj;
           drawText(layer);
         }

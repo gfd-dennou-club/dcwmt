@@ -9,7 +9,6 @@ $(function() {
       layergroup.getActiveLayer().activeD = ui.value;
       layergroup.getActiveLayer().switchLayer("d",0);
 
-      //layergroup.getActiveLayer().setURL();
       layergroup.getActiveLayer().redraw();
 
       drawText(layergroup.getActiveLayer());
