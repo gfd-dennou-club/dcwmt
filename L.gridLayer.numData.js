@@ -23,7 +23,7 @@ L.GridLayer.NumData = L.GridLayer.extend({
     this.options.shade=true;
 
     //Z=0のタイル座標の生成
-    var coords  = new L.Point(0, 0);
+    let coords  = new L.Point(0, 0);
     coords.z = 0;
 
     //インスタンス変数定義
@@ -35,16 +35,16 @@ L.GridLayer.NumData = L.GridLayer.extend({
    this.max = -1000000;
    this.min =  1000000;
    this._mean = []
-   var imgData, rgba, num = [];
-   var size, self, canvas, ctx, imgData, rgba, pxNum;
-   var mean;
+   let imgData, rgba, num = [];
+   let size, self, canvas, ctx, pxNum;
+   let mean;
    size = this.getTileSize();
    self = this;
    canvas = document.createElement('canvas');
    canvas.setAttribute('width', size.x); //canvasの大きさ定義
    canvas.setAttribute('height', size.y);
    ctx = canvas.getContext('2d');
-   var img = new Image();
+   let img = new Image();
    img.src = `${this._url}/${coords.z}/${coords.x}/${coords.y}.png`;
 
    img.onload = function(){
@@ -59,7 +59,7 @@ L.GridLayer.NumData = L.GridLayer.extend({
          //console.log(mean);
        }
        //console.log(num);
-       for(var i = 0; i < size.y * size.x; i++){
+       for(let i = 0; i < size.y * size.x; i++){
          if(num[i] > self.max ){
            self.max = num[i];
          }
@@ -82,7 +82,7 @@ L.GridLayer.NumData = L.GridLayer.extend({
         this.activeD = 0;
       }
       this._url = `${this._imgRootDir}/${this.options.dir_t[this.activeT]}/${this.options.dir_d[this.activeD]}`;
-      var coords  = new L.Point(0, 0);
+      let coords  = new L.Point(0, 0);
       coords.z = 0;
       this.getInitRange(coords);
       return this.activeD;
@@ -94,21 +94,21 @@ L.GridLayer.NumData = L.GridLayer.extend({
         this.activeT = 0;
       }
       this._url = `${this._imgRootDir}/${this.options.dir_t[this.activeT]}/${this.options.dir_d[this.activeD]}`;
-      var coords  = new L.Point(0, 0);
+      let coords  = new L.Point(0, 0);
       coords.z = 0;
       this.getInitRange(coords);
       return this.activeT;
     }
   },
   _getMean : function(num){
-    //var mean = [];
-    var i,x,y,size;
+    //let mean = [];
+    let i,x,y,size;
     size = this.getTileSize();
 
     if(this.options.operation == "eddy"){
       this._mean = 0;
 
-        for(var i = 0; i < size.y * size.x; i++){
+        for(let i = 0; i < size.y * size.x; i++){
             this._mean += num[i];
         }
         this._mean /= size.y * size.x;
@@ -145,11 +145,11 @@ L.GridLayer.NumData = L.GridLayer.extend({
     //console.log(mean)
   },
   _getNumDataDiff : function(num){
-    var size, i;
+    let size, i;
     size = this.getTileSize();
     //console.log(this._mean);
     //console.log(num);
-    for(var i = 0; i < size.y * size.x; i++){
+    for(let i = 0; i < size.y * size.x; i++){
       if(this.options.operation == "eddy"){
         num[i] = num[i] - this._mean;
       }else if(this.options.operation == "eddy_y"){
@@ -166,18 +166,18 @@ L.GridLayer.NumData = L.GridLayer.extend({
     return num;
   },
   _loader : function(expectedCnt, callback){
-    var cnt = 0;
+    let cnt = 0;
     return function(){
       if(++cnt == expectedCnt){ callback(); }
     }
   },
   _getNumData: function(rgba){
-    var tileSize = this.getTileSize();
-    var numData = [];
-    var idx;
-    var r,g,b;
+    let tileSize = this.getTileSize();
+    let numData = [];
+    let idx;
+    let r,g,b;
     //console.log(rgba);
-    for(var i = 0; i < tileSize.y * tileSize.x; i++){
+    for(let i = 0; i < tileSize.y * tileSize.x; i++){
       idx = i * 4;
       r = rgba[idx] << 24;
       g = rgba[idx + 1] << 16;
@@ -198,7 +198,7 @@ L.GridLayer.NumData = L.GridLayer.extend({
   _getColor: function(value) {
     //console.log(this.max);
 
-    var diff = (this.max - this.min) / (this._colormap.length - 2);
+    let diff = (this.max - this.min) / (this._colormap.length - 2);
     if( value === 0.0000000000 ){     //読み込み失敗タイルは白く塗りつぶす
       return {r:0, g:255, b:255, a:255};
     }else if(value <= this.min){           //最小値以下
@@ -206,7 +206,7 @@ L.GridLayer.NumData = L.GridLayer.extend({
     }else if(value > this.max){            //最大値より大
       return this._colormap[this._colormap.length - 1];
     }else{                            //最小値より大 & 最大値以下
-      for(var i = 1; i < this._colormap.length - 1; i++){
+      for(let i = 1; i < this._colormap.length - 1; i++){
         if(value > this.min + (i-1) * diff && value <= this.min + i * diff){
           return this._colormap[i];
         }
@@ -216,7 +216,7 @@ L.GridLayer.NumData = L.GridLayer.extend({
     return {r:255, g:255, b:255, a:255};
   },
    /*_draw: function(rgba){
-     var tile, size, ctx, num;
+     let tile, size, ctx, num;
      tile = L.DomUtil.create('canvas', 'leaflet-tile');
      // setup tile width and height according to the options
      size = this.getTileSize(this.cross_sect);
@@ -226,7 +226,7 @@ L.GridLayer.NumData = L.GridLayer.extend({
      imgData = ctx.getImageData(0, 0, size.x, size.y);
      num = this._getNumData(rgba);
      //実数値から塗りつぶす色決定しイメージデータを書き換
-     for(var i = 0; i < size.y * size.x; i++){
+     for(let i = 0; i < size.y * size.x; i++){
         idx = i * 4;
         color = self._getColor(num[i]); //数値に対して色を決める
         imgData.data[idx + 3] = 255;
@@ -251,21 +251,21 @@ L.GridLayer.NumData = L.GridLayer.extend({
     }else{
       this.options.operation = "";
     }
-    var coords  = new L.Point(0, 0);
+    let coords  = new L.Point(0, 0);
     coords.z = 0;
     this.getInitRange(coords);
     this.redraw();
   },
   getNum: function(coords, point){
-    var imgData, rgba, num;
-    var size, self, canvas, ctx, imgData, rgba, pxNum;
+    let imgData, rgba, num;
+    let size, self, canvas, ctx, pxNum;
     size = this.getTileSize();
     self = this;
     canvas = document.createElement('canvas');
     canvas.setAttribute('width', size.x); //canvasの大きさ定義
     canvas.setAttribute('height', size.y);
     ctx = canvas.getContext('2d');
-    var img = new Image();
+    let img = new Image();
     img.src = `${this._url}/${coords.z}/${coords.x}/${coords.y}.png`;
     img.onload = function(){
         ctx.drawImage(img, 0, 0);
@@ -283,14 +283,14 @@ L.GridLayer.NumData = L.GridLayer.extend({
     }
   },
   _drawContour: function(numData, color_array){
-    var tileSize = this.getTileSize();
-    var idx;
-    var numData_sub = [];
-    for(var i = 0; i < tileSize.y * tileSize.x; i++){
+    let tileSize = this.getTileSize();
+    let idx;
+    let numData_sub = [];
+    for(let i = 0; i < tileSize.y * tileSize.x; i++){
       numData_sub[i] = Math.floor(numData[i]);
       //console.log(numData_sub[i]);
     }
-    for(var i = 0; i < tileSize.y * tileSize.x; i++){
+    for(let i = 0; i < tileSize.y * tileSize.x; i++){
       idx = i * 4;
       //自分の画素と右、右下、下の画素と比較し書くので、右下の辺上のピクセルには書けない
       if((i + 1)%tileSize.x == 0 || i/tileSize.y >= tileSize.y-1 ){
@@ -306,7 +306,7 @@ L.GridLayer.NumData = L.GridLayer.extend({
     return color_array;
   },
   _drawSquare: function(rgba, div, color, i){
-    var size, rgba, y, x, idx;
+    let size, y, x, idx;
     size = this.getTileSize();
     for(y = 0; y < div; y++){
       for(x = 0; x < div; x++){
@@ -324,9 +324,9 @@ L.GridLayer.NumData = L.GridLayer.extend({
   /*coords : タイルのz,x,y オーバーズーム時のみ必要*/
   _draw: function(tile, rgba, coords){
 
-    var size, tile, num, imgData, idx;
-    var y, x, topLeft, topRight, bottomLeft, bottomRight;
-    var diff_z, div;
+    let size, num, imgData, idx;
+    let y, x, topLeft, topRight, bottomLeft, bottomRight;
+    let diff_z, div;
     size = this.getTileSize();
     ctx = tile.getContext('2d');
     imgData = ctx.getImageData(0, 0, size.x, size.y);
@@ -341,7 +341,7 @@ L.GridLayer.NumData = L.GridLayer.extend({
       //console.log(map.options.maxZoom+"    "+coords.z  );
       //実数値から塗りつぶす色決定しイメージデータを書き換
       if(1){
-        for(var i = 0; i < size.y * size.x; i++){
+        for(let i = 0; i < size.y * size.x; i++){
            idx = i * 4;
            color = this._getColor(num[i]); //数値に対して色を決める
            imgData.data[idx + 3] = 255;
@@ -389,9 +389,9 @@ L.GridLayer.NumData = L.GridLayer.extend({
 
   /*タイル生成*/
   createTile: function (coords) {
-    var size, self;
-    var tile, ctx, d_tile, d_ctx, img, num;
-    var xstart, ystart, diff_z, div;
+    let size, self;
+    let tile, ctx, d_tile, d_ctx, img, num;
+    let xstart, ystart, diff_z, div;
 
     self = this;
     size = this.getTileSize();

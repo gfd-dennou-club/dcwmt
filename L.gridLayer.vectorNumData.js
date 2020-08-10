@@ -11,7 +11,7 @@ L.GridLayer.VectorNumData = L.GridLayer.extend({
     this.options.shade=true
 
     //Z=0のタイル座標の生成
-    var coords  = new L.Point(0, 0);
+    let coords  = new L.Point(0, 0);
     coords.z = 0;
 
     //インスタンス変数定義
@@ -46,22 +46,22 @@ L.GridLayer.VectorNumData = L.GridLayer.extend({
   getInitRange: function(coords){
    this.max = -1000000;
    this.min =  1000000;
-   var imgData, rgba, num;
-   var size, self, canvas, ctx, imgData, rgba, pxNum;
+   let imgData, rgba, num;
+   let size, self, canvas, ctx, imgData, rgba, pxNum;
    size = this.getTileSize();
    self = this;
    canvas = document.createElement('canvas');
    canvas.setAttribute('width', size.x); //canvasの大きさ定義
    canvas.setAttribute('height', size.y);
    ctx = canvas.getContext('2d');
-   var img = new Image();
+   let img = new Image();
    img.src = `${this._url}${coords.z}/${coords.x}/${coords.y}.png`;
    img.onload = function(){
        ctx.drawImage(img, 0, 0);
        imgData = ctx.getImageData(0, 0, size.x, size.y);
        rgba = imgData.data;
        num = self._getNumData(rgba);
-       for(var i = 0; i < size.y * size.x; i++){
+       for(let i = 0; i < size.y * size.x; i++){
          if(num[i] > self.max){
            self.max = num[i];
          }
@@ -75,18 +75,18 @@ L.GridLayer.VectorNumData = L.GridLayer.extend({
    },
    */
   Loader : function(expectedCnt, callback){
-    var cnt = 0;
+    let cnt = 0;
     return function(){
       if(++cnt == expectedCnt){ callback(); }
     }
   },
   _getNumData: function(rgba){
-    var tileSize = this.getTileSize();
-    var numData = [];
-    var idx;
-    var r,g,b;
+    let tileSize = this.getTileSize();
+    let numData = [];
+    let idx;
+    let r,g,b;
     //console.log(rgba);
-    for(var i = 0; i < tileSize.y * tileSize.x; i++){
+    for(let i = 0; i < tileSize.y * tileSize.x; i++){
       idx = i * 4;
       r = rgba[idx] << 24;
       g = rgba[idx + 1] << 16;
@@ -98,7 +98,7 @@ L.GridLayer.VectorNumData = L.GridLayer.extend({
   },
   /*
   _getColor: function(value) {
-    var diff = (this.max - this.min) / (this._colormap.length - 2);
+    let diff = (this.max - this.min) / (this._colormap.length - 2);
     if( value === 0.0000000000 ){     //読み込み失敗タイルは白く塗りつぶす
       return {r:0, g:255, b:255, a:255};
     }else if(value <= this.min){           //最小値以下
@@ -106,7 +106,7 @@ L.GridLayer.VectorNumData = L.GridLayer.extend({
     }else if(value > this.max){            //最大値より大
       return this._colormap[this._colormap.length - 1];
     }else{                            //最小値より大 & 最大値以下
-      for(var i = 1; i < this._colormap.length - 1; i++){
+      for(let i = 1; i < this._colormap.length - 1; i++){
         if(value > this.min + (i-1) * diff && value <= this.min + i * diff){
           return this._colormap[i];
         }
@@ -117,7 +117,7 @@ L.GridLayer.VectorNumData = L.GridLayer.extend({
   */
   /*
    _draw: function(rgba){
-     var tile, size, ctx, num;
+     let tile, size, ctx, num;
      tile = L.DomUtil.create('canvas', 'leaflet-tile');
      // setup tile width and height according to the options
      size = this.getTileSize();
@@ -127,7 +127,7 @@ L.GridLayer.VectorNumData = L.GridLayer.extend({
      imgData = ctx.getImageData(0, 0, size.x, size.y);
      num = this._getNumData(rgba);
      //実数値から塗りつぶす色決定しイメージデータを書き換
-     for(var i = 0; i < size.y * size.x; i++){
+     for(let i = 0; i < size.y * size.x; i++){
         idx = i * 4;
         color = self._getColor(num[i]); //数値に対して色を決める
         imgData.data[idx + 3] = 255;
@@ -140,15 +140,15 @@ L.GridLayer.VectorNumData = L.GridLayer.extend({
    },
    */
   /*getNum: function(coords, point){
-    var imgData, rgba, num;
-    var size, self, canvas, ctx, imgData, rgba, pxNum;
+    let imgData, rgba, num;
+    let size, self, canvas, ctx, imgData, rgba, pxNum;
     size = this.getTileSize();
     self = this;
     canvas = document.createElement('canvas');
     canvas.setAttribute('width', size.x); //canvasの大きさ定義
     canvas.setAttribute('height', size.y);
     ctx = canvas.getContext('2d');
-    var img = new Image();
+    let img = new Image();
     img.src = `${this._url}${coords.z}/${coords.x}/${coords.y}.png`;
     img.onload = function(){
         ctx.drawImage(img, 0, 0);
@@ -162,13 +162,13 @@ L.GridLayer.VectorNumData = L.GridLayer.extend({
   _draw: function(tile, rgba1, rgba2){
     //console.log(rgba1);
     //console.log(rgba2);
-    var size, tile, imgData, idx, i, j, k;
-    var x,y;
-    var num = new Array(2);
-    var mean = new Array(2);
-    var vector_dens = this.options.dens;  //矢印をイトルのタイルに縦横何コ描画するか
-    var vector_size = this.options.size;  //矢印の描画サイズ倍率(仮)
-    var vector_intv_x, vector_intv_y;
+    let size, tile, imgData, idx, i, j, k;
+    let x,y;
+    let num = new Array(2);
+    let mean = new Array(2);
+    let vector_dens = this.options.dens;  //矢印をイトルのタイルに縦横何コ描画するか
+    let vector_size = this.options.size;  //矢印の描画サイズ倍率(仮)
+    let vector_intv_x, vector_intv_y;
     size = this.getTileSize();
     ctx = tile.getContext('2d');
 
@@ -182,7 +182,7 @@ L.GridLayer.VectorNumData = L.GridLayer.extend({
     num[0] = this._getNumData(rgba1);//U
     num[1] = this._getNumData(rgba2);//V
     //実数値から塗りつぶす色決定しイメージデータを書き換
-    var a =0
+    let a =0
     for(i = 0; i < size.y; i += vector_intv_y){
       //console.log(size);
       for(j = 0; j < size.x; j += vector_intv_x){
@@ -219,19 +219,19 @@ L.GridLayer.VectorNumData = L.GridLayer.extend({
     }
   },
   Loader: function(expectedCnt, callback){
-    var cnt = 0;
+    let cnt = 0;
     return function(){if(++cnt == expectedCnt){ callback(); }}
   },
 
   /*タイル生成*/
   createTile: function (coords) {
-    var size, self;
-    var tile, ctx, num, i;
-    var d_tile = new Array(2);
-    var d_ctx = new Array(2);
-    var img = new Array(2);
-    var d_imgData = new Array(2);
-    var rgba = new Array(2);
+    let size, self;
+    let tile, ctx, num, i;
+    let d_tile = new Array(2);
+    let d_ctx = new Array(2);
+    let img = new Array(2);
+    let d_imgData = new Array(2);
+    let rgba = new Array(2);
 
     self = this;
     size = this.getTileSize();
@@ -249,7 +249,7 @@ L.GridLayer.VectorNumData = L.GridLayer.extend({
       d_tile[i].height = size.y;
       d_ctx[i] = d_tile[i].getContext('2d');
     }
-    var loader = this.Loader(2, function(){
+    let loader = this.Loader(2, function(){
       for(i = 0; i < 2; i++){
         d_ctx[i].drawImage(img[i], 0, 0);
         d_imgData[i] = d_ctx[i].getImageData(0, 0, size.x, size.y);

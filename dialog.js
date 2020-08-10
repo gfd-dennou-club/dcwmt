@@ -74,7 +74,7 @@ $(function() {
 			title:"カラーマップ変更", //タイトル
 			buttons: { //ボタン
 			  "決定": function() {
-            var obj = document.getElementById("select_clrmap");
+            let obj = document.getElementById("select_clrmap");
             layergroup.getActiveLayer()._colormap = eval( "clrmap_"+obj.value );
             layergroup.getActiveLayer().redraw();
             drawText( layergroup.getActiveLayer() );
@@ -95,9 +95,9 @@ $(function() {
 			title:"断面切り替え", //タイトル
 			buttons: { //ボタン
 			  "決定": function() {
-            var obj = document.getElementById("select_cross_sect");
+            let obj = document.getElementById("select_cross_sect");
             //Z=0のタイル座標の生成
-            var coords  = new L.Point(0, 0);
+            let coords  = new L.Point(0, 0);
             coords.z = 0;
 
             for( key in baseMaps ) {
@@ -106,7 +106,7 @@ $(function() {
                 baseMaps[key].getInitRange(coords);
               }
             }
-            /*for(var i = 0; i < baseMaps.length; i++){
+            /*for(let i = 0; i < baseMaps.length; i++){
               layer[i].setURL( obj.value );
               map.removeLayer(layer[i]);
               map.addLayer(layer[i]);

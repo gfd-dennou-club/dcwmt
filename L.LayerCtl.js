@@ -1,15 +1,15 @@
 L.LayerCtl = L.Control.Layers.extend({
   _createRadioElement: function (name, checked) {
 
-		var radioHtml = '<input type="radio" class="leaflet-control-layers-selector" name="' +
+		let radioHtml = '<input type="radio" class="leaflet-control-layers-selector" name="' +
 				name + '"' + (checked ? ' checked="checked"' : '') + '/>';
 
-		var radioFragment = document.createElement('div');
+		let radioFragment = document.createElement('div');
 		radioFragment.innerHTML = radioHtml;
 		return radioFragment.firstChild;
 	},
   _addItem: function (obj) {
-		var label = document.createElement('label'),
+		let label = document.createElement('label'),
 		    checked = this._map.hasLayer(obj.layer),
 		    input;
 
@@ -27,18 +27,18 @@ L.LayerCtl = L.Control.Layers.extend({
 
 		L.DomEvent.on(input, 'click', this._onInputClick, this);
 
-		var name = document.createElement('span');
+		let name = document.createElement('span');
 		name.innerHTML = ' ' + obj.name;
 
 		// Helps from preventing layer control flicker when checkboxes are disabled
 		// https://github.com/Leaflet/Leaflet/issues/2771
-		var holder = document.createElement('div');
+		let holder = document.createElement('div');
 
 		label.appendChild(holder);
 		holder.appendChild(input);
 		holder.appendChild(name);
 
-		var container = obj.overlay ? this._overlaysList : this._baseLayersList;
+		let container = obj.overlay ? this._overlaysList : this._baseLayersList;
 		container.appendChild(label);
 
 		this._checkDisabledLayers();
@@ -46,7 +46,7 @@ L.LayerCtl = L.Control.Layers.extend({
 	},
   _getLayer: function (id) {
 
-		for (var i = 0; i < this._layers.length; i++) {
+		for (let i = 0; i < this._layers.length; i++) {
 
 			if (this._layers[i] && L.Util.stamp(this._layers[i].layer) === id) {
 				return this._layers[i];
@@ -54,17 +54,17 @@ L.LayerCtl = L.Control.Layers.extend({
 		}
 	},
   getActiveLayer: function(){
-    var inputs = this._layerControlInputs,
+    let inputs = this._layerControlInputs,
         input, layer;
-    var addedLayers = [],
+    let addedLayers = [],
         removedLayers = [];
 
     this._handlingClick = true;
 
-    for (var i = inputs.length - 1; i >= 0; i--) {
+    for (let i = inputs.length - 1; i >= 0; i--) {
       input = inputs[i];
       layer = this._getLayer(input.layerId).layer;
-      var obj = this._getLayer(L.Util.stamp(layer));
+      let obj = this._getLayer(L.Util.stamp(layer));
 
       if (input.checked) {
         addedLayers.push(layer);
@@ -80,17 +80,17 @@ L.LayerCtl = L.Control.Layers.extend({
     return -1;
   },
   _onInputClick: function () {
-    var inputs = this._layerControlInputs,
+    let inputs = this._layerControlInputs,
         input, layer;
-    var addedLayers = [],
+    let addedLayers = [],
         removedLayers = [];
 
     this._handlingClick = true;
 
-    for (var i = inputs.length - 1; i >= 0; i--) {
+    for (let i = inputs.length - 1; i >= 0; i--) {
       input = inputs[i];
       layer = this._getLayer(input.layerId).layer;
-      var obj = this._getLayer(L.Util.stamp(layer));
+      let obj = this._getLayer(L.Util.stamp(layer));
 
 
 
