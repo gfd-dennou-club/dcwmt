@@ -3,10 +3,11 @@ let buf = new ArrayBuffer(4);       //32bitのバッファ用意
 let data_view = new DataView(buf);  //用意したバッファにDataViewクラスを介して入出力
 let min, max;                 //カラーマップの最大、最小、各色の差
 let new_crs_simple
+
 if(typeof continuous !== 'undefined' && continuous){
   new_crs_simple = L.Util.extend({}, L.CRS.Simple, {
     wrapLng: [0,  tile_size_x],
-   wrapLat: [0, -tile_size_y]
+    wrapLat: [0, -tile_size_y]
   });
 }else{
   new_crs_simple = L.Util.extend({}, L.CRS.Simple, {
@@ -27,27 +28,36 @@ let layer_vec=[];
 let baseMaps = {};
 let overlayMaps = {};
 
+// 物理量を参照する
 for(let i = 0; i < value_name.length; i++){
-  layer[i] = L.gridLayer.numData(`${dir_root}/${value_name[i]}`,{
-    tileSize : new L.Point(tile_size_x, tile_size_y),//タイルの大きさを定義 new L.Point(横の解像度, 縦の解像度),
-    dir_t    : dir_time,
-    dir_d    : dir_dim
-  });
+  layer[i] = L.gridLayer.numData(
+    // 物理量ディレクトリまでのpath
+    `${dir_root}/${value_name[i]}`,
+    // 
+    {
+      tileSize : new L.Point(tile_size_x, tile_size_y),//タイルの大きさを定義 new L.Point(横の解像度, 縦の解像度),
+      nameOfTimeDir         : dir_time,
+      nameOfDimentionDir    : dir_dim
+    }
+  );
 
-  let q=layer[i];
   eval("baseMaps." + value_name[i]+ "=layer[i];");
   eval("overlayMaps." + value_name[i]+ "=layer[i];");
 }
 //baseMaps.PTemp = layer[0];
 //baseMaps.VelX = layer[1];
 for(let i = 0; i < value_name_vec.length; i+=2){
-  layer_vec[i/2] = L.gridLayer.vectorNumData(`${dir_root}/${value_name_vec[i+0]}`,`${dir_root}/${value_name_vec[i+1]}`,{
-    tileSize : new L.Point(tile_size_x, tile_size_y),//タイルの大きさを定義 new L.Point(横の解像度, 縦の解像度),
-    dir_t    : dir_time,
-    dir_d    : dir_dim,
-    size : 6, //矢印の長さ倍率
-    dens : 8
-  });
+  layer_vec[i/2] = L.gridLayer.vectorNumData(
+    `${dir_root}/${value_name_vec[i+0]}`, // 
+    `${dir_root}/${value_name_vec[i+1]}`,
+    {
+      tileSize : new L.Point(tile_size_x, tile_size_y),//タイルの大きさを定義 new L.Point(横の解像度, 縦の解像度),
+      dir_t    : dir_time,
+      dir_d    : dir_dim,
+      size : 6, //矢印の長さ倍率
+      dens : 8
+    }
+  );
   //eval("baseMaps." + value_name_vec[i+0] + "=layer_vec[i/2];");
   eval("overlayMaps.vec_"+ value_name_vec[i+0] +""+value_name_vec[i+1]+ "=layer_vec[i/2];");
 }

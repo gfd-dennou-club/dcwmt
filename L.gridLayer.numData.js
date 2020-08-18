@@ -1,22 +1,19 @@
 L.GridLayer.NumData = L.GridLayer.extend({
-  /*インスタンス変数*/
-  // _imgRootDir : 数値データタイルが格納されるディレクトリツリーのトップ
-  // cross_sect  : アクティブな断面 0=xy 1=xz 2=yz
-  // T
-  // Z
-  // Y
-  // X
-  // activeT
-  // activeZ
-  // activeY
-  // activeX
-  // URL : タイルのURL
+  options: {
+    // @option nameOfTimeDir: Array = []
+    // 時間ディレクトリの名前を文字列の配列として格納されます. タイル参照の際に使用されます.
+    nameOfTimeDir: [],
+
+    // @option nameOfDimentionDir: Array = []
+    // 物理量ディレクトリの名前を文字列の配列として格納されます. タイル参照の際に使用されます.
+    nameOfDimentionDir: [] 
+  },
+
   initialize: function(url, options){
-    //インスタンス変数定義
-    //console.log(url);
+    L.Util.setOptions(this, options);
+
     this.activeT = 0;
     this.activeD = 0;
-    L.Util.setOptions(this, options);
     this._imgRootDir = url;
     this.switchLayer("t",0);
     this.switchLayer("d",0);
@@ -31,13 +28,18 @@ L.GridLayer.NumData = L.GridLayer.extend({
     this._colormap = clrmap_04;
     this._cnt = 0;
   },
+
+  // @method getInitRange(coords: Point): void
+  // キャンバスを作成し, シミュレーションデータとカラーバーを表示
+  // TODO: hockInit?メソッドにここの処理を移しても良いかもしれない...
   getInitRange: function(coords){
    this.max = -1000000;
-   this.min =  1000000;
-   this._mean = []
+   this.min = 1000000;
+
+   this._mean = [];
+
    let imgData, rgba, num = [];
-   let size, self, canvas, ctx, pxNum;
-   let mean;
+   let size, self, canvas, ctx;
    size = this.getTileSize();
    self = this;
    canvas = document.createElement('canvas');
@@ -55,29 +57,26 @@ L.GridLayer.NumData = L.GridLayer.extend({
        if(self.options.operation == "eddy" || self.options.operation == "eddy_y" || self.options.operation == "eddy_x"){
          this._mean = self._getMean(num);
          num = self._getNumDataDiff(num);
-       }
-       for(let i = 0; i < size.y * size.x; i++){
-         if(num[i] > self.max ){
-           self.max = num[i];
-         }
-         else if(num[i] < self.min){
-           self.min = num[i];
-         }
+      }
+      for(let i = 0; i < size.y * size.x; i++){
+         if ( num[i] > self.max )    self.max = num[i];
+         else if ( num[i] < self.min )    self.min = num[i];
       }
       drawText(self);
     }
   },
 
-
+  // @method switchLayer(dim: String, num: Number): Number
+  // スライドバーの位置に応じて, シミュレーションデータの描画を変更する. スライドバーの値を返す.
   switchLayer : function(dim, num){
     if(dim == "d"){
       this.activeD += num;
       if(this.activeD < 0){
-        this.activeD = this.options.dir_d.length-1;
-      }else if(this.activeD >= this.options.dir_d.length){
+        this.activeD = this.options.nameOfDimentionDir.length-1;
+      }else if(this.activeD >= this.options.nameOfDimentionDir.length){
         this.activeD = 0;
       }
-      this._url = `${this._imgRootDir}/${this.options.dir_t[this.activeT]}/${this.options.dir_d[this.activeD]}`;
+      this._url = `${this._imgRootDir}/${this.options.nameOfTimeDir[this.activeT]}/${this.options.nameOfDimentionDir[this.activeD]}`;
       let coords  = new L.Point(0, 0);
       coords.z = 0;
       this.getInitRange(coords);
@@ -85,17 +84,20 @@ L.GridLayer.NumData = L.GridLayer.extend({
     }else if(dim == "t"){
       this.activeT += num;
       if(this.activeT < 0){
-        this.activeT = this.options.dir_t.length-1;
-      }else if(this.activeT >=  this.options.dir_t.length){
+        this.activeT = this.options.nameOfTimeDir.length-1;
+      }else if(this.activeT >=  this.options.nameOfTimeDir.length){
         this.activeT = 0;
       }
-      this._url = `${this._imgRootDir}/${this.options.dir_t[this.activeT]}/${this.options.dir_d[this.activeD]}`;
+      this._url = `${this._imgRootDir}/${this.options.nameOfTimeDir[this.activeT]}/${this.options.nameOfDimentionDir[this.activeD]}`;
       let coords  = new L.Point(0, 0);
       coords.z = 0;
       this.getInitRange(coords);
       return this.activeT;
     }
   },
+
+  // @method _getMean(num: Number): void
+  // 引数により与えられた配列の中身の平均値を計算
   _getMean : function(num){
     let i,x,y,size;
     size = this.getTileSize();
@@ -133,8 +135,9 @@ L.GridLayer.NumData = L.GridLayer.extend({
       alert("Error");
     }
   },
+
   _getNumDataDiff : function(num){
-    let size, i;
+    let size;
     size = this.getTileSize();
     for(let i = 0; i < size.y * size.x; i++){
       if(this.options.operation == "eddy"){
@@ -150,12 +153,14 @@ L.GridLayer.NumData = L.GridLayer.extend({
     }
     return num;
   },
+
   _loader : function(expectedCnt, callback){
     let cnt = 0;
     return function(){
       if(++cnt == expectedCnt){ callback(); }
     }
   },
+
   _getNumData: function(rgba){
     let tileSize = this.getTileSize();
     let numData = [];
@@ -179,8 +184,8 @@ L.GridLayer.NumData = L.GridLayer.extend({
     }
     return numData;
   },
-  _getColor: function(value) {
 
+  _getColor: function(value) {
     let diff = (this.max - this.min) / (this._colormap.length - 2);
     if( value === 0.0000000000 ){     //読み込み失敗タイルは白く塗りつぶす
       return {r:0, g:255, b:255, a:255};
@@ -197,6 +202,7 @@ L.GridLayer.NumData = L.GridLayer.extend({
     }
     return {r:255, g:255, b:255, a:255};
   },
+
   setOperation: function(flag){
     if(flag=="b"){
       this.options.operation = "log10";
@@ -216,9 +222,10 @@ L.GridLayer.NumData = L.GridLayer.extend({
     this.getInitRange(coords);
     this.redraw();
   },
+
   getNum: function(coords, point){
     let imgData, rgba, num;
-    let size, self, canvas, ctx, pxNum;
+    let size, self, canvas, ctx;
     size = this.getTileSize();
     self = this;
     canvas = document.createElement('canvas');
@@ -240,6 +247,7 @@ L.GridLayer.NumData = L.GridLayer.extend({
 
     }
   },
+
   _drawContour: function(numData, color_array){
     let tileSize = this.getTileSize();
     let idx;
@@ -262,6 +270,7 @@ L.GridLayer.NumData = L.GridLayer.extend({
     }
     return color_array;
   },
+
   _drawSquare: function(rgba, div, color, i){
     let size, y, x, idx;
     size = this.getTileSize();
