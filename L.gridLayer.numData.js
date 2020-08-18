@@ -1,19 +1,11 @@
 L.GridLayer.NumData = L.GridLayer.extend({
-  /*インスタンス変数*/
-  // _imgRootDir : 数値データタイルが格納されるディレクトリツリーのトップ
-  // cross_sect  : アクティブな断面 0=xy 1=xz 2=yz
-  // T
-  // Z
-  // Y
-  // X
-  // activeT
-  // activeZ
-  // activeY
-  // activeX
-  // URL : タイルのURL
+  options: {
+    nameOfTimeDir: [],
+    nameOfDimentionDir: []
+  },
+
   initialize: function(url, options){
     //インスタンス変数定義
-    //console.log(url);
     this.activeT = 0;
     this.activeD = 0;
     L.Util.setOptions(this, options);
@@ -32,12 +24,11 @@ L.GridLayer.NumData = L.GridLayer.extend({
     this._cnt = 0;
   },
   getInitRange: function(coords){
-   this.max = -1000000;
-   this.min =  1000000;
-   this._mean = []
+   this.max = this.min = undefined;
+   this._mean = [];
    let imgData, rgba, num = [];
-   let size, self, canvas, ctx, pxNum;
-   let mean;
+   let size, self, canvas, ctx;
+
    size = this.getTileSize();
    self = this;
    canvas = document.createElement('canvas');
@@ -51,18 +42,15 @@ L.GridLayer.NumData = L.GridLayer.extend({
        ctx.drawImage(img, 0, 0);
        imgData = ctx.getImageData(0, 0, size.x, size.y);
        rgba = imgData.data;
+       console.log(ctx)
        num = self._getNumData(rgba);
        if(self.options.operation == "eddy" || self.options.operation == "eddy_y" || self.options.operation == "eddy_x"){
          this._mean = self._getMean(num);
          num = self._getNumDataDiff(num);
        }
        for(let i = 0; i < size.y * size.x; i++){
-         if(num[i] > self.max ){
-           self.max = num[i];
-         }
-         else if(num[i] < self.min){
-           self.min = num[i];
-         }
+         if( num[i] > self.max || self.max === undefined ) self.max = num[i];
+         if( num[i] < self.min || self.min === undefined ) self.min = num[i];
       }
       drawText(self);
     }
@@ -73,11 +61,11 @@ L.GridLayer.NumData = L.GridLayer.extend({
     if(dim == "d"){
       this.activeD += num;
       if(this.activeD < 0){
-        this.activeD = this.options.dir_d.length-1;
-      }else if(this.activeD >= this.options.dir_d.length){
+        this.activeD = this.options.nameOfDimentionDir.length-1;
+      }else if(this.activeD >= this.options.nameOfDimentionDir.length){
         this.activeD = 0;
       }
-      this._url = `${this._imgRootDir}/${this.options.dir_t[this.activeT]}/${this.options.dir_d[this.activeD]}`;
+      this._url = `${this._imgRootDir}/${this.options.nameOfTimeDir[this.activeT]}/${this.options.nameOfDimentionDir[this.activeD]}`;
       let coords  = new L.Point(0, 0);
       coords.z = 0;
       this.getInitRange(coords);
@@ -85,11 +73,11 @@ L.GridLayer.NumData = L.GridLayer.extend({
     }else if(dim == "t"){
       this.activeT += num;
       if(this.activeT < 0){
-        this.activeT = this.options.dir_t.length-1;
-      }else if(this.activeT >=  this.options.dir_t.length){
+        this.activeT = this.options.nameOfTimeDir.length-1;
+      }else if(this.activeT >=  this.options.nameOfTimeDir.length){
         this.activeT = 0;
       }
-      this._url = `${this._imgRootDir}/${this.options.dir_t[this.activeT]}/${this.options.dir_d[this.activeD]}`;
+      this._url = `${this._imgRootDir}/${this.options.nameOfTimeDir[this.activeT]}/${this.options.nameOfDimentionDir[this.activeD]}`;
       let coords  = new L.Point(0, 0);
       coords.z = 0;
       this.getInitRange(coords);
@@ -175,10 +163,10 @@ L.GridLayer.NumData = L.GridLayer.extend({
       if(this.options.operation == "sqrt"){
         numData[i] = Math.sqrt(numData[i]);
       }
-
     }
     return numData;
   },
+
   _getColor: function(value) {
 
     let diff = (this.max - this.min) / (this._colormap.length - 2);
@@ -291,7 +279,6 @@ L.GridLayer.NumData = L.GridLayer.extend({
     num = this._getNumData(rgba);
     if(this.options.operation == "eddy" || this.options.operation == "eddy_y" || this.options.operation == "eddy_x"){
       num = this._getNumDataDiff(num);
-      //console.log(mean);
     }
 
     if( this.options.shade ){

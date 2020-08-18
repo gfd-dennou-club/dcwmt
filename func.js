@@ -97,7 +97,6 @@ function getGoodPlace_Y(delta_y_axis){
 }
 //諸々表示関数(仮)
 function drawText(viewLayer){
-
   let size = {};
   size.x = 3;//カラーマップの1色の幅
   let start = {};
@@ -110,8 +109,8 @@ function drawText(viewLayer){
   let ctx = canvas.getContext('2d');
   ctx.font = "bold 16px 'Arial'";
 
-  ctx.fillText(" "+viewLayer.options.dir_d[viewLayer.activeD]+"", 380, window.innerHeight-35);
-  ctx.fillText(" "+viewLayer.options.dir_t[viewLayer.activeT]+"", 380, window.innerHeight-10);
+  ctx.fillText(" "+viewLayer.options.nameOfDimentionDir[viewLayer.activeD]+"", 380, window.innerHeight-35);
+  ctx.fillText(" "+viewLayer.options.nameOfTimeDir[viewLayer.activeT]+"", 380, window.innerHeight-10);
 
   for(let i = 0; i < viewLayer._colormap.length; i++){
 

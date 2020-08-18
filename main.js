@@ -30,8 +30,8 @@ let overlayMaps = {};
 for(let i = 0; i < value_name.length; i++){
   layer[i] = L.gridLayer.numData(`${dir_root}/${value_name[i]}`,{
     tileSize : new L.Point(tile_size_x, tile_size_y),//タイルの大きさを定義 new L.Point(横の解像度, 縦の解像度),
-    dir_t    : dir_time,
-    dir_d    : dir_dim
+    nameOfTimeDir    : dir_time,
+    nameOfDimentionDir    : dir_dim
   });
 
   let q=layer[i];
