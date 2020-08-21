@@ -4,16 +4,22 @@ let data_view = new DataView(buf);  //用意したバッファにDataViewクラ�
 let min, max;                 //カラーマップの最大、最小、各色の差
 let new_crs_simple
 
-if(typeof continuous !== 'undefined' && continuous){
-  new_crs_simple = L.Util.extend({}, L.CRS.Simple, {
-    wrapLng: [0,  tile_size_x],
-    wrapLat: [0, -tile_size_y]
-  });
-}else{
-  new_crs_simple = L.Util.extend({}, L.CRS.Simple, {
-    wrapLng: [0, tile_size_y]
-  });
-}
+new_crs_simple = new L.Proj.CRS('ESRI:53009', '+proj=moll +lon_0=0 +x_0=0 +y_0=0 +a=6371000 +b=6371000 +units=m +no_defs', {
+  resolutions: [65536, 32768, 16384, 8192, 4096, 2048],
+  wrapLng: [0,  tile_size_x],
+  wrapLat: [0, -tile_size_y]
+});
+
+// if(typeof continuous !== 'undefined' && continuous){
+//   new_crs_simple = L.Util.extend({}, L.CRS.Simple, {
+//     wrapLng: [0,  tile_size_x],
+//     wrapLat: [0, -tile_size_y]
+//   });
+// }else{
+//   new_crs_simple = L.Util.extend({}, L.CRS.Simple, {
+//     wrapLng: [0, tile_size_y]
+//   });
+// }
 
 let map = L.map('map',{
   center: [0, 0],
@@ -64,6 +70,22 @@ for(let i = 0; i < value_name_vec.length; i+=2){
 let layergroup = L.layerCtl(baseMaps, overlayMaps);
 layergroup.addTo(map);
 
+L.geoJson(countries, {
+  style: {
+      color: '#000',
+      weight: 0.5,
+      opacity: 1,
+      fillColor: '#fff',
+      fillOpacity: 1
+  }
+}).addTo(map);
+
+L.latlngGraticule({
+  showLabel: true,
+  lngLineCurved: 2
+}).addTo(map);
+
+map.fitWorld();
 
 //以下Leaflet内で呼ばれる関数  そのうちfinc.jsに記述
 map.on('click', function(e){

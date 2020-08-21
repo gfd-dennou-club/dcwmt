@@ -97,8 +97,6 @@ function getGoodPlace_Y(delta_y_axis){
 }
 //諸々表示関数(仮)
 function drawText(viewLayer){
-  console.log(viewLayer)
-
   let size = {};
   size.x = 3;//カラーマップの1色の幅
   let start = {};

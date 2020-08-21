@@ -33,8 +33,9 @@ L.GridLayer.NumData = L.GridLayer.extend({
   // キャンバスを作成し, シミュレーションデータとカラーバーを表示
   // TODO: hockInit?メソッドにここの処理を移しても良いかもしれない...
   getInitRange: function(coords){
-   this.max = -1000000;
-   this.min = 1000000;
+   this.max = this.min = undefined;
+   // this.max = -1000000;
+   // this.min = 1000000;
 
    this._mean = [];
 
@@ -59,8 +60,8 @@ L.GridLayer.NumData = L.GridLayer.extend({
          num = self._getNumDataDiff(num);
       }
       for(let i = 0; i < size.y * size.x; i++){
-         if ( num[i] > self.max )    self.max = num[i];
-         else if ( num[i] < self.min )    self.min = num[i];
+         if ( num[i] > self.max || self.max === undefined )    self.max = num[i];
+         if ( num[i] < self.min || self.min === undefined )    self.min = num[i];
       }
       drawText(self);
     }
@@ -300,7 +301,6 @@ L.GridLayer.NumData = L.GridLayer.extend({
     num = this._getNumData(rgba);
     if(this.options.operation == "eddy" || this.options.operation == "eddy_y" || this.options.operation == "eddy_x"){
       num = this._getNumDataDiff(num);
-      //console.log(mean);
     }
 
     if( this.options.shade ){
