@@ -22,6 +22,7 @@ L.GridLayer.NumData = L.GridLayer.extend({
     this.getInitRange(coords);
     this._colormap = clrmap_04;
     this._cnt = 0;
+    console.log(this)
   },
   getInitRange: function(coords){
    this.max = this.min = undefined;
@@ -42,7 +43,7 @@ L.GridLayer.NumData = L.GridLayer.extend({
        ctx.drawImage(img, 0, 0);
        imgData = ctx.getImageData(0, 0, size.x, size.y);
        rgba = imgData.data;
-       console.log(ctx)
+       console.log(rgba)
        num = self._getNumData(rgba);
        if(self.options.operation == "eddy" || self.options.operation == "eddy_y" || self.options.operation == "eddy_x"){
          this._mean = self._getMean(num);

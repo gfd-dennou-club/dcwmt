@@ -2,8 +2,7 @@ L.LayerCtl = L.Control.Layers.extend({
   getActiveLayer: function(){
     let inputs = this._layerControlInputs,
         input, layer;
-    let addedLayers = [],
-        removedLayers = [];
+    let addedLayers = [];
 
     this._handlingClick = true;
 
