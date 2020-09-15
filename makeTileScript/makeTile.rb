@@ -2,7 +2,6 @@
 
 require "numru/gphys"
 require "numru/gphys/gpcommon"
-require "msgpack"
 include NumRu
 
 
@@ -83,7 +82,6 @@ tile_size_y = elem_y/(2**maxZoom)
 
 p "tilesize : #{tile_size_x} * #{tile_size_y}, maxZoomLevel : #{maxZoom}でタイルを作ります"
 num = 0
-tile = Array.new(tile_size_y).map{Array.new(tile_size_x)}
 
 coords_z = maxZoom
 while coords_z>=0
@@ -93,13 +91,17 @@ while coords_z>=0
     system("mkdir -p #{dir}/#{coords_z}/#{coords_x}")
     offset_x = ( elem_x / (2**coords_z) ) * coords_x #offset:各ズームレベルにおけるタイル境界の幅
     (2**coords_z).times do |coords_y|
-      f = File.open("#{dir}/#{coords_z}/#{coords_x}/#{coords_y}.msg","w")
+
+      f = File.open("#{dir}/#{coords_z}/#{coords_x}/#{coords_y}.ppm","w")
       
-      rgb_array = Array.new()
+      f.puts("P3")                              # マジックナンバー (Type: Portable pixmap, Encoding: ASCII)
+      f.puts("#{tile_size_x} #{tile_size_y}")   # 画像サイズ(X, Y)
+      f.puts("255")                             # 色の最大値
 
       offset_y = ( elem_y / (2**coords_z) ) * coords_y
       #一枚のタイルごとのループ
       puts("---------( #{coords_x}, #{coords_y} )---------")
+
 
       (tile_size_y).times do |y|
         (tile_size_x).times do |x|
@@ -119,18 +121,17 @@ while coords_z>=0
           b = ([num].pack("g").unpack("B*")[0][16,8]).to_i(2)
           num = 0
 
-          rgb_array.push r  
-          rgb_array.push g
-          rgb_array.push b
+          f.puts("#{r} #{g} #{b}")
           
           #end of 一個の画素
 
         end#end of x
       end#end of y
       #end of 一枚のタイル
-
-      f.write(rgb_array.to_msgpack)
       f.close
+
+      system("pnmtopng #{dir}/#{coords_z}/#{coords_x}/#{coords_y}.ppm > #{dir}/#{coords_z}/#{coords_x}/#{coords_y}.png")
+      system("rm -f #{dir}/#{coords_z}/#{coords_x}/#{coords_y}.ppm")
 
     end#end of coords_y
   end#end of coords_x

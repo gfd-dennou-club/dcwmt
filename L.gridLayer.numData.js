@@ -24,12 +24,12 @@ L.GridLayer.NumData = L.GridLayer.extend({
     this._cnt = 0;
     console.log(this)
   },
-  getInitRange: function(coords){
+  getInitRange: async function(coords){
    this.max = this.min = undefined;
    this._mean = [];
-   let imgData, rgba, num = [];
+   let imgData, rgba;
    let size, self, canvas, ctx;
-
+   
    size = this.getTileSize();
    self = this;
    canvas = document.createElement('canvas');
