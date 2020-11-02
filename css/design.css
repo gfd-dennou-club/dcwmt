@@ -1,0 +1,11 @@
+ul.tool_bar li {
+    background: #7ba5ff;
+}
+
+ul.dropdown_menu{
+    background: rgb(75, 100, 209);
+}
+
+ul.dropdwon_menu li a{
+    color: #fff;
+}
