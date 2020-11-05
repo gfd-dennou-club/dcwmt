@@ -7,7 +7,7 @@ $(function() {
       }
     })
     .click(function() {
-      var options;
+      let options;
       if ( $( this ).text() === "play" ) {
         options = {
           label: "pause",
@@ -37,7 +37,7 @@ $(function() {
       }
     })
     .click(function() {
-      var options;
+      let options;
       if ( $( this ).text() === "play" ) {
         options = {
           label: "pause",
@@ -58,7 +58,4 @@ $(function() {
       }
       $( this ).button( "option", options );
     });
-
-
-
 });

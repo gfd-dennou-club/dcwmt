@@ -74,7 +74,7 @@ $(function() {
 			title:"カラーマップ変更", //タイトル
 			buttons: { //ボタン
 			  "決定": function() {
-            var obj = document.getElementById("select_clrmap");
+            let obj = document.getElementById("select_clrmap");
             layergroup.getActiveLayer()._colormap = eval( "clrmap_"+obj.value );
             layergroup.getActiveLayer().redraw();
             drawText( layergroup.getActiveLayer() );
@@ -95,9 +95,9 @@ $(function() {
 			title:"断面切り替え", //タイトル
 			buttons: { //ボタン
 			  "決定": function() {
-            var obj = document.getElementById("select_cross_sect");
+            let obj = document.getElementById("select_cross_sect");
             //Z=0のタイル座標の生成
-            var coords  = new L.Point(0, 0);
+            let coords  = new L.Point(0, 0);
             coords.z = 0;
 
             for( key in baseMaps ) {
@@ -106,13 +106,6 @@ $(function() {
                 baseMaps[key].getInitRange(coords);
               }
             }
-            /*for(var i = 0; i < baseMaps.length; i++){
-              layer[i].setURL( obj.value );
-              map.removeLayer(layer[i]);
-              map.addLayer(layer[i]);
-              layer[i].getInitRange(coords);
-              layer[i].redraw();
-            }*/
             //インスタンス変数定義
 				    $(this).dialog("close");
 				},
@@ -169,7 +162,6 @@ $(function() {
         "決定": function() {
           
             layergroup.getActiveLayer().setOperation( $("input[name='math']:checked").val()  );
-            //layergroup.getActiveLayer().setIsGrid($("#check_is_grid").prop('checked'));
             $(this).dialog("close");
         },
         "キャンセル": function() {
@@ -181,18 +173,3 @@ $(function() {
         $("#dlg_math").dialog("open");
     });
 });
-
-/*
-$(function() {
-  // 1アイコンをボタン左に表示
-  $("#play").button({ //classで指定するとなぜか位置が指定できない
-    icons: {
-      primary: 'ui-icon-play'
-    },
-    text: false
-  });
-  $("#play").click(function() {
-    alert("sss");
-  });
-});
-console.log($('button.play'));*/
