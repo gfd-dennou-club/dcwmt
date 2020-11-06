@@ -29,6 +29,7 @@ DCWMT.Layer.ScalarData = DCWMT.Layer.extend({
     createTile: function(coords){
         // 数値タイルを描くためのキャンバス要素を作成
         let tile = L.DomUtil.create('canvas', 'dcwmt-tile');
+        
         // tileの大きさを取得
         [tile.width, tile.height] = [DEFINE.tile_size.x, DEFINE.tile_size.y];
 
@@ -36,9 +37,8 @@ DCWMT.Layer.ScalarData = DCWMT.Layer.extend({
         let img = new Image();
 
         // イベントハンドラーの設定
-        const self = this;                                  // 引数として渡す変数を用意
         const loadedImage = this._loadedImage.bind(img);    // この関数をimgオブジェクトにバインド
-        img.onload = () => loadedImage(self, tile);         // 画像がロードし終わったら関数が実行されるように設定
+        img.onload = () => loadedImage(this, tile);         // 画像がロードし終わったら関数が実行されるように設定
        
         // 読み込み処理を実行
         img.src = `${this.options.scalar_layer_of_dir}/${coords.z}/${coords.x}/${coords.y}.png`;

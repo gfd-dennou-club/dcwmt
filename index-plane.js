@@ -7,6 +7,7 @@ const wrap_crs = L.Util.extend({}, L.CRS.Simple, {
 const map = L.map(
     'plane-map',
     {
+        preferCanvas: true, // Canvasレンダラーを選択
         center:     [0, 0],
         crs:        wrap_crs,
         maxZoom:    DEFINE.max_zoom,
@@ -24,7 +25,9 @@ let layers = new L.control.layers();
 for(let scalar_quantity_of_dir of DEFINE.physical_quantity_of_dir.scalar){
     //[TODO]: ディレクトリの受け渡しが決め打ちになっている. 時間と高さを変更できるように拡張すべし.
     const scalar_layer = DCWMT.layer.scalarData(
-        { scalar_layer_of_dir: `${DEFINE.root_of_dir}/${scalar_quantity_of_dir}/${DEFINE.time_of_dir[0]}/${DEFINE.z_axios_of_dir[0]}` }
+        { 
+            scalar_layer_of_dir: `${DEFINE.root_of_dir}/${scalar_quantity_of_dir}/${DEFINE.time_of_dir[0]}/${DEFINE.z_axios_of_dir[0]}`,
+        }
     );
     layers.addBaseLayer(scalar_layer, scalar_quantity_of_dir);
     layers.addOverlay(scalar_layer, scalar_quantity_of_dir);

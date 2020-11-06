@@ -8,7 +8,7 @@
 let DCWMT = {};
 
 DCWMT.Layer = L.GridLayer.extend({
-    
+ 
 });
 
 DCWMT.Handler = L.Handler.extend({

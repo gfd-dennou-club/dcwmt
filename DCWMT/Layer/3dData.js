@@ -29,7 +29,6 @@ DCWMT.Layer.ThreedData = DCWMT.Layer.extend({
     createTile: function(coords){
         // 数値タイルを描くためのキャンバス要素を作成
         let tile = document.createElement('canvas');
-        tile.setAttribute('id', 'sqhere-tile');
         // tileの大きさを取得
         [tile.width, tile.height] = [DEFINE.tile_size.x, DEFINE.tile_size.y];
 
@@ -103,10 +102,10 @@ DCWMT.Layer.ThreedData = DCWMT.Layer.extend({
 
         // 読み込み失敗時は白を返す
         if(data === 0.0000000000)   { return {r:0, g:255, b:255, a:255}; }
-
-        if(this.options.colormap.length <= colormap_index) { return this.options.colormap[this.options.colormap.length - 1]; }
-        else if (0 > colormap_index)                       { return this.options.colormap[0]; }
-        else                                               { return this.options.colormap[colormap_index]; }                          // それ以外は対応する色を返す
+        
+        if(this.options.colormap.length <= colormap_index)      { return this.options.colormap[this.options.colormap.length - 1]; }
+        else if (0 > colormap_index)                            { return this.options.colormap[0]; }
+        else                                                    { return this.options.colormap[colormap_index]; }                          // それ以外は対応する色を返す
     },
 });
 
