@@ -58,5 +58,10 @@ div.color-range {
 
 div.animation {
     height: 100%;
-    width: 65%;
+    width: 45%/*65%*/;
+}
+
+div#toolbar {
+    height: 100%;
+    width: 20%/*65%*/;
 }
