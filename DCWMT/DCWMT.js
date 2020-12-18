@@ -7,9 +7,10 @@
 
 let DCWMT = {};
 
-DCWMT.Layer = L.GridLayer.extend({
- 
-});
+DCWMT.Layer = {
+    Plane: L.GridLayer.extend({}),
+    Globe: {},
+};
 
 DCWMT.Handler = L.Handler.extend({
    
@@ -24,7 +25,10 @@ DCWMT.Module = {
 };
 
 // factory関数
-DCWMT.layer = {}
-DCWMT.control = {}
-DCWMT.handler = {}
-DCWMT.module = {}
+DCWMT.layer = {
+    plane: {},
+    globe: {},
+};
+DCWMT.control = {};
+DCWMT.handler = {};
+DCWMT.module = {};

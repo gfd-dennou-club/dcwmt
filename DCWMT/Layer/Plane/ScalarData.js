@@ -1,7 +1,9 @@
-// class name:  DCWMT.Layer.ScalarData
-// role:        トーン図やコンター図の表示に関するクラス
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// propaty:     
+// class name:  DCWMT.Layer.Plane.ScalarData
+// role:        トーン図やコンター図を平面上に表示するためのクラス
+//
+// member:     
 //              [public]
 //              options: {}                                                         ->  クラス内の共有変数を定義群
 //              initialize: function()                                              ->  コンストラクタ
@@ -11,8 +13,10 @@
 //              _draw: function(tile: Object)                                       ->  シミュレーションデータの描画
 //              _loadedImage: function(selft: Object, tile: Object)                 ->  imgオブジェクトで画像を読み終わった際に呼ばれるイベントハンドラー
 //              _getColor: function(data: Number)                                   ->  数値データからカラーマップを参照して, 色を選択
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-DCWMT.Layer.ScalarData = DCWMT.Layer.extend({
+DCWMT.Layer.Plane.ScalarData = DCWMT.Layer.Plane.extend({
     options:{
         _scalarData: new Float32Array(),                        // 数値シミュレーションデータから読み取ったデータ
         _min: new Number(),                                     // スカラーデータの最小値
@@ -31,7 +35,7 @@ DCWMT.Layer.ScalarData = DCWMT.Layer.extend({
         let tile = L.DomUtil.create('canvas', 'dcwmt-tile');
         
         // tileの大きさを取得
-        [tile.width, tile.height] = [DEFINE.tile_size.x, DEFINE.tile_size.y];
+        [tile.width, tile.height] = [this.options.tileSize.x, this.options.tileSize.y];
 
         // 数値データタイルの画像を読み込むためのオブジェクトを用意
         let img = new Image();
@@ -56,7 +60,7 @@ DCWMT.Layer.ScalarData = DCWMT.Layer.extend({
         let red, green, blue,                                                                   // red値, green値, blue値, それぞれの保管用変数
             dataView = new DataView(new ArrayBuffer(32)),                                       // 32bit値を保存しておく変数
             scalarData = new Array();                                                           // Float32を保管しておく配列
-        for(let i = 0; i < tile.width * tile.height; i++){
+        for(let i = 0; i < tile.width*tile.height; i++){
             const bias_rgb_index = i * 4;
             red =   rgba[bias_rgb_index    ]  << 24;
             green = rgba[bias_rgb_index + 1]  << 16;
@@ -100,9 +104,6 @@ DCWMT.Layer.ScalarData = DCWMT.Layer.extend({
         const colormap_per_scalardata = this.options.colormap.length / (this.options._max - this.options._min);
         const colormap_index = parseInt(colormap_per_scalardata * (data - this.options._min));
 
-        // 読み込み失敗時は白を返す
-        if(data === 0.0000000000)   { return {r:0, g:255, b:255, a:255}; }
-
         if(this.options.colormap.length <= colormap_index) { return this.options.colormap[this.options.colormap.length - 1]; }
         else if (0 > colormap_index)                       { return this.options.colormap[0]; }
         else                                               { return this.options.colormap[colormap_index]; }                          // それ以外は対応する色を返す
@@ -111,6 +112,6 @@ DCWMT.Layer.ScalarData = DCWMT.Layer.extend({
 
 // DCWMT.layer.scalarData: function(options: Object)    ->  Object
 // ファクトリ関数
-DCWMT.layer.scalarData = function(options){
-    return new DCWMT.Layer.ScalarData(options);
+DCWMT.layer.plane.scalarData = function(options){
+    return new DCWMT.Layer.Plane.ScalarData(options);
 }

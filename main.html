@@ -14,8 +14,12 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
     integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
     crossorigin=""></script>
+    
+    <!-- Proj4Leaflet関連 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.6.3/proj4.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4leaflet/1.0.2/proj4leaflet.min.js"></script>
 
-    <!-- cesium.js -->
+    <!-- cesium.js関連 -->
     <script src="https://cesium.com/downloads/cesiumjs/releases/1.76/Build/Cesium/Cesium.js"></script>
     <link href="https://cesium.com/downloads/cesiumjs/releases/1.76/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
 
@@ -25,11 +29,15 @@
     <script src="https://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
 
     <!-- DCWMT関連 -->
+    <script src="./DCWMT/DCWMT.js"></script>
     <script src="./define.js"></script>
     <script src="./colormap.js"></script>
-    <script src="./DCWMT/DCWMT.js"></script>
-    <script src="./DCWMT/Layer/ScalarData.js"></script>
-    <script src="./DCWMT/Layer/Grid.js"></script>
+    <!-- <script src="./DCWMT/Layer/"></script> -->
+    <script src="./DCWMT/Layer/Plane/ScalarData.js"></script>
+    <script src="./DCWMT/Layer/Globe/ScalarData.js"></script>
+
+    <!-- その他 -->
+    <script src="./debug/exportCSV.js"></script>
   </head>
   <body>
     <div class="dcwmt-wrapper">
@@ -38,8 +46,8 @@
       </header>
       <div class="main-screen">
         <div id="plane-map"></div>
-        <div id="spherical-map"></div>
         <script src="./index-plane.js"></script>
+        <div id="spherical-map"></div>
         <script src="./index-spherical.js"></script>
       </div>
       <footer>
