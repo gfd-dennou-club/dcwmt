@@ -21,7 +21,7 @@ DCWMT.Layer.Plane.ScalarData = DCWMT.Layer.Plane.extend({
         _scalarData: new Float32Array(),                        // 数値シミュレーションデータから読み取ったデータ
         _min: new Number(),                                     // スカラーデータの最小値
         _max: new Number(),                                     // スカラーデータの最大値
-        coords: {x: 0, y: 0, z: 0},                             // タイルを参照するための座標
+        zoom_level: new Number(),                               // マップの拡大率
         colormap: clrmap_04,                                    // カラーマップ
     },
 
@@ -31,6 +31,9 @@ DCWMT.Layer.Plane.ScalarData = DCWMT.Layer.Plane.extend({
     },
 
     createTile: function(coords){
+        // 拡大率を保持
+        this.options.zoom_level = coords.z;
+
         // 数値タイルを描くためのキャンバス要素を作成
         let tile = L.DomUtil.create('canvas', 'dcwmt-tile');
         
@@ -69,11 +72,14 @@ DCWMT.Layer.Plane.ScalarData = DCWMT.Layer.Plane.extend({
             dataView.setUint32(0, red + green + blue);
             scalarData[i] = dataView.getFloat32(0);
 
-            if(i != 0){
-                if(self.options._min >= scalarData[i]){ self.options._min = scalarData[i]; }    // 最小値を求める
-                if(self.options._max <= scalarData[i]){ self.options._max = scalarData[i]; }    // 最大値を求める
-            }else{ 
-                self.options._min = self.options._max = scalarData[i]; 
+            // 全体画像の時だけ最大値と最小値を求める
+            if(self.options.zoom_level == 0){
+                if(i != 0){
+                    if(self.options._min >= scalarData[i]){ self.options._min = scalarData[i]; }    // 最小値を求める
+                    if(self.options._max <= scalarData[i]){ self.options._max = scalarData[i]; }    // 最大値を求める
+                }else{ 
+                    self.options._min = self.options._max = scalarData[i]; 
+                }
             }
         }
 
@@ -86,15 +92,46 @@ DCWMT.Layer.Plane.ScalarData = DCWMT.Layer.Plane.extend({
         const ctx = tile.getContext('2d');
         let imgData = ctx.getImageData(0, 0, tile.width, tile.height);
 
-        for(let i = 0; i < tile.width * tile.height; i++){
+        for(let i = 0; i < tile.width; i++){
             const bias_rgb_index = i * 4;
-            const rgb = this._getColor(this.options._scalarData[i]);
-            imgData.data[bias_rgb_index  ] = rgb.r;
-            imgData.data[bias_rgb_index+1] = rgb.g;
-            imgData.data[bias_rgb_index+2] = rgb.b;
-            imgData.data[bias_rgb_index+3] = 255;
+            imgData.data[bias_rgb_index  ] = 0;
+            imgData.data[bias_rgb_index+1] = 0;
+            imgData.data[bias_rgb_index+2] = 0;
+            imgData.data[bias_rgb_index+3] = 255;   
+        }
+        for(let i = tile.width; i < tile.width*tile.height - tile.width; i++){
+            const bias_rgb_index = i * 4;
+            if(i % tile.width == 0){
+                imgData.data[bias_rgb_index  ] = 0;
+                imgData.data[bias_rgb_index+1] = 0;
+                imgData.data[bias_rgb_index+2] = 0;
+                imgData.data[bias_rgb_index+3] = 255; 
+            }else{
+                const rgb = this._getColor(this.options._scalarData[i]);
+                imgData.data[bias_rgb_index  ] = rgb.r;
+                imgData.data[bias_rgb_index+1] = rgb.g;
+                imgData.data[bias_rgb_index+2] = rgb.b;
+                imgData.data[bias_rgb_index+3] = 255;  
+            }
+        }
+        for(let i = tile.width*tile.height - tile.width; i < tile.width*tile.height; i++){
+            const bias_rgb_index = i * 4;
+            imgData.data[bias_rgb_index  ] = 0;
+            imgData.data[bias_rgb_index+1] = 0;
+            imgData.data[bias_rgb_index+2] = 0;
+            imgData.data[bias_rgb_index+3] = 255;   
         }
 
+
+        // for(let i = 0; i < tile.width * tile.height; i++){
+        //     const bias_rgb_index = i * 4;
+        //     const rgb = this._getColor(this.options._scalarData[i]);
+        //     imgData.data[bias_rgb_index  ] = rgb.r;
+        //     imgData.data[bias_rgb_index+1] = rgb.g;
+        //     imgData.data[bias_rgb_index+2] = rgb.b;
+        //     imgData.data[bias_rgb_index+3] = 255;   
+        // }
+       
         ctx.putImageData(imgData, 0, 0);
     },
 
@@ -104,8 +141,14 @@ DCWMT.Layer.Plane.ScalarData = DCWMT.Layer.Plane.extend({
         const colormap_per_scalardata = this.options.colormap.length / (this.options._max - this.options._min);
         const colormap_index = parseInt(colormap_per_scalardata * (data - this.options._min));
 
-        if(this.options.colormap.length <= colormap_index) { return this.options.colormap[this.options.colormap.length - 1]; }
-        else if (0 > colormap_index)                       { return this.options.colormap[0]; }
+        // console.log("data: " + data);
+        // console.log("max: " + this.options._max + ", min: " + this.options._min);
+        // console.log("colormap_per_scalardata: " + colormap_per_scalardata);
+        // console.log("colormap_index: " + colormap_index);
+        // console.log(" ")
+        
+        if(colormap_index >= this.options.colormap.length) { return this.options.colormap[this.options.colormap.length - 1]; }
+        else if (colormap_index < 0)                       { return this.options.colormap[0]; }
         else                                               { return this.options.colormap[colormap_index]; }                          // それ以外は対応する色を返す
     },
 });

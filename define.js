@@ -27,42 +27,22 @@
 // };
 
 const DEFINE = {
-	root_of_dir: "../tile",
-	time_of_dir: "time=32125",
-	physical_quantity_of_dir: {
-		scalar: ["PRCP", ],
-		vector: [],
+	ROOT: "../tile",
+	PHYSICAL_QUANTITY: {
+		PRCP: {
+			FIXED: ["time=32125"],
+			SIZE: {X: 384, Y: 192},
+			MAX_ZOOM: 2,
+		},
+		Ps: {
+			FIXED: ["time=32112"],
+			SIZE: {X: 384, Y: 192},
+			MAX_ZOOM: 2,
+		},
+		SLP: {
+			FIXED: ["time=32113"],
+			SIZE: {X: 384, Y: 192},
+			MAX_ZOOM: 2,
+		}
 	},
-	tile_size: {x: 384,y: 192},
-	max_zoom:  2,
-	DimentionInfo: [
-		{
-			name: "lon",
-			length: 1536,
-			stride: -0.2344,
-			start_value: 0.000000,
-			end_value: 359.765600,
-		},
-		{
-			name: "lat",
-			length: 768,
-			stride: -0.23226,
-			start_value: -89.920710,
-			end_value: 89.820710,
-		},
-		{
-			name: "level",
-			length: 0,
-			stride: 0.000000,
-			start_value: 0.000000,
-			end_value: 0.000000,
-		},
-		{
-			name: "time",
-			length: 1,
-			stride: 0.000000,
-			start_value: 32125.000000,
-			end_value: 32125.000000,
-		},
-	],
 };

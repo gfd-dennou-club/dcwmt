@@ -20,11 +20,15 @@ DCWMT.Layer.Globe.ScalarData = class{
     options = {
         _myImageryProdiver: undefined, // 数値データタイルから数値データを取り出し可視化させたレイヤーを作成する
         _imageryProviderHooks: {},     // レイヤーに関するホック
+        _zoomLevel: new Number(),
+        tileSize: {},
     }
 
     // @cunstructor(options)
     // 数値データタイルを復元する機能を搭載したimageProviderを返す
     constructor(options){
+        [this.options.tileSize.x, this.options.tileSize.y] = [options.width, options.height];
+
         // ホックを定義しておく
         this.options._imageryProviderHooks.addRecolorFunc = this._addRecolorFunc;
         this.options._imageryProviderHooks.visualizeImage = this._visualizeImage;
@@ -57,6 +61,8 @@ DCWMT.Layer.Globe.ScalarData = class{
         imageryProvider.recolorFunc = recolorFunc;                          // 引数により与えられたハンドラをimageProviderのハンドラとして登録
         // requestImageメソッドを上書き
         imageryProvider.requestImage = (x, y, level) => {
+            // 拡大率を保持
+            this.options._zoomLevel = level;
             // 読み込んだ画像(HTMLCanvasElement)を変数に保存
             const imagePromise = imageryProvider.base_requestImage(x, y, level);
             // 読み込んだ画像がundefinedだった場合, それをそのまま返す.
@@ -76,7 +82,7 @@ DCWMT.Layer.Globe.ScalarData = class{
     // @method: _visualizeImage(image: 元画像データ, recolorFunc: 数値データを復元するための関数) => image(HTMLCanvasElement): 数値データに復元された画像
     // 画像に対して色を塗っていく関数
     _visualizeImage = (image, recolorFunc) => {
-        const lendth = DEFINE.tile_size.x * DEFINE.tile_size.y;                                 // イメージデータより配列の長さを取得
+        const lendth = this.options.tileSize.x * this.options.tileSize.y;                       // イメージデータより配列の長さを取得
         let min = undefined, max = undefined;                                                   // 最小値と最大値を保存しておくための変数を用意
         let red, green, blue;
         let dataView = new DataView(new ArrayBuffer(32));                                       // 32bit値を保存しておく変数
@@ -92,22 +98,24 @@ DCWMT.Layer.Globe.ScalarData = class{
             dataView.setUint32(0, red + green + blue);
             scalarData[i] = dataView.getFloat32(0);
 
-            if(min === undefined || max === undefined)    { min = max = scalarData[i];    }
-            else if(min >= scalarData[i])                 { min = scalarData[i];          }
-            else if(max <= scalarData[i])                 { max = scalarData[i];          }
+            if(this.options._zoomLevel == 0){
+                if(min === undefined || max === undefined)    { min = max = scalarData[i];    }
+                else if(min >= scalarData[i])                 { min = scalarData[i];          }
+                else if(max <= scalarData[i])                 { max = scalarData[i];          }
+            }
         }
 
         // クロミウムの場合, タイルが上下反転してしまうという問題があるためそれを対処
         if(useBlowser() === "Chrome"){ 
             let tempAry = new Array();
-            for(let x = 0; x < DEFINE.tile_size.x; x++){
+            for(let x = 0; x < this.options.tileSize.x; x++){
                 let colAry = new Array();
-                for(let y = 0; y < DEFINE.tile_size.y; y++){
-                    colAry[y] = scalarData[y*DEFINE.tile_size.x + x];
+                for(let y = 0; y < this.options.tileSize.y; y++){
+                    colAry[y] = scalarData[y*this.options.tileSize.x + x];
                 }
                 colAry.reverse();
-                for(let y = 0; y < DEFINE.tile_size.y; y++){
-                    tempAry[y*DEFINE.tile_size.x + x] = colAry[y];
+                for(let y = 0; y < this.options.tileSize.y; y++){
+                    tempAry[y*this.options.tileSize.x + x] = colAry[y];
                 }
             }
             scalarData = Array.from(tempAry);
@@ -157,9 +165,7 @@ DCWMT.Layer.Globe.ScalarData = class{
         imageryProvider.pickFeatures = (x, y, level, longitude, latitude) => {
             // 特徴を含んだプロミスを取得
             const featurePromise = imageryProvider.base_pickFeatures(x, y, level, longitude, latitude);
-            console.log("x: " + x, ", y :" + y)
-            console.log("level: "+level);
-            console.log("lon: " + longitude + ", lat: " + latitude)
+            console.log("x: " + x + ", y: " + y);
             // undefinedだった場合...
             if(!Cesium.defined(featurePromise)) { return featurePromise;                }
             // オブジェクトが存在した場合は, 引数で受け取ったホックを実行し, その返り値を含んだプロミスを返す
