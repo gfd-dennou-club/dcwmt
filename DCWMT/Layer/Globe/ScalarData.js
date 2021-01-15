@@ -21,6 +21,8 @@ DCWMT.Layer.Globe.ScalarData = class{
         _myImageryProdiver: undefined, // 数値データタイルから数値データを取り出し可視化させたレイヤーを作成する
         _imageryProviderHooks: {},     // レイヤーに関するホック
         _zoomLevel: new Number(),
+        _min: new Number(),
+        _max: new Number(),
         tileSize: {},
     }
 
@@ -34,13 +36,24 @@ DCWMT.Layer.Globe.ScalarData = class{
         this.options._imageryProviderHooks.visualizeImage = this._visualizeImage;
         this.options._imageryProviderHooks.addPickFeaturesHook = this._addPickFeaturesHook;
 
-        let custom_imageryProdiver = new Cesium.OpenStreetMapImageryProvider({
-            url: options.url,
-            tileHeight: options.height,
-            tileWidth: options.width,
+        let custom_imageryProdiver = new Cesium.UrlTemplateImageryProvider({
+            url: options.url + "{z}/{x}/{y}.png",
+            tilingScheme: new Cesium.GeographicTilingScheme({
+                numberOfLevelZeroTilesX: 1
+            }),
+            tileHeight: this.options.tileSize.y,
+            tileWidth: this.options.tileSize.x,
             maximumLevel: options.maxZoom,
             mimimumLevel: options.minZoom,
-        });
+        })
+
+        // let custom_imageryProdiver = new Cesium.OpenStreetMapImageryProvider({
+        //     url: options.url,
+        //     tileHeight: this.options.tileSize.y,
+        //     tileWidth: this.options.tileSize.x,
+        //     maximumLevel: options.maxZoom,
+        //     mimimumLevel: options.minZoom,
+        // });
 
         this.options._imageryProviderHooks.addRecolorFunc(custom_imageryProdiver, this.recolorFunc);
         this.options._imageryProviderHooks.addPickFeaturesHook(custom_imageryProdiver, this.options.hooks);
@@ -61,8 +74,6 @@ DCWMT.Layer.Globe.ScalarData = class{
         imageryProvider.recolorFunc = recolorFunc;                          // 引数により与えられたハンドラをimageProviderのハンドラとして登録
         // requestImageメソッドを上書き
         imageryProvider.requestImage = (x, y, level) => {
-            // 拡大率を保持
-            this.options._zoomLevel = level;
             // 読み込んだ画像(HTMLCanvasElement)を変数に保存
             const imagePromise = imageryProvider.base_requestImage(x, y, level);
             // 読み込んだ画像がundefinedだった場合, それをそのまま返す.
@@ -72,6 +83,7 @@ DCWMT.Layer.Globe.ScalarData = class{
                 let img;
                 if(Cesium.defined(image)){ // imageオブジェクトがundefinedでなければ...
                     const context = this._getCanvasContext(imageryProvider, image);                           // 画像のコンテキストを取得
+                    this.options._zoomLevel = level;
                     img = this._recolorImageWithCanvasContext(context, image, imageryProvider.recolorFunc);   // 数値データを可視化した画像に変換
                 }
                 return img; // 変換した画像を返す
@@ -82,14 +94,13 @@ DCWMT.Layer.Globe.ScalarData = class{
     // @method: _visualizeImage(image: 元画像データ, recolorFunc: 数値データを復元するための関数) => image(HTMLCanvasElement): 数値データに復元された画像
     // 画像に対して色を塗っていく関数
     _visualizeImage = (image, recolorFunc) => {
-        const lendth = this.options.tileSize.x * this.options.tileSize.y;                       // イメージデータより配列の長さを取得
-        let min = undefined, max = undefined;                                                   // 最小値と最大値を保存しておくための変数を用意
+        const length = this.options.tileSize.x * this.options.tileSize.y;                       // イメージデータより配列の長さを取得
         let red, green, blue;
         let dataView = new DataView(new ArrayBuffer(32));                                       // 32bit値を保存しておく変数
         let scalarData = new Array();
 
         // 数値データの復元に加えて, 最大値と最小値を確保
-        for(let i = 0; i < lendth; i++){
+        for(let i = 0; i < length; i++){
             const bias_rgb_index = i * 4;
             red     = image.data[bias_rgb_index     ] << 24;
             green   = image.data[bias_rgb_index + 1 ] << 16;
@@ -99,9 +110,9 @@ DCWMT.Layer.Globe.ScalarData = class{
             scalarData[i] = dataView.getFloat32(0);
 
             if(this.options._zoomLevel == 0){
-                if(min === undefined || max === undefined)    { min = max = scalarData[i];    }
-                else if(min >= scalarData[i])                 { min = scalarData[i];          }
-                else if(max <= scalarData[i])                 { max = scalarData[i];          }
+                if(i == 0)                                                  { this.options._min = this.options._max = scalarData[i];    }
+                else if(this.options._min >= scalarData[i])                 { this.options._min = scalarData[i];          }
+                else if(this.options._max <= scalarData[i])                 { this.options._max = scalarData[i];          }
             }
         }
 
@@ -122,9 +133,9 @@ DCWMT.Layer.Globe.ScalarData = class{
         }
 
         // 色を塗り替えてゆく
-        for(let i = 0; i < lendth; i++){
+        for(let i = 0; i < length; i++){
             const bias_rgb_index = i * 4;
-            const rgb = recolorFunc(scalarData[i], min, max);
+            const rgb = recolorFunc(scalarData[i]);
             image.data[bias_rgb_index    ] = rgb.r;
             image.data[bias_rgb_index + 1] = rgb.g;
             image.data[bias_rgb_index + 2] = rgb.b;
@@ -166,6 +177,8 @@ DCWMT.Layer.Globe.ScalarData = class{
             // 特徴を含んだプロミスを取得
             const featurePromise = imageryProvider.base_pickFeatures(x, y, level, longitude, latitude);
             console.log("x: " + x + ", y: " + y);
+            console.log("level: " + level)
+            console.log("lon: " + (longitude * 180.0 / Cesium.Math.PI) + ", lat: " + (latitude* 180.0 / Cesium.Math.PI ))
             // undefinedだった場合...
             if(!Cesium.defined(featurePromise)) { return featurePromise;                }
             // オブジェクトが存在した場合は, 引数で受け取ったホックを実行し, その返り値を含んだプロミスを返す
@@ -173,14 +186,14 @@ DCWMT.Layer.Globe.ScalarData = class{
         }
     }
 
-    recolorFunc = (data, min, max) => {
+    recolorFunc = (data) => {
         // カラーマップの配列の要素値を作成(以下の比の計算)
         // colomap の長さ : scalardata の長さ(_max - _min) = colormap_index : data - this.options._min (_minに基準を合わせている)
-        const colormap_per_scalardata = clrmap_04.length / (max - min);
-        const colormap_index = parseInt(colormap_per_scalardata * (data - min));
+        const colormap_per_scalardata = clrmap_04.length / (this.options._max - this.options._min);
+        const colormap_index = parseInt(colormap_per_scalardata * (data - this.options._min));
      
-        if(clrmap_04.length <= colormap_index)             { return clrmap_04[clrmap_04.length - 1]; }
-        else if (0 > colormap_index)                       { return clrmap_04[0]; }
+        if(colormap_index >= clrmap_04.length)             { return clrmap_04[clrmap_04.length - 1]; }
+        else if (colormap_index < 0)                       { return clrmap_04[0]; }
         else                                               { return clrmap_04[colormap_index]; }                          // それ以外は対応する色を返す
      }
 }
