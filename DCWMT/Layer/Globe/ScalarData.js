@@ -38,9 +38,7 @@ DCWMT.Layer.Globe.ScalarData = class{
 
         let custom_imageryProdiver = new Cesium.UrlTemplateImageryProvider({
             url: options.url + "{z}/{x}/{y}.png",
-            tilingScheme: new Cesium.GeographicTilingScheme({
-                numberOfLevelZeroTilesX: 1
-            }),
+            tilingScheme: new Cesium.WebMercatorTilingScheme(),//tilingScheme,
             tileHeight: this.options.tileSize.y,
             tileWidth: this.options.tileSize.x,
             maximumLevel: options.maxZoom,
@@ -49,6 +47,7 @@ DCWMT.Layer.Globe.ScalarData = class{
 
         // let custom_imageryProdiver = new Cesium.OpenStreetMapImageryProvider({
         //     url: options.url,
+        //     //tilingScheme: tilingScheme,
         //     tileHeight: this.options.tileSize.y,
         //     tileWidth: this.options.tileSize.x,
         //     maximumLevel: options.maxZoom,
@@ -189,7 +188,7 @@ DCWMT.Layer.Globe.ScalarData = class{
     recolorFunc = (data) => {
         // カラーマップの配列の要素値を作成(以下の比の計算)
         // colomap の長さ : scalardata の長さ(_max - _min) = colormap_index : data - this.options._min (_minに基準を合わせている)
-        const colormap_per_scalardata = clrmap_04.length / (this.options._max - this.options._min);
+        const   colormap_per_scalardata = clrmap_04.length / (this.options._max - this.options._min);
         const colormap_index = parseInt(colormap_per_scalardata * (data - this.options._min));
      
         if(colormap_index >= clrmap_04.length)             { return clrmap_04[clrmap_04.length - 1]; }

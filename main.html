@@ -3,6 +3,9 @@
   <head>
     <meta charset="UTF-8">
     <title>DCWMT</title>
+    <!-- その他 -->
+    <script src="./debug/exportCSV.js"></script>
+
     <!-- css -->
     <link rel="stylesheet" href="./css/layout.css">
     <link rel="stylesheet" href="./css/design.css">
@@ -20,8 +23,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4leaflet/1.0.2/proj4leaflet.min.js"></script>
 
     <!-- cesium.js関連 -->
-    <script src="https://cesium.com/downloads/cesiumjs/releases/1.76/Build/Cesium/Cesium.js"></script>
-    <link href="https://cesium.com/downloads/cesiumjs/releases/1.76/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.77/Build/Cesium/Cesium.js"></script>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.77/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
 
     <!-- jQuery関連 -->
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" type="text/css">
@@ -32,12 +35,10 @@
     <script src="./DCWMT/DCWMT.js"></script>
     <script src="./define.js"></script>
     <script src="./colormap.js"></script>
-    <!-- <script src="./DCWMT/Layer/"></script> -->
     <script src="./DCWMT/Layer/Plane/ScalarData.js"></script>
+    <script src="./DCWMT/Layer/TilingScheme/tilingScheme.js"></script>
+    <script src="./DCWMT/Layer/Projection/project.js"></script>
     <script src="./DCWMT/Layer/Globe/ScalarData.js"></script>
-
-    <!-- その他 -->
-    <script src="./debug/exportCSV.js"></script>
   </head>
   <body>
     <div class="dcwmt-wrapper">
@@ -45,9 +46,7 @@
         <script src="./DCWMT/Modlue/ToolBar.js"></script>
       </header>
       <div class="main-screen">
-        <!-- <div id="plane-map"></div> -->
         <div id="spherical-map"></div>
-        <!-- <script src="./index-plane.js"></script> -->
         <script src="./index-spherical.js"></script>
       </div>
       <footer>

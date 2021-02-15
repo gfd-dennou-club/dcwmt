@@ -31,6 +31,7 @@ ul.tool_bar li{
 
 div.main-screen {
     height: 75%;
+    /* height: 100%; */
     display: flex;
 }
 

@@ -4,7 +4,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-// exprotRgbCSV(record: Array): Void
+// @method: exprotRgbCSV(record: Array): Void
 // 画像中のRGBそれぞれの値をCSV形式で出力を行う関数です. この関数を該当の箇所に記述してください.
 // cxt.getImageData で取得した各画素のRGB値を引数として与えてください. 
 const exportRgbCSV = record => {
@@ -12,10 +12,35 @@ const exportRgbCSV = record => {
   const RED = 0, GREEN = 1, BLUE = 2;
   [RED, GREEN, BLUE].forEach(color => exportCSV(rgba, color))
 }
+
+const exportPnmFromRgb = (record, width, height) => {
+  const rgba = sliceByNumber(record, 4);
+  const rgb = rgba.map(value => new Uint8Array([value[0], value[1], value[2]]))
+  let text = `P3\r\n${width} ${height}\r\n255\r\n`;
+  text += rgb.map( value => value.join(' ')).join('\r\n');
+  const blob = new Blob([text], {type: "text/ppm"});
+  let link = document.createElement('a');
+  const csvName = useOS() + '-' + useBlowser() + '.ppm';
+  
+  if (window.navigator.msSaveOrOpenBlob) {    
+    // for Internet Exproler
+    window.navigator.msSaveOrOpenBlob(blob, file_name);
+  } else if (window.webkitURL && window.webkitURL.createObjectURL) {
+    // for chrome (and safari)
+    link.href = window.webkitURL.createObjectURL(blob);
+    link.download = csvName;
+    link.click();
+  } else if (window.URL && window.URL.createObjectURL) {
+    // for firefox
+    link.href = window.URL.createObjectURL(blob);
+    link.download = csvName;
+    link.click();
+  }
+}
   
 // exprotCSV(rgbaArray: Array, COLOR: Int): Void
 // CSV形式でファイル出力を実際に行う関数です. exportRgbCSV関数内で呼び出されます.
-const exportCSV = (rgbaArray, COLOR) => {
+const exportColorToCSV = (rgbaArray, COLOR) => {
   let rgb = rgbaArray.map(value => value[COLOR]);
   rgb = sliceByNumber(rgb, 100);
   rgb = rgb.map(value => value.join(',')).join('\r\n');
