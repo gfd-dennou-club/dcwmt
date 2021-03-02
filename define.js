@@ -37,7 +37,7 @@ const DEFINE = {
 		Ps: {
 			FIXED: ["time=32112"],
 			SIZE: {X: 256, Y: 256},
-			MAX_ZOOM: 0,
+			MAX_ZOOM: 2,
 		},
 		SLP: {
 			FIXED: ["time=32113"],

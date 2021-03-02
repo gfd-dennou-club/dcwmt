@@ -4,22 +4,22 @@ const proj = new Cesium.GeographicProjection(Cesium.Ellipsoid.WGS84);
 // 座標変換( 地図投影法 → ピクセル座標 )
 // この関数は project, unproject 内で使用するため, 既存機能としては存在していない
 proj.transform = ( longlat ) => {
-    const firstProjection = "EPSG:4326";
-    // const secondProjection = `+proj=merc +a=1.0 +b=1.0 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs`;
-    const secondProjection = `+proj=moll +a=1.0m +b=1.0 +lon_0=0 +x_0=0 +y_0=0 +units=m no_defs`;
+    // const firstProjection = "EPSG:4326";
+    // // const secondProjection = `+proj=merc +a=1.0 +b=1.0 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs`;
+    // const secondProjection = `+proj=moll +a=1.0m +b=1.0 +lon_0=0 +x_0=0 +y_0=0 +units=m no_defs`;
 
-    if(longlat.latitude >= (Math.PI / 2.0)-(5.0 * Math.PI / 180.0)){ longlat.latitude = 85.0 * Math.PI / 180.0; }
-    else if (longlat.latitude <= -(Math.PI / 2.0)+(5.0 * Math.PI / 180.0)){ longlat.latitude = -85.0 * Math.PI / 180.0; }
+    // if(longlat.latitude >= (Math.PI / 2.0)-(5.0 * Math.PI / 180.0)){ longlat.latitude = 85.0 * Math.PI / 180.0; }
+    // else if (longlat.latitude <= -(Math.PI / 2.0)+(5.0 * Math.PI / 180.0)){ longlat.latitude = -85.0 * Math.PI / 180.0; }
 
-    const data = proj4(firstProjection, secondProjection, 
-        {
-            x: longlat.longitude * 180.0 / Math.PI, 
-            y: longlat.latitude * 180.0 / Math.PI,
-        }
-    );
+    // const data = proj4(firstProjection, secondProjection, 
+    //     {
+    //         x: longlat.longitude * 180.0 / Math.PI, 
+    //         y: longlat.latitude * 180.0 / Math.PI,
+    //     }
+    // );
 
     // return {x: data.x, y: data.y};
-    return {x: longlat.longitude, y: longlat.latitude};
+    return {x: longlat.longitude, y: longlat.latitude * 2};
 
     // sinLat = Math.sin(longlat.latitude);
     // return {

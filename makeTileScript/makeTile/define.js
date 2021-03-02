@@ -1,4 +1,4 @@
 const DEFINE = {
-	ROOT: "./",
+	ROOT: "/Users/Daichi/Desktop/tile/",
 	PHYSICAL_QUANTITY: {
 		Temp: {

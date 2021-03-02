@@ -21,8 +21,8 @@ DCWMT.Layer.Globe.ScalarData = class{
         _myImageryProdiver: undefined, // 数値データタイルから数値データを取り出し可視化させたレイヤーを作成する
         _imageryProviderHooks: {},     // レイヤーに関するホック
         _zoomLevel: new Number(),
-        _min: new Number(),
-        _max: new Number(),
+        _min: undefined,
+        _max: undefined,
         tileSize: {},
     }
 
@@ -36,9 +36,13 @@ DCWMT.Layer.Globe.ScalarData = class{
         this.options._imageryProviderHooks.visualizeImage = this._visualizeImage;
         this.options._imageryProviderHooks.addPickFeaturesHook = this._addPickFeaturesHook;
 
+        console.log(options.url)
+
         let custom_imageryProdiver = new Cesium.UrlTemplateImageryProvider({
             url: options.url + "{z}/{x}/{y}.png",
-            tilingScheme: new Cesium.WebMercatorTilingScheme(),//tilingScheme,
+            //tilingScheme: new Cesium.GeographicTilingScheme(),
+            tilingScheme: tilingScheme,
+            // tilingScheme: new Cesium.WebMercatorTilingScheme(),
             tileHeight: this.options.tileSize.y,
             tileWidth: this.options.tileSize.x,
             maximumLevel: options.maxZoom,
@@ -101,19 +105,31 @@ DCWMT.Layer.Globe.ScalarData = class{
         // 数値データの復元に加えて, 最大値と最小値を確保
         for(let i = 0; i < length; i++){
             const bias_rgb_index = i * 4;
-            red     = image.data[bias_rgb_index     ] << 24;
-            green   = image.data[bias_rgb_index + 1 ] << 16;
-            blue    = image.data[bias_rgb_index + 2 ] << 8;
 
-            dataView.setUint32(0, red + green + blue);
-            scalarData[i] = dataView.getFloat32(0);
+            // 余白の部分かどうかを判断する
+            let checker = 0xFF;
+            for(let j = 0; j < 3; j++){
+                checker &= image.data[bias_rgb_index + j];
+            }
+            if(checker == 0xFF){
+                scalarData[i] = 0.00000000;
+            }else{
+                red     = image.data[bias_rgb_index     ] << 24;
+                green   = image.data[bias_rgb_index + 1 ] << 16;
+                blue    = image.data[bias_rgb_index + 2 ] << 8;
 
-            if(this.options._zoomLevel == 0){
-                if(i == 0)                                                  { this.options._min = this.options._max = scalarData[i];    }
+                dataView.setUint32(0, red + green + blue);
+                scalarData[i] = dataView.getFloat32(0);
+            }
+
+            if(this.options._zoomLevel == 0 && scalarData[i] != 0.00000000){
+                if(this.options._min == undefined)                          { this.options._min = this.options._max = scalarData[i];    }
                 else if(this.options._min >= scalarData[i])                 { this.options._min = scalarData[i];          }
                 else if(this.options._max <= scalarData[i])                 { this.options._max = scalarData[i];          }
             }
         }
+        console.log(this.options._min);
+        console.log(this.options._max);
 
         // クロミウムの場合, タイルが上下反転してしまうという問題があるためそれを対処
         if(useBlowser() === "Chrome"){ 
@@ -140,6 +156,7 @@ DCWMT.Layer.Globe.ScalarData = class{
             image.data[bias_rgb_index + 2] = rgb.b;
             image.data[bias_rgb_index + 3] = 255;
         }
+
         return image;
     }
 
@@ -186,11 +203,13 @@ DCWMT.Layer.Globe.ScalarData = class{
     }
 
     recolorFunc = (data) => {
+        if (data == 0.00000000)                           { return {r: 255, g: 255, b: 255}; }
+
         // カラーマップの配列の要素値を作成(以下の比の計算)
         // colomap の長さ : scalardata の長さ(_max - _min) = colormap_index : data - this.options._min (_minに基準を合わせている)
-        const   colormap_per_scalardata = clrmap_04.length / (this.options._max - this.options._min);
+        const colormap_per_scalardata = clrmap_04.length / (this.options._max - this.options._min);
         const colormap_index = parseInt(colormap_per_scalardata * (data - this.options._min));
-     
+         
         if(colormap_index >= clrmap_04.length)             { return clrmap_04[clrmap_04.length - 1]; }
         else if (colormap_index < 0)                       { return clrmap_04[0]; }
         else                                               { return clrmap_04[colormap_index]; }                          // それ以外は対応する色を返す

@@ -21,7 +21,7 @@ require './circle.rb'
 # バームクーヘン状のマップを作成する際に歪ませる次元名
 @warp_dim = false
 # カラーマップ
-@clrmap = clrmap_04
+# @clrmap = clrmap_04
 
 # コマンドライン引数より物理量の抽出
 option = OptionParser.new
@@ -84,9 +84,9 @@ option.on('-b', '--baumkuchen', 'Whether to create a map of shape such as baumku
 	@warp_dim = true
 }
 
-option.on('-c', '--clrmap CLRMAP', 'color map'){|color|
-	@clrmap = color
-}
+# option.on('-c', '--clrmap CLRMAP', 'color map'){|color|
+# 	@clrmap = color
+# }
 
 # オプション以外のコマンドラインの情報を取得
 option.parse!(ARGV)
