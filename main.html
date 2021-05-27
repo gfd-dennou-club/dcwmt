@@ -1,214 +1,88 @@
 <!DOCTYPE html>
 <html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <title>DCWMT</title>
+    <!-- その他 -->
+    <script src="./debug/exportCSV.js"></script>
 
-<head>
-  <meta charset="UTF-8">
-  <title>main</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="design.css">
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" type="text/css"><!--JQueryUI.css for slider-->
-  <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"></script>
-  <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script> <!--JQuery for slider-->
-  <script src="https://code.jquery.com/ui/1.9.2/jquery-ui.js"></script> <!--JQueryUI.js for slider-->
+    <!-- css -->
+    <link rel="stylesheet" href="./css/layout.css">
+    <link rel="stylesheet" href="./css/design.css">
 
-  <script src="https://rawgit.com/kawanet/msgpack-lite/master/dist/msgpack.min.js"></script>
-  <script type="text/javascript" src="browserfs.min.js"></script>
+    <!-- cesium.js関連 -->
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.77/Build/Cesium/Cesium.js"></script>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.77/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
 
-  <script src="colormap.js"></script>
-  <script src="https://frogcat.github.io/canvas-arrow/canvas-arrow.js"></script>
+    <!-- ol-Ceisium関連 -->
+    <script src="https://cdn.jsdelivr.net/npm/ol-cesium@2.12.1/dist/olcesium.min.js"></script>
 
-  <script src="L.gridLayer.numData.js"></script>
-  <script src="L.gridLayer.vectorNumData.js"></script>
+    <!-- jQuery関連 -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" type="text/css">
+    <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
 
-  <script src="dialog.js"></script>
-  <script src="toolbar_ctl.js"></script>
-  <script src="slider.js"></script>
-  <script src="L.LayerCtl.js"></script>
-</head>
-<body>
-  <!-- ////////   dropdown menu  ///////// -->
-  <ul class="dropdwn">
-    <li>HOME</li>
-    <li id="menu_a">トーン関連
-        <ul class="dropdwn_menu">
-            <li><a id="lnk_set_opacity" href="javascript:void(0);">不透明度</a></li>
-            <li><a id="link02" href="javascript:void(0);">トーンの範囲</a></li>
-            <li><a id="lnk_math" href="javascript:void(0);">数学的操作</a></li>
-        </ul>
-    </li>
-    <li id="menu_b">カラーマップ関連
-        <ul class="dropdwn_menu">
-            <li><a id="lnk_ch_clrmap" href="javascript:void(0);">カラーマップ</a></li>
-            <li><a href="#">B2</a></li>
-            <li><a href="#">B3</a></li>
-        </ul>
-    </li>
-    <li id="menu_c">断面切り替え
-        <ul class="dropdwn_menu">
-            <li><a id="lnk_ch_cross_sect" href="javascript:void(0);">断面切り替え</a></li>
-            <li><a href="#">C2</a></li>
-            <li><a href="#">C3</a></li>
-            <li><a href="#">C4</a></li>
-        </ul>
-    </li>
-    <li id="menu_d">図
-        <ul class="dropdwn_menu">
-            <li><a id="lnk_img_type" href="javascript:void(0);">図の切り替え</a></li>
-            <li><a id="lnk_is_grid" href="javascript:void(0);">グリッド表示</a></li>
-            <li><a href="#">D3</a></li>
-            <li><a href="#">D4</a></li>
-            <li><a href="#">D5</a></li>
-        </ul>
-      </li>
-  </ul>
-  <!-- ///////end of dropdown menu//////// -->
+    <!-- knockout.js関連 -->
+    <script src="./js/knockout/switchingLayers.js" type="module"></script>
+    <!-- <script src="./js/knockout/switchingProjection.js" type="module"></script> -->
 
-  <!-- ////////  dialog content  ///////// -->
-  <div id = "dialog_content">
-    <div id="div1">
-      <p>メッセージ</p>
+    <!-- 定義ファイル -->
+    <script src="./define.js"></script>
+  </head>
+  <body>
+    <div class="dcwmt-wrapper">
+      <header id="header">
+        <script src="./js/components/toolBar.js"></script>
+      </header>
+      <div class="main-screen">
+        <div id="spherical-map"></div>
+        <!-- <script src="./js/components/canvas.js" type="module"></script> -->
+        <script src="./main.js" type="module"></script>
+        <!-- <script src="./js/components/changeProjection.js" type="module"></script>  -->
+
+        <!------------------------------------>
+        <!-- ここからはテストのために書いています -->
+        <div id="toolbar">
+          <select data-bind="options: mapProjections, optionsText: 'name', value: selectedProjection"></select>
+          <table>
+            <!-- viewModelの配列layersの要素数だけ回す -->
+            <tbody data-bind="foreach: layers">
+              <tr data-bind="css: { up: $parent.upLayer === $data, down: $parent.downLayer === $data }">
+                <!-- imageryLayerのパラメータであるshowを参照 -->
+                <td><input type="checkbox" data-bind="checked: show"></td>
+                <!-- layerの名前を表示する部分(baseLayerはselectタグ内に表示. overlaylayerはスタックして表示) -->
+                <td>
+                  <!-- imageryLayerのパラメータnameを参照. また, visibleに関しては親要素であるviewModelの関数isSelectedLayerを参照 -->
+                  <span data-bind="text: name, visible: !$parent.isSelectableLayer($data)"></span>
+                  <!-- selectタグを表示 -->
+                  <select data-bind="visible: $parent.isSelectableLayer($data), options: $parent.baseLayers, optionsText: 'name', value: $parent.selectedLayer"></select>
+                </td>
+                <!-- ツールバーに関する表示部分 -->
+                <td>
+                  <input type="range" min="0" max="1" step="0.01" data-bind="value: alpha, valueUpdate: 'input'">
+                </td>
+                <!-- レイヤを上げるためのボタン -->
+                <td>
+                  <button type="button" class="cesium-button" data-bind="click: function() { $parent.raise($data, $index()); }, visible: $parent.canRaise($index())">
+                    ▲
+                  </button>
+                </td>
+                <!-- レイヤを下げるためのボタン -->
+                <td>
+                  <button type="button" class="cesium-button" data-bind="click: function() { $parent.lower($data, $index()); }, visible: $parent.canLower($index())">
+                    ▼
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- ここまではテストのために書いています -->
+        <!------------------------------------>
+
+      </div>
+      <footer id="footer">
+      </footer>
     </div>
-
-    <div id="div2" style="display:none;">
-      max<input type="text" id="toneRangeMax" size="5" maxlength="5"><br>
-      min<input type="text" id="toneRangeMin" size="5" maxlength="5">
-    </div>
-
-    <div id="dlg_math">
-      <form id="target">
-	       <input name="math" type="radio" value="a"> 通常
-	       <input name="math" type="radio" value="b"> log10
-	       <input name="math" type="radio" value="c"> sqrt
-         <br>
-         <input name="math" type="radio" value="d"> eddy_x
-         <input name="math" type="radio" value="e"> eddy_y
-         <br>
-         <input name="math" type="radio" value="f"> eddy_xy
-       </form>
-    </div>
-
-    <div id="dlg_ch_clrmap">
-      <select name="clrmap" id="select_clrmap">
-        <option value="01">1</option>
-        <option value="02">2</option>
-        <option value="03">3</option>
-        <option value="04" selected>4</option>
-        <option value="05">5</option>
-        <option value="06">6</option>
-        <option value="07">7</option>
-        <option value="08">8</option>
-        <option value="09">9</option>
-        <option value="10">10</option>
-
-        <option value="11">11</option>
-        <option value="12">12</option>
-        <option value="13">13</option>
-        <option value="14">14</option>
-        <option value="15">15</option>
-        <option value="16">16</option>
-        <option value="17">17</option>
-        <option value="18">18</option>
-        <option value="19">19</option>
-        <option value="20">20</option>
-
-        <option value="21">21</option>
-        <option value="22">22</option>
-        <option value="23">23</option>
-        <option value="24">24</option>
-        <option value="25">25</option>
-        <option value="26">26</option>
-        <option value="27">27</option>
-        <option value="28">28</option>
-        <option value="29">29</option>
-        <option value="30">30</option>
-
-
-        <option value="31">31</option>
-        <option value="32">32</option>
-        <option value="33">33</option>
-        <option value="34">34</option>
-        <option value="35">35</option>
-        <option value="36">36</option>
-        <option value="37">37</option>
-        <option value="38">38</option>
-        <option value="39">39</option>
-        <option value="40">40</option>
-
-        <option value="41">41</option>
-        <option value="42">42</option>
-        <option value="43">43</option>
-        <option value="44">44</option>
-        <option value="45">45</option>
-        <option value="46">46</option>
-        <option value="47">47</option>
-        <option value="48">48</option>
-        <option value="49">49</option>
-        <option value="50">50</option>
-
-        <option value="51">51</option>
-        <option value="52">52</option>
-        <option value="53">53</option>
-        <option value="54">54</option>
-        <option value="55">55</option>
-        <option value="56">56</option>
-        <option value="57">57</option>
-        <option value="58">58</option>
-        <option value="59">59</option>
-        <option value="60">60</option>
-
-        <option value="61">61</option>
-        <option value="62">62</option>
-        <option value="63">63</option>
-        <option value="64">64</option>
-        <option value="65">65</option>
-        <option value="66">66</option>
-        <option value="67">67</option>
-        <option value="68">68</option>
-        <option value="69">69</option>
-        <option value="70">70</option>
-      </select>
-    </div>
-
-    <div id="dlg_set_opacity">
-       不透明度<input type="text" id="opacity" size="5" maxlength="5"><br>
-    </div>
-
-    <div id = "dlg_ch_cross_sect">
-      <select name="clrmap" id="select_cross_sect">
-        <option value="0" selected>X-Y断面</option>
-        <option value="1">X-Z断面</option>
-        <option value="2">Z-Y断面</option>
-      </select>
-    </div>
-
-    <div id="dlg_img_type">
-      <input type="checkbox" id="check_tone" value="1" checked="checked">トーン
-      <input type="checkbox" id="check_countour" value="2">コンター
-    </div>
-
-    <div id="dlg_is_grid">
-      <input type="checkbox" id="check_is_grid" value="1">グリッド表示
-    </div>
-  </div>
-  <!-- ///////end of dropdown menu//////// -->
-
-
-  <button id="play_h" class="play">play</button>
-  <button id="play_t" class="play">play</button>
-
-
-
-  <!-- //////////Leaflet related////////// -->
-  <canvas id="text" width="300" height="100"></canvas>
-  <div id="map"></div>
-  <script src="define.js"></script>
-  <script src="main.js"></script>
-  <span id = "slider_parent">
-
-    <div id="slider_h"></div>
-    <div id="slider_t" style="margin-top: 10px"></div>
-  </span>
-  <script src="func.js"></script>
-  <!-- ///////end of Leaflet related////// -->
-</body>
+  </body>
 </html>
