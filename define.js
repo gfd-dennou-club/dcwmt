@@ -45,4 +45,10 @@ const DEFINE = {
 			MAX_ZOOM: 2,
 		}
 	},
+	PROJECTION: {
+		name: "Webメルカトル図法",
+        sceneMode: Cesium.SceneMode.COLUMBUS_VIEW,
+        mapProjection: new Cesium.WebMercatorProjection(),
+        tilingScheme: new Cesium.WebMercatorTilingScheme()
+	}
 };

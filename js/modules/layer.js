@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// class name:  DCWMT.Layer.Globe.ScalarData
-// role:        トーン図やコンター図を球面上に表示するためのクラス
+// class name:  DCWMT.Layer
+// role:        地図のレイヤを返すクラス
 //
 // member:     
 //              [public]
@@ -16,7 +16,9 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-DCWMT.Layer.Globe.ScalarData = class{
+import {clrmap_04} from '../lib/colormap.js'
+
+const Layer = class{
     options = {
         _myImageryProdiver: undefined, // 数値データタイルから数値データを取り出し可視化させたレイヤーを作成する
         _imageryProviderHooks: {},     // レイヤーに関するホック
@@ -36,27 +38,14 @@ DCWMT.Layer.Globe.ScalarData = class{
         this.options._imageryProviderHooks.visualizeImage = this._visualizeImage;
         this.options._imageryProviderHooks.addPickFeaturesHook = this._addPickFeaturesHook;
 
-        console.log(options.url)
-
         let custom_imageryProdiver = new Cesium.UrlTemplateImageryProvider({
             url: options.url + "{z}/{x}/{y}.png",
-            //tilingScheme: new Cesium.GeographicTilingScheme(),
-            tilingScheme: tilingScheme,
-            // tilingScheme: new Cesium.WebMercatorTilingScheme(),
+            tilingScheme: options.tilingScheme,
             tileHeight: this.options.tileSize.y,
             tileWidth: this.options.tileSize.x,
             maximumLevel: options.maxZoom,
             mimimumLevel: options.minZoom,
         })
-
-        // let custom_imageryProdiver = new Cesium.OpenStreetMapImageryProvider({
-        //     url: options.url,
-        //     //tilingScheme: tilingScheme,
-        //     tileHeight: this.options.tileSize.y,
-        //     tileWidth: this.options.tileSize.x,
-        //     maximumLevel: options.maxZoom,
-        //     mimimumLevel: options.minZoom,
-        // });
 
         this.options._imageryProviderHooks.addRecolorFunc(custom_imageryProdiver, this.recolorFunc);
         this.options._imageryProviderHooks.addPickFeaturesHook(custom_imageryProdiver, this.options.hooks);
@@ -128,9 +117,7 @@ DCWMT.Layer.Globe.ScalarData = class{
                 else if(this.options._max <= scalarData[i])                 { this.options._max = scalarData[i];          }
             }
         }
-        console.log(this.options._min);
-        console.log(this.options._max);
-
+      
         // クロミウムの場合, タイルが上下反転してしまうという問題があるためそれを対処
         if(useBlowser() === "Chrome"){ 
             let tempAry = new Array();
@@ -214,10 +201,16 @@ DCWMT.Layer.Globe.ScalarData = class{
         else if (colormap_index < 0)                       { return clrmap_04[0]; }
         else                                               { return clrmap_04[colormap_index]; }                          // それ以外は対応する色を返す
      }
+
+     changeTilingScheme = (tilingScheme) => {
+        console.log(this.options._myImageryProdiver)
+     }
 }
 
-// DCWMT.layer.Globe.scalarData: function(options: Object)    ->  Object
+// layer: function(options: Object)    ->  Object
 // ファクトリ関数
-DCWMT.layer.globe.scalarData = function(options){
-    return new DCWMT.Layer.Globe.ScalarData(options);
+const layer = function(options){
+    return new Layer(options);
 }
+
+export default layer;
