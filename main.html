@@ -3,83 +3,21 @@
   <head>
     <meta charset="UTF-8">
     <title>DCWMT</title>
-    <!-- その他 -->
-    <script src="./debug/exportCSV.js"></script>
-
+   
     <!-- css -->
     <link rel="stylesheet" href="./css/layout.css">
     <link rel="stylesheet" href="./css/design.css">
 
-    <!-- cesium.js関連 -->
-    <script src="https://cesium.com/downloads/cesiumjs/releases/1.77/Build/Cesium/Cesium.js"></script>
-    <link href="https://cesium.com/downloads/cesiumjs/releases/1.77/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
-
-    <!-- ol-Ceisium関連 -->
-    <script src="https://cdn.jsdelivr.net/npm/ol-cesium@2.12.1/dist/olcesium.min.js"></script>
-
-    <!-- jQuery関連 -->
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" type="text/css">
-    <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
-
-    <!-- knockout.js関連 -->
-    <script src="./js/knockout/switchingLayers.js" type="module"></script>
-    <!-- <script src="./js/knockout/switchingProjection.js" type="module"></script> -->
-
     <!-- 定義ファイル -->
-    <script src="./define.js"></script>
+    <script src="./src/define.js" type="module"></script>
   </head>
   <body>
     <div class="dcwmt-wrapper">
       <header id="header">
-        <script src="./js/components/toolBar.js"></script>
       </header>
       <div class="main-screen">
-        <div id="spherical-map"></div>
-        <!-- <script src="./js/components/canvas.js" type="module"></script> -->
-        <script src="./main.js" type="module"></script>
-        <!-- <script src="./js/components/changeProjection.js" type="module"></script>  -->
-
-        <!------------------------------------>
-        <!-- ここからはテストのために書いています -->
-        <div id="toolbar">
-          <select data-bind="options: mapProjections, optionsText: 'name', value: selectedProjection"></select>
-          <table>
-            <!-- viewModelの配列layersの要素数だけ回す -->
-            <tbody data-bind="foreach: layers">
-              <tr data-bind="css: { up: $parent.upLayer === $data, down: $parent.downLayer === $data }">
-                <!-- imageryLayerのパラメータであるshowを参照 -->
-                <td><input type="checkbox" data-bind="checked: show"></td>
-                <!-- layerの名前を表示する部分(baseLayerはselectタグ内に表示. overlaylayerはスタックして表示) -->
-                <td>
-                  <!-- imageryLayerのパラメータnameを参照. また, visibleに関しては親要素であるviewModelの関数isSelectedLayerを参照 -->
-                  <span data-bind="text: name, visible: !$parent.isSelectableLayer($data)"></span>
-                  <!-- selectタグを表示 -->
-                  <select data-bind="visible: $parent.isSelectableLayer($data), options: $parent.baseLayers, optionsText: 'name', value: $parent.selectedLayer"></select>
-                </td>
-                <!-- ツールバーに関する表示部分 -->
-                <td>
-                  <input type="range" min="0" max="1" step="0.01" data-bind="value: alpha, valueUpdate: 'input'">
-                </td>
-                <!-- レイヤを上げるためのボタン -->
-                <td>
-                  <button type="button" class="cesium-button" data-bind="click: function() { $parent.raise($data, $index()); }, visible: $parent.canRaise($index())">
-                    ▲
-                  </button>
-                </td>
-                <!-- レイヤを下げるためのボタン -->
-                <td>
-                  <button type="button" class="cesium-button" data-bind="click: function() { $parent.lower($data, $index()); }, visible: $parent.canLower($index())">
-                    ▼
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <!-- ここまではテストのために書いています -->
-        <!------------------------------------>
-
+        <div id="map" class="map"></div>
+        <script src="./dist/bundle.js"></script>
       </div>
       <footer id="footer">
       </footer>
