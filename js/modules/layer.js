@@ -16,7 +16,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-import {clrmap_04} from '../lib/colormap.js'
+// import {clrmap_04} from '../lib/colormap.js'
 
 const Layer = class{
     options = {
@@ -213,4 +213,4 @@ const layer = function(options){
     return new Layer(options);
 }
 
-export default layer;
+// export default layer;
