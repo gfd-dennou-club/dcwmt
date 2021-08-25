@@ -26,6 +26,13 @@
     <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.5.0/build/ol.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.5.0/css/ol.css">
 
+    <!-- Diagram関連 -->
+    <script src="./js/diagram/CounterDiagram.js" type="text/javascript"></script>
+
+    <!-- viewer関連 -->
+    <script src="./js/viewer/viewer3D.js"></script>
+    <script src="./js/viewer/viewerCartesian.js"></script>
+    <script src="./js/viewer/viewerProjection.js"></script>
 
     <!-- knockout.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>
@@ -39,10 +46,8 @@
     <script src="./define.js"></script>
 
     <!-- knockout.js関連 -->
-    <!-- <script src="./js/knockout/switchingLayers.js" type="module"></script> -->
     <script src="./js/modules/layer.js" type="text/javascript"></script>
     <script src="./js/lib/colormap.js" type="text/javascript"></script>
-    <script src="./data2bitmap.js" type="text/javascript"></script>
     <script src="./js/knockout/swirchingView.js" type="text/javascript"></script>
   </head>
   <body>
@@ -56,11 +61,11 @@
         <!-- viewerを操作するhtml要素 -->
         <div id="selecter">
           <table>
-            <tbody data-bind="foreach: coordinate_systems">
+            <tbody data-bind="foreach: names">
               <tr>
                 <td>
-                  <input type="button" data-bind="click: view">
-                    <span data-bind="text: name"></span>
+                  <input type="button" data-bind="click: () => {$parent.view($data)}">
+                    <span data-bind="text: $data"></span>
                   </input>
                 </td>
               </tr>
