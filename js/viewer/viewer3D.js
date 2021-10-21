@@ -1,7 +1,4 @@
 const viewer3D = (map, diagram) => {
-    const defined = Cesium.defined;                 // Cesium.defined:          オブジェクトが定義されていたら真を返して, そうでなければ偽を返す関数
-    const when = Cesium.when;                       // Cesium.when:             非同期処理を実現するための関数
-
     // イメージプロバイダに対する独自の処理を実装するためのインスタンス
     let imageryProviderHooks = {};
 
@@ -13,30 +10,36 @@ const viewer3D = (map, diagram) => {
         imageryProvider.base_requestImage = imageryProvider.requestImage;   // 画像のオブジェクトを指定して, 画像を返してもらうハンドラのバックアップをとる
         // requestImageメソッドを上書き
         imageryProvider.requestImage = (x, y, level) => {
-            // 読み込んだ画像(HTMLCanvasElement)を変数に保存
-            const imagePromise = imageryProvider.base_requestImage(x, y, level);
-            // 読み込んだ画像がundefinedだった場合, それをそのまま返す.
-            if(!defined(imagePromise)){ return imagePromise; } 
-            return when(imagePromise, image => {
-                if(defined(image)){ // imageオブジェクトがundefinedでなければ...
-                    const canvas = document.createElement("canvas");
-                    [canvas.width, canvas.height] = [image.width, image.height];
-                    const context = canvas.getContext("2d");
-                    context.drawImage(image, 0, 0);
+            // urlを解析
+            const urls = [];
+            imageryProvider._resource.forEach((ele) => {
+                const url = ele.replace(/{(.*?)}/g, (_, key) => {
+                    switch(key){
+                        case "z": return level.toString();
+                        case "x": return x.toString();
+                        case "y": return y.toString();
+                    }
+                })
+                urls.push(url);
+            });
 
-                    // const counterDiagram = new CounterDiagram(clrmap_04);
-                    const isLevel0 = (level === 0);
-                    image = diagram.bitmap2tile(canvas, isLevel0);
-                }
-                return image; // 変換した画像を返す
-            })
+            const canvas = document.createElement("canvas");
+            // [canvas.width, canvas.height] = [320, 320];
+            [canvas.width, canvas.height] = [256, 256];
+            if (diagram instanceof CounterDiagram){
+                const isLevel0 = level === 1;
+                return diagram.url2tile(urls[0], canvas, isLevel0);
+            }else if (diagram instanceof VectorDiagram){
+                return diagram.urls2tile(urls, canvas);
+            }
         }
     };
 
     // 表示領域のインスタンスを作成
     // プロパティはとりあえず指定しない
     let custom_imageryProdiver = new Cesium.UrlTemplateImageryProvider({
-        url: "../tile/Ps/time=32112/{z}/{x}/{y}.png",
+        url: ["../tile/Ps/time=32112/{z}/{x}/{y}.png"],
+        // url: ["../tile/VelX/1.4002e+06/z=47200/{z}/{x}/{y}.png", "../tile/VelY/1.4002e+06/z=51000/{z}/{x}/{y}.png"],
         tileHeight: 256,
         tileWidth: 256,
         maximumLevel: 2,

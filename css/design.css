@@ -1,11 +1,27 @@
+/* ====================[header]==================== */
+
+/* ツールバー */
+ul.tool_bar {
+    list-style-type: none;      /* リストのマーカは何も表記しない */
+    color: #fff;              /* 色は白色 */
+}
+
+/* ツールバーの各要素 */
 ul.tool_bar>li {
+    cursor: pointer;            /* マウスホバー時カーソルをポインタにする */
     background: #7ba5ff;
 }
 
-ul.dropdown_menu{
-    background: rgb(75, 100, 209);
+ul.tool_bar>li>ul#menu{
+    scroll-behavior: smooth;
 }
 
-ul.dropdwon_menu li a{
-    color: #fff;
+ul.tool_bar>li>ul#menu>li{
+    list-style-type: none;      /* リストのマーカは何も表記しない */
+    background: #9bb7f5;
+}
+
+ul.tool_bar>li>ul#menu>li>a{
+    color: white;
+    text-decoration: none;
 }

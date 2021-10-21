@@ -21,23 +21,20 @@ header {
 
 /* ツールバー */
 ul.tool_bar {
-    margin: 0%;            /* 要素外部の横方向の空白を0%, 縦方向の空白をautoにしておく */
+    margin: 0%;                 /* 要素外部の横方向の空白を0%, 縦方向の空白をautoにしておく */
     padding: 0%;                /* 要素内部の空白を0%にしておく */
     display: flex;              /* 要素が被らずに並ぶようにする */
     justify-content: center;    /* アイテムを中央寄せする */
     text-align: center;         /* テキストを中央寄せする */
-    list-style-type: none;      /* リストのマーカは何も表記しない */
-    color: #fff;              /* 色は白色 */
 }
 
 /* ツールバーの各要素 */
 ul.tool_bar>li{
+    position: relative;         /* 元々配置されていた場所を基準座標とする */
     width: 100%;
     height: 100%;
     display: inline;            /* 文中に挿入する. inlineの要素同士は横に並ぶ */
     text-align: center;         /* テキストを中央寄せする */
-    cursor: pointer;            /* マウスホバー時カーソルをポインタにする */
-    position: relative;         /* 元々配置されていた場所を基準座標とする */
 }
 
 ul.tool_bar>li>div#title{
@@ -45,10 +42,19 @@ ul.tool_bar>li>div#title{
     height: 10%;
 }
 
-ul.tool_bar>li>div#menu{
+ul.tool_bar>li>ul#menu{
     width: 100%;
-    height: 100%;
-    background: aqua;
+    height: auto;
+    max-height: 100px;
+    overflow-x: hidden;
+}
+
+ul.tool_bar>li>ul#menu>li{
+    width: 100%;
+}
+
+ul.tool_bar>li>ul#menu>li>a{
+    text-align: center;         /* テキストを中央寄せする */
 }
 
 /* ====================[main]==================== */

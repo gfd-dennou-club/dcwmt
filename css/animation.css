@@ -1,0 +1,23 @@
+/* ====================[header]==================== */
+
+/* ツールバーの各要素 */
+
+ul.tool_bar>li:hover{
+    background: #4b64d1;
+}
+
+ul.tool_bar>li>ul#menu{
+    position: relative;
+    display: none;
+    padding: 0;
+}
+
+ul.tool_bar>li:hover>ul#menu{
+    display: block;
+    position: absolute;
+}
+
+ul.tool_bar>li>ul#menu>li:hover{
+    background: #7ba5ff;
+}
+

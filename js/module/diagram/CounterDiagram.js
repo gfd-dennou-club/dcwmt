@@ -110,22 +110,27 @@ const CounterDiagram = class{
      * @param {String} url 画像のurl
      * @param {HTMLElement<Canvas>} canvas ビットマップ
      */
-    url2canvas = (url, canvas, isLevel0 = false) => {
-        return new Promise(resolve => {
-            console.log("hhh")
-            const ctx = canvas.getContext("2d");
+    url2canvas = async (url, canvas, isLevel0 = false) => {
+        const ctx = canvas.getContext("2d");
 
+        const promise = new Promise(resolve => {    
             const img = new Image();
             [img.width, img.height] = [canvas.width, canvas.height];
-
-            img.src = url;
-
+            
             img.onload = () => {
                 ctx.drawImage(img, 0, 0);
                 this.bitmap2canvas(canvas, isLevel0);
+                resolve();
             }
-
-            resolve(canvas);
+            img.src = url;
         });
+        await promise;
+        return canvas;
+    }
+
+    url2tile = async (url, canvas, isLevel0 = false) => {
+        canvas = await this.url2canvas(url, canvas, isLevel0);
+        const ctx = canvas.getContext("2d");
+        return ctx.getImageData(0, 0, canvas.width, canvas.height);
     }
 }
