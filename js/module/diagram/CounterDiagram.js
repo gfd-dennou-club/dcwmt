@@ -115,6 +115,7 @@ const CounterDiagram = class{
 
         const promise = new Promise(resolve => {    
             const img = new Image();
+            img.crossOrigin = "anonymous";
             [img.width, img.height] = [canvas.width, canvas.height];
             
             img.onload = () => {
@@ -133,4 +134,6 @@ const CounterDiagram = class{
         const ctx = canvas.getContext("2d");
         return ctx.getImageData(0, 0, canvas.width, canvas.height);
     }
+
+    isCounter = (t, f) => { return t; }
 }

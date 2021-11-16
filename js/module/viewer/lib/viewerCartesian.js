@@ -15,16 +15,21 @@ const viewerCartesian = (map, diagram) => {
     
         createTile: function(coords){
             const canvas = L.DomUtil.create('canvas', 'dcwmt-tile');
-            [canvas.width, canvas.height] = [256, 256];
-            // [canvas.width, canvas.height] = [320, 320];
-            if (diagram instanceof CounterDiagram){
+            [canvas.width, canvas.height] = diagram.isCounter([256, 256], [320, 320]);
+
+            const counterFunc = () => {
                 const url = `${this.options.scalar_layer_of_dir}/${coords.z}/${coords.x}/${coords.y}.png`;
                 const isLevel0 = coords.z === 0;
                 diagram.url2canvas(url, canvas, isLevel0);
-            }else if (diagram instanceof VectorDiagram){
+            }
+
+            const vectorFunc = () => {
                 const url = this.options.vector_layer_of_dir.map( v => `${v}/${coords.z}/${coords.x}/${coords.y}.png` );
                 diagram.urls2canvas(url, canvas);
             }
+            
+            diagram.isCounter(counterFunc, vectorFunc)();
+
             return canvas;
         },
     });

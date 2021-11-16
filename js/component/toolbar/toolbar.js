@@ -67,11 +67,13 @@ for(tool_bar_element of toolBarElement){
         menu_element_wrapper.appendChild(element);
 
         // イベントハンドラを追加
-        for(eventListener of menu_element.event){
-            menu_element_wrapper.addEventListener(
-                eventListener.handler, 
-                eventListener.event
-            );
+        if(menu_element.event !== undefined){
+            for(eventListener of menu_element.event){
+                menu_element_wrapper.addEventListener(
+                    eventListener.handler, 
+                    eventListener.event
+                );
+            }
         }
     }
 }

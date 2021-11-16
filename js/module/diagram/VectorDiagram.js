@@ -85,6 +85,7 @@ const VectorDiagram = class{
         urls.forEach( (url, index) => {
             const promise = new Promise(resolve => {
                 const img = new Image();
+                img.crossOrigin = "anonymous";
                 [img.width, img.height] = [canvas.width, canvas.height];
                 img.onload = () => {
                     ctxs[index].drawImage(img, 0, 0);
@@ -116,4 +117,6 @@ const VectorDiagram = class{
         const ctx = canvas.getContext("2d");
         return ctx.getImageData(0, 0, canvas.width, canvas.height);
     }
+
+    isCounter = (t, f) => { return f; }
 }

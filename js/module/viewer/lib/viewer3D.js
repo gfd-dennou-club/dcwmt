@@ -24,22 +24,27 @@ const viewer3D = (map, diagram) => {
             });
 
             const canvas = document.createElement("canvas");
-            // [canvas.width, canvas.height] = [320, 320];
-            [canvas.width, canvas.height] = [256, 256];
-            if (diagram instanceof CounterDiagram){
-                const isLevel0 = level === 1;
+            [canvas.width, canvas.height] = diagram.isCounter([256, 256], [320, 320]);
+            
+            const counterFunc = () => {
+                const isLevel0 = (level === 1);
                 return diagram.url2tile(urls[0], canvas, isLevel0);
-            }else if (diagram instanceof VectorDiagram){
+            }
+            const vectorFunc = () => {
                 return diagram.urls2tile(urls, canvas);
             }
+
+            return diagram.isCounter(counterFunc, vectorFunc)();
         }
     };
 
     // 表示領域のインスタンスを作成
     // プロパティはとりあえず指定しない
     let custom_imageryProdiver = new Cesium.UrlTemplateImageryProvider({
-        url: ["../tile/Ps/time=32112/{z}/{x}/{y}.png"],
-        // url: ["../tile/VelX/1.4002e+06/z=47200/{z}/{x}/{y}.png", "../tile/VelY/1.4002e+06/z=51000/{z}/{x}/{y}.png"],
+        url: diagram.isCounter(
+            ["../tile/Ps/time=32112/{z}/{x}/{y}.png"],
+            ["../tile/VelX/1.4002e+06/z=47200/{z}/{x}/{y}.png", "../tile/VelY/1.4002e+06/z=51000/{z}/{x}/{y}.png"]
+        ),
         tileHeight: 256,
         tileWidth: 256,
         maximumLevel: 2,

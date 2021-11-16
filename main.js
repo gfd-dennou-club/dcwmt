@@ -30,7 +30,6 @@ window.onload = function(){
 
     let viewModel = {
         names: [ "Cesium", "Leaflet", "OpenLayers"],     // 座標系の種類
-        selectedCoordinate: null,   // 選択されている表系
         view: view,
     }
 
