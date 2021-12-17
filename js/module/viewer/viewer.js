@@ -1,10 +1,11 @@
 const Viewer = class{
     constructor(options){
-        this.options = {
-            viewer_name: options.name ? options.name : "Cesium",
-            diagram_name: options.diagram ? options.diagram : "counter",
-            clrindex: options.clrindex ? options.clrindex : 4,
-        };
+        this.options = options;
+
+        this.options.viewer_name = options.viewer_name ?? "Cesium";
+        this.options.diagram_name = options.diagram_name ?? "counter";
+        this.options.clrindex = options.clrindex ?? 4;
+
         this.redraw(this.options);
     }
 
@@ -14,20 +15,39 @@ const Viewer = class{
         }
 
         const viewer_ele = this._createViewerElement();
-        const diagram = this._createDiagram(this.options.diagram_name, this.options.clrindex);
+        const diagram = this._createDiagram(
+            this.options.diagram_name, 
+            this.options.clrindex,
+            this.options.opacity || 255,
+        );
+
+        if(diagram.isCounter()){
+            const level0_url = this.options.url.concat("/0/0/0.png");
+            diagram.calcMaxMin(level0_url);
+        }
+
+        const vieweroption = {
+            map: viewer_ele, 
+            diagram: diagram,
+            url: this.options.url, 
+            urls: this.options.urls,
+        };
+
         switch(this.options.viewer_name){
             case "Cesium":
-                viewer3D(viewer_ele, diagram);
+                viewer3D(vieweroption);
                 break;
             case "Leaflet":
-                viewer_ele.setAttribute("style", "height: 500px;");
-                viewerCartesian(viewer_ele, diagram);
+                viewerCartesian(vieweroption);
                 break;
             case "OpenLayers":
-                viewer_ele.setAttribute("style", "height: 700px; width: 100%;");
-                viewerProjection(viewer_ele, diagram);
+                viewerProjection(vieweroption);
                 break;
         }
+    }
+
+    getCurrentColorIndex = () => {
+        return this.options.clrindex;
     }
 
     _createViewerElement = () => {
@@ -47,10 +67,10 @@ const Viewer = class{
         return viewer_element;
     }
 
-    _createDiagram = (diagram_type, clrindex) => {
-        const clrmap = new colorbar(clrindex);
+    _createDiagram = (diagram_type, clrindex, opacity) => {
+        const clrmap = new colormap(clrindex);
         switch(diagram_type){
-            case "counter": return new CounterDiagram(clrmap.getClrmap());
+            case "counter": return new CounterDiagram(clrmap.getClrmap(), opacity);
             case "vector":  return new VectorDiagram(clrmap.getClrmap());
         }
     }

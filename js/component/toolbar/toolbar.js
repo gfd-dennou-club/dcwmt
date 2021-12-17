@@ -1,5 +1,8 @@
 // ツールバーの要素のインスタンスを作成
+const toolbar_tone = new ToolbarTone();
 const toolbar_colormap = new ToolbarColormap();
+const toolbar_cross_section = new ToolbarCrossSection();
+const toolbar_diagram = new ToolbarDiagram();
 
 // ツールバーの大枠を作成
 const toolBar = document.createElement("ul");
@@ -16,7 +19,7 @@ const toolBarElement = [
     {
         name: "トーン関連", 
         id: "menu_tone",
-        menuElement: []
+        menuElement: toolbar_tone.getMenuElement(),
     },
     {
         name: "カラーマップ関連", 
@@ -26,15 +29,12 @@ const toolBarElement = [
     {
         name: "断面切り替え", 
         id: "menu_cross_section",
-        menuElement: []
+        menuElement: toolbar_cross_section.getMenuElement(),
     },
     {
         name: "図", 
         id: "menu_drawing",
-        menuElement: [
-            { name: "コンタ図" },
-            { name: "ベクタ図" }
-        ]
+        menuElement: toolbar_diagram.getMenuElement(),
     },
 ];
 
@@ -60,7 +60,12 @@ for(tool_bar_element of toolBarElement){
         menu.appendChild(menu_element_wrapper);
 
         const element = document.createElement("div");
+        element.setAttribute("class", "second_layer_element");
+
+        // 名前を追加
         element.innerHTML = menu_element.name;
+        
+        // コンポーネントを追加
         if (menu_element.component !== undefined){
             element.appendChild(menu_element.component);
         }
@@ -68,12 +73,10 @@ for(tool_bar_element of toolBarElement){
 
         // イベントハンドラを追加
         if(menu_element.event !== undefined){
-            for(eventListener of menu_element.event){
-                menu_element_wrapper.addEventListener(
-                    eventListener.handler, 
-                    eventListener.event
-                );
-            }
+            menu_element_wrapper.addEventListener(
+                menu_element.event.handler, 
+                menu_element.event.event
+            );
         }
     }
 }

@@ -1,4 +1,4 @@
-const viewer3D = (map, diagram) => {
+const viewer3D = (option) => {
     // イメージプロバイダに対する独自の処理を実装するためのインスタンス
     let imageryProviderHooks = {};
 
@@ -24,27 +24,26 @@ const viewer3D = (map, diagram) => {
             });
 
             const canvas = document.createElement("canvas");
-            [canvas.width, canvas.height] = diagram.isCounter([256, 256], [320, 320]);
+            [canvas.width, canvas.height] = option.diagram.isCounter([256, 256], [320, 320]);
             
             const counterFunc = () => {
-                const isLevel0 = (level === 1);
-                return diagram.url2tile(urls[0], canvas, isLevel0);
+                return option.diagram.url2tile(urls[0], canvas);
             }
             const vectorFunc = () => {
-                return diagram.urls2tile(urls, canvas);
+                return option.diagram.urls2tile(urls, canvas);
             }
 
-            return diagram.isCounter(counterFunc, vectorFunc)();
+            return option.diagram.isCounter(counterFunc, vectorFunc)();
         }
     };
+
+    const url = option.url.concat("/{z}/{x}/{y}.png");
+    const urls = option.urls.map(url => url.concat("/{z}/{x}/{y}.png"));
 
     // 表示領域のインスタンスを作成
     // プロパティはとりあえず指定しない
     let custom_imageryProdiver = new Cesium.UrlTemplateImageryProvider({
-        url: diagram.isCounter(
-            ["../tile/Ps/time=32112/{z}/{x}/{y}.png"],
-            ["../tile/VelX/1.4002e+06/z=47200/{z}/{x}/{y}.png", "../tile/VelY/1.4002e+06/z=51000/{z}/{x}/{y}.png"]
-        ),
+        url: option.diagram.isCounter([url], urls),
         tileHeight: 256,
         tileWidth: 256,
         maximumLevel: 2,
@@ -54,7 +53,7 @@ const viewer3D = (map, diagram) => {
     imageryProviderHooks.addRecolorFunc(custom_imageryProdiver);
 
     const viewer = new Cesium.Viewer(
-        map, 
+        option.map, 
         {   // 表示するhtml要素
             // 画像参照を行うインスタンを設定
             imageryProvider: custom_imageryProdiver,

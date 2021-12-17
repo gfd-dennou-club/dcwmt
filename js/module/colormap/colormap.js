@@ -1,4 +1,4 @@
-const colorbar = class{
+const colormap = class{
     constructor(clrindex){
         this.clrindex = clrindex;
     }
@@ -54,6 +54,7 @@ const colorbar = class{
             context.moveTo(width, height / 2);
             context.lineTo(width - Math.sqrt(3) * height / 2, height);
         }
+
         context.fill();
     }
 

@@ -118,5 +118,5 @@ const VectorDiagram = class{
         return ctx.getImageData(0, 0, canvas.width, canvas.height);
     }
 
-    isCounter = (t, f) => { return f; }
+    isCounter = (t=true, f=false) => { return f; }
 }

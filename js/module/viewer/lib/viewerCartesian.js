@@ -1,4 +1,4 @@
-const viewerCartesian = (map, diagram) => {
+const viewerCartesian = (option) => {
     let CounterData = L.GridLayer.extend({
         options:{
             _scalarData: new Float32Array(),                        // 数値シミュレーションデータから読み取ったデータ
@@ -15,20 +15,19 @@ const viewerCartesian = (map, diagram) => {
     
         createTile: function(coords){
             const canvas = L.DomUtil.create('canvas', 'dcwmt-tile');
-            [canvas.width, canvas.height] = diagram.isCounter([256, 256], [320, 320]);
+            [canvas.width, canvas.height] = option.diagram.isCounter([256, 256], [320, 320]);
 
             const counterFunc = () => {
                 const url = `${this.options.scalar_layer_of_dir}/${coords.z}/${coords.x}/${coords.y}.png`;
-                const isLevel0 = coords.z === 0;
-                diagram.url2canvas(url, canvas, isLevel0);
+                option.diagram.url2canvas(url, canvas);
             }
 
             const vectorFunc = () => {
                 const url = this.options.vector_layer_of_dir.map( v => `${v}/${coords.z}/${coords.x}/${coords.y}.png` );
-                diagram.urls2canvas(url, canvas);
+                option.diagram.urls2canvas(url, canvas);
             }
             
-            diagram.isCounter(counterFunc, vectorFunc)();
+            option.diagram.isCounter(counterFunc, vectorFunc)();
 
             return canvas;
         },
@@ -41,7 +40,7 @@ const viewerCartesian = (map, diagram) => {
     }
 
     const view  = L.map(
-        map,
+        option.map,
         {
             preferCanvas: true, // Canvasレンダラーを選択
             center:     [0, 0],
@@ -59,11 +58,8 @@ const viewerCartesian = (map, diagram) => {
     //[TODO]: ディレクトリの受け渡しが決め打ちになっている. 時間と高さを変更できるように拡張すべし.
     const counter_layer = counterData(
         { 
-            scalar_layer_of_dir: "../tile/Ps/time=32112",
-            vector_layer_of_dir: [
-                "../tile/VelX/1.4002e+06/z=47200",
-                "../tile/VelY/1.4002e+06/z=51000"
-            ],
+            scalar_layer_of_dir: option.url,
+            vector_layer_of_dir: option.urls,
         }
     );
     layers.addBaseLayer(counter_layer, "Ps");

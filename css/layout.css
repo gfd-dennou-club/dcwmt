@@ -16,7 +16,7 @@ div.dcwmt-wrapper {
 /* ====================[header]==================== */
 /* ヘッダーの全ての要素を包括する要素 */
 header {
-    height: 100px;              /* 高さを100pxにして, 固定長にする */
+    padding-bottom: 10px;              /* 高さを100pxにして, 固定長にする */
 }
 
 /* ツールバー */
@@ -58,9 +58,13 @@ ul.tool_bar>li>ul#menu>li>a{
 }
 
 /* ====================[main]==================== */
-div.main-screen {
-    height: 85%;
+div#main-screen {
+    height: 75%;
     display: flex;
+}
+
+div#main-screen>div#viewer {
+    width: 100%;
 }
 
 div#plane-map {
@@ -78,6 +82,7 @@ div#spherical-map {
 /* ====================[footer]==================== */
 footer {
     height: 15%;
+    padding-top: 5px;
     display: flex;
 }
 
@@ -94,4 +99,47 @@ div.animation {
 div#toolbar {
     height: 100%;
     width: 20%/*65%*/;
+}
+
+/* ====================[modal window]==================== */
+div#modal {
+    display: none;
+    position: fixed;
+    z-index: 2;
+    left: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+}
+
+div#modal>div.content {
+    margin: 20% auto;
+    width: 25%;
+}
+
+div#modal div.header>h1.title {
+    margin: 0.5rem 0;
+    font-size: 24px;
+    font-family:'Courier New', Courier, monospace;
+}
+
+div#modal div.header {
+    padding: 3px 15px;
+    display: flex;
+}
+
+div#modal div.body {
+    display: flex;
+    justify-content: center;
+}
+
+div#modal div.footer {
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+div#modal div.footer button.button {
+    width: 40%;
 }

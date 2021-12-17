@@ -25,3 +25,30 @@ ul.tool_bar>li>ul#menu>li>a{
     color: white;
     text-decoration: none;
 }
+
+/* ====================[modal window]==================== */
+div#modal {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+div#modal>div.content {
+    background-color: #f4f4f4;
+    box-shadow: 0 5px 8px 0 rgba(0,0,0,0.2),0 7px 20px 0 rgba(0,0,0,0.17);
+}
+
+div#modal div.header {
+    background: #9bb7f5;
+    justify-content: space-between;
+}
+
+div#modal div.footer {
+    color: black;
+}
+
+div#modal div.footer button.button {
+    border-radius: 10px;
+    border: solid #7ba5ff;
+    background-color: transparent;
+    color: #7ba5ff;
+}
+
