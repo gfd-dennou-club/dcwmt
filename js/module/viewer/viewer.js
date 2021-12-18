@@ -3,7 +3,6 @@ const Viewer = class{
         this.options = options;
 
         this.options.viewer_name = options.viewer_name ?? "Cesium";
-        this.options.diagram_name = options.diagram_name ?? "counter";
         this.options.clrindex = options.clrindex ?? 4;
 
         this.redraw(this.options);
@@ -15,39 +14,25 @@ const Viewer = class{
         }
 
         const viewer_ele = this._createViewerElement();
-        const diagram = this._createDiagram(
-            this.options.diagram_name, 
-            this.options.clrindex,
-            this.options.opacity || 255,
-        );
+        options.counter.forEach((ele) => {
+            const layer = new Layer({
+                url: ele.url,
+                size: ele.size,
+                clrindex: this.options.clrindex,
+                opacity: this.options.opacity,
+            });
+            this._view(viewer_ele, layer.for3D(2, 0));
+        });
+        // const diagram = this._createDiagram(
+        //     //this.options.diagram_type, // 今はなき
+        //     this.options.clrindex,
+        //     this.options.opacity || 255,
+        // );
 
-        if(diagram.isCounter()){
-            const level0_url = this.options.url.concat("/0/0/0.png");
-            diagram.calcMaxMin(level0_url);
-        }
-
-        const vieweroption = {
-            map: viewer_ele, 
-            diagram: diagram,
-            url: this.options.url, 
-            urls: this.options.urls,
-        };
-
-        switch(this.options.viewer_name){
-            case "Cesium":
-                viewer3D(vieweroption);
-                break;
-            case "Leaflet":
-                viewerCartesian(vieweroption);
-                break;
-            case "OpenLayers":
-                viewerProjection(vieweroption);
-                break;
-        }
-    }
-
-    getCurrentColorIndex = () => {
-        return this.options.clrindex;
+        // this.options.counter_url.forEach(url => { 
+        //     const level0_url = url.concat("/0/0/0.png");
+        //     diagram.calcMaxMin(level0_url);    
+        // });
     }
 
     _createViewerElement = () => {
@@ -72,6 +57,20 @@ const Viewer = class{
         switch(diagram_type){
             case "counter": return new CounterDiagram(clrmap.getClrmap(), opacity);
             case "vector":  return new VectorDiagram(clrmap.getClrmap());
+        }
+    }
+
+    _view = (viewer_ele, layer) => {
+        switch(this.options.viewer_name){
+            case "Cesium":
+                viewer3D(viewer_ele, layer);
+                break;
+            case "Leaflet":
+                viewerCartesian(viewer_ele, layer);
+                break;
+            case "OpenLayers":
+                viewerProjection(viewer_ele, layer);
+                break;
         }
     }
 } 

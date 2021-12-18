@@ -57,20 +57,15 @@ const CounterDiagram = class{
      * @param {HTMLElement<Canvas>} canvas ビットマップ
      * @return {ImageData} 再度色付けされたビットマップ画像のimageData 
      */
-    bitmap2tile = (canvas, isGrid, isCalcMaxMin) => {
+    bitmap2tile = (canvas, isCalcMaxMin) => {
         const ctx = canvas.getContext("2d");
 
         let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const size = {width: canvas.width, height: canvas.height};
         const datas = this.bitmap2data(imageData, size, isCalcMaxMin);
-        for(let i = 0; i < canvas.width * canvas.height; i++){
+        for(let i = 0; i < 10/*canvas.width * canvas.height*/; i++){
             const bias_rgb_index = i * 4;
-            let rgb;
-            if(isGrid && this._whereDrawGridLine(bias_rgb_index, canvas.width, canvas.height)){
-                rgb = { r: 255, g: 255, b: 255 };
-            }else{
-                rgb = this.data2color(datas[i]);
-            }
+            const rgb = this.data2color(datas[i]);
             imageData.data[bias_rgb_index   ] = rgb.r;
             imageData.data[bias_rgb_index +1] = rgb.g;
             imageData.data[bias_rgb_index +2] = rgb.b;
@@ -85,9 +80,9 @@ const CounterDiagram = class{
      *
      * @param {HTMLElement<Canvas>} canvas ビットマップ
      */
-    bitmap2canvas = (canvas, isGrid, isCalcMaxMin) => {
+    bitmap2canvas = (canvas, isCalcMaxMin) => {
         const ctx = canvas.getContext("2d");
-        const imageData = this.bitmap2tile(canvas, isGrid, isCalcMaxMin);
+        const imageData = this.bitmap2tile(canvas, isCalcMaxMin);
         ctx.putImageData(imageData, 0, 0);
     }
 
@@ -116,7 +111,7 @@ const CounterDiagram = class{
      * @param {String} url 画像のurl
      * @param {HTMLElement<Canvas>} canvas ビットマップ
      */
-    url2canvas = async (url, canvas, isGrid = false, isCalcMaxMin = false) => {
+    url2canvas = async (url, canvas, isCalcMaxMin = false) => {
         const ctx = canvas.getContext("2d");
 
         const promise = new Promise(resolve => {    
@@ -126,7 +121,7 @@ const CounterDiagram = class{
             
             img.onload = () => {
                 ctx.drawImage(img, 0, 0);
-                this.bitmap2canvas(canvas, isGrid, isCalcMaxMin);
+                this.bitmap2canvas(canvas, isCalcMaxMin);
                 resolve();
             }
             img.src = url;

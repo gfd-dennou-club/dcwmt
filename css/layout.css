@@ -67,18 +67,6 @@ div#main-screen>div#viewer {
     width: 100%;
 }
 
-div#plane-map {
-    width: 100%;
-    margin-left: 2.5%;
-    margin-bottom: 2.5%;
-}
-
-div#spherical-map {
-    width: 100%;
-    margin-left: 2.5%;
-    margin-bottom: 2.5%;
-}
-
 /* ====================[footer]==================== */
 footer {
     height: 15%;

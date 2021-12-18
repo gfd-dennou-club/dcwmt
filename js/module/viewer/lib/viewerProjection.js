@@ -4,7 +4,7 @@ const viewerProjection = (option) => {
     const proj32662 = ol.proj.get('EPSG:54009');
     
     const olMap = new ol.Map({
-        target: option.map,
+        target: option.viewer_ele,
         layers: [
             new ol.layer.Tile({
                 source: new ol.source.XYZ({

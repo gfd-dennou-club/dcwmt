@@ -28,27 +28,19 @@
 
 const DEFINE = {
 	ROOT: "../tile",
-	PHYSICAL_QUANTITY: {
-		PRCP: {
-			FIXED: ["time=32125"],
-			SIZE: {X: 384, Y: 192},
-			MAX_ZOOM: 2,
-		},
-		Ps: {
+	COUNTER: [
+		{
+			NAME: "Ps",
 			FIXED: ["time=32112"],
 			SIZE: {X: 256, Y: 256},
-			MAX_ZOOM: 2,
 		},
-		SLP: {
-			FIXED: ["time=32113"],
-			SIZE: {X: 384, Y: 192},
-			MAX_ZOOM: 2,
-		}
-	},
-	PROJECTION: {
-		name: "Webメルカトル図法",
-        sceneMode: Cesium.SceneMode.COLUMBUS_VIEW,
-        mapProjection: new Cesium.WebMercatorProjection(),
-        tilingScheme: new Cesium.WebMercatorTilingScheme()
-	}
+	],
+	VECTOR: [
+		{
+			NAME: ["VelX", "VelY"],
+			FIXED: ["1.4002e+06/z=47200"],
+			SIZE: {X: 320, Y: 320},
+		},
+	],
+	MAX_ZOOM: 2,
 };
