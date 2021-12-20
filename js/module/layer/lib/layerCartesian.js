@@ -24,4 +24,6 @@ const layerCartesian = L.GridLayer.extend({
 
         return canvas;
     },
+
+    getName: function(){ return this.name; }
 });

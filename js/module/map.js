@@ -1,21 +1,37 @@
 const Map = class{
-    constructor(viewer, baselayers, overlaylayers, diagram){
+    constructor(options){
         this.name = "map";
         this.element = undefined;
-        this.diagram = diagram || "Cesium";
+        this.viewer_name = options.viewer_name || "Cesium";
+        
+        const baselayers = [];
+        const overlaylayer = [];
 
-        this.viewer = viewer;
-        this.baselayers = baselayers;
-        this.overlaylayers = overlaylayers;
+        options.counter.forEach((value) => {
+            const layer_options = {
+                name: value.name,
+                url: value.url,
+                size: value.size,
+                clrindex: options.clrindex,
+                opacity: options.opacity,
+            };
+            baselayers.push(new Layer(layer_options));
+            overlaylayer.push(new Layer(layer_options));
+        });        
+        this.viewer = new Viewer(
+            baselayers, 
+            overlaylayer, 
+            options.viewer_name, 
+        );
     }
 
     draw = (options) => {
-        this._create();
+        this._createElement();
         this.viewer.show();
     }
 
     redraw = (options) => {
-        this._destroy();
+        this._destroyElement();
         this.draw(options);
     }
 
@@ -27,13 +43,13 @@ const Map = class{
 
     }
 
-    _destroy = () => {
+    _destroyElement = () => {
         if(document.getElementById(this.name) !== null){
             document.getElementById(this.name).remove();
         }
     }
 
-    _create = () => {
+    _createElement = () => {
         // viewerを表示するためのdiv要素を作成
         const map_ele = document.createElement("div");
         map_ele.setAttribute("id", this.name);

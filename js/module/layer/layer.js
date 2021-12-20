@@ -20,6 +20,7 @@ const Layer = class{
             maximumLevel: muximumLevel,
             minimumLevel: minimumLevel,
             diagram: this.diagram,
+            name: this.name,
         };
         return new layer3D(options);
     }
@@ -29,6 +30,7 @@ const Layer = class{
             url: this.url,
             size: this.size,
             diagram: this.diagram,
+            name: this.name,
         };
         return new layerCartesian(options);
     }
