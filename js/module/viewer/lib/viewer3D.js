@@ -1,4 +1,4 @@
-const viewer3D = (viewer_ele, baselayers, overlaylayers) => {
+const viewer3D = (viewer_ele, baselayers, overlaylayers, options) => {
     const viewer = new Cesium.Viewer(
         viewer_ele, 
         {   // 表示するhtml要素

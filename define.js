@@ -42,5 +42,5 @@ const DEFINE = {
 			SIZE: {X: 320, Y: 320},
 		},
 	],
-	MAX_ZOOM: 2,
+	MAXIMUMLEVEL: 2,
 };

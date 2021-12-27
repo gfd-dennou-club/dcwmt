@@ -63,7 +63,7 @@ div#main-screen {
     display: flex;
 }
 
-div#main-screen>div#viewer {
+div#main-screen>div#map {
     width: 100%;
 }
 

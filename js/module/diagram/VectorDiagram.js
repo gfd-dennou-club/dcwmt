@@ -118,5 +118,7 @@ const VectorDiagram = class{
         return ctx.getImageData(0, 0, canvas.width, canvas.height);
     }
 
+    calcMaxMin = (url) => {}
+
     isCounter = (t=true, f=false) => { return f; }
 }

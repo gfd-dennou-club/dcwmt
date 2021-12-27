@@ -1,4 +1,4 @@
-const layerCartesian = L.GridLayer.extend({
+const LayerCartesian = L.GridLayer.extend({
     options:{
         coords: {x: 0, y: 0, z: 0},                             // タイルを参照するための座標
     },
@@ -9,21 +9,26 @@ const layerCartesian = L.GridLayer.extend({
     },
 
     createTile: function(coords){
-        const canvas = L.DomUtil.create('canvas', 'dcwmt-tile');
-        [canvas.width, canvas.height] = [option.size.X, option.size.Y];
+        const canvas = document.createElement("canvas");
+        [canvas.width, canvas.height] = [this.options.size.X, this.options.size.Y];
+        const url = this.options.url.map(v => v.concat(`/${coords.z}/${coords.x}/${coords.y}.png`));
 
         const counterFunc = () => {
-            option.diagram.url2canvas(option.url, canvas);
+            this.options.diagram.url2canvas(url[0], canvas);
         }
 
         const vectorFunc = () => {
-            option.diagram.urls2canvas(option.url, canvas);
+            this.options.diagram.urls2canvas(url, canvas);
         }
         
-        option.diagram.isCounter(counterFunc, vectorFunc)();
+        this.options.diagram.isCounter(counterFunc, vectorFunc)();
 
         return canvas;
     },
 
-    getName: function(){ return this.name; }
+    getName: function(){ return this.options.name; },
 });
+
+const layerCartesian = function(options){
+    return new LayerCartesian(options);
+}

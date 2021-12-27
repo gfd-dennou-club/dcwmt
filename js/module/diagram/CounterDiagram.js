@@ -11,6 +11,7 @@
 
 const CounterDiagram = class{
     constructor(colormap, opacity){
+        // [TODO] min, maxを更新するべし
         this.min = undefined;
         this.max = undefined;
         this.colormap = colormap;
@@ -39,9 +40,9 @@ const CounterDiagram = class{
             scalarData[i] = dataView.getFloat32(0);
 
             if(isCalcMaxMin){
-                if(this.min === undefined)
+                if(this.min === undefined){
                     this.min = this.max = scalarData[i];
-                else{
+                }else{
                     if(this.min > scalarData[i]) this.min = scalarData[i];
                     if(this.max < scalarData[i]) this.max = scalarData[i];
                 }
@@ -63,7 +64,7 @@ const CounterDiagram = class{
         let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const size = {width: canvas.width, height: canvas.height};
         const datas = this.bitmap2data(imageData, size, isCalcMaxMin);
-        for(let i = 0; i < 10/*canvas.width * canvas.height*/; i++){
+        for(let i = 0; i < canvas.width * canvas.height; i++){
             const bias_rgb_index = i * 4;
             const rgb = this.data2color(datas[i]);
             imageData.data[bias_rgb_index   ] = rgb.r;
@@ -138,7 +139,7 @@ const CounterDiagram = class{
 
     calcMaxMin = (url) => {
         const canvas = document.createElement("canvas");
-        this.url2canvas(url, canvas, false, true);
+        this.url2canvas(url, canvas, true);
     }
 
     isCounter = (t=true, f=false) => { return t; }

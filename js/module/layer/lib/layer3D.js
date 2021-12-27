@@ -9,7 +9,7 @@ const layer3D = class extends Cesium.UrlTemplateImageryProvider{
     requestImage(x, y, level){
         const urls = [];
         this._resource.forEach((ele) => {
-            const url = ele.concat("/", level.toString(), "/", x.toString(), "/", y.toString(), ".png");
+            const url = ele.concat(`/${level}/${x}/${y}.png`);
             urls.push(url);
         });
 

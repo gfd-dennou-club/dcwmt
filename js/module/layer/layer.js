@@ -1,38 +1,76 @@
 const Layer = class{
-    // DEFINE.COUTNER: {url, size}, clrmap, opacity
+    // options: {
+    //     name: String,
+    //     url: [String, ...],
+    //     maximumLevel: Number,
+    //     minimumLevel: Number,
+    //     clrindex: Number,
+    //     opacity: Number,
+    // };
     constructor(options){
-        this.url = options.url;
-        this.size = options.size;
+        this.options = options;
+    }
 
-        const clrmap = new colormap(options.clrindex);
-        if(options.url === 2){
-            this.diagram = new VectorDiagram(clrmap.getClrmap());
+    changeOpacity = (opacity) => { this.options.opacity = opacity; }
+    changeClrindex = (clrindex) => { this.options.clrindex = clrindex; }
+
+    create = (display_name) => {
+        const clrmap = new colormap(this.options.clrindex);
+        const diagram = this._getDiagram(clrmap, this.options.opacity);
+        diagram.calcMaxMin(this.options.url[0].concat("/0/0/0.png"));
+        const layer = this._getLayerWithSuitableLib(display_name, diagram);
+        return layer;
+    }
+
+    _getDiagram = (clrmap, opacity) => {
+        if(this.options.url.length === 2){
+            return new VectorDiagram(clrmap.getClrmap());
         }else{
-            this.diagram = new CounterDiagram(clrmap.getClrmap(), options.opacity);
+            return new CounterDiagram(clrmap.getClrmap(), opacity);
         }
     }
 
-    for3D = (muximumLevel, minimumLevel) => {
+    _getLayerWithSuitableLib = (display_name, diagram) => {
+        switch(display_name){
+            case "Cesium":      return this._for3D(diagram);
+            case "Leaflet":     return this._forCartesian(diagram);
+            case "OpenLayers":  return this._forProjection(diagram);
+        }
+    }
+
+    _for3D = (diagram) => {
         const options = {
-            url: this.url,
-            tileHeight: this.size.Y,
-            tileWidth: this.size.X,
-            maximumLevel: muximumLevel,
-            minimumLevel: minimumLevel,
-            diagram: this.diagram,
-            name: this.name,
+            url: this.options.url,
+            tileHeight: this.options.size.Y,
+            tileWidth: this.options.size.X,
+            maximumLevel: this.options.muximumLevel,
+            minimumLevel: this.options.minimumLevel,
+            diagram: diagram,
+            name: this.options.name,
         };
         return new layer3D(options);
     }
 
-    forCartesian = () => {
+    _forCartesian = (diagram) => {
         const options = {
-            url: this.url,
-            size: this.size,
-            diagram: this.diagram,
-            name: this.name,
+            url: this.options.url,
+            size: this.options.size,
+            diagram: diagram,
+            name: this.options.name,
         };
-        return new layerCartesian(options);
+        return layerCartesian(options);
     }
 
+    _forProjection = (diagram) => {
+        const options = {
+            url: this.options.url,
+            size: this.options.size,
+            diagram: diagram,
+            maxZoom: this.options.maximumLevel,
+            minZoom: this.options.minimumLevel,
+            name: this.options.name,
+        }
+        console.log(options);
+        return new layerProjection(options);
+    }
 }
