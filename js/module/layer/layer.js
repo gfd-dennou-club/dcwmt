@@ -46,7 +46,6 @@ const Layer = class{
             maximumLevel: this.options.muximumLevel,
             minimumLevel: this.options.minimumLevel,
             diagram: diagram,
-            name: this.options.name,
         };
         return new layer3D(options);
     }
@@ -70,7 +69,6 @@ const Layer = class{
             minZoom: this.options.minimumLevel,
             name: this.options.name,
         }
-        console.log(options);
         return new layerProjection(options);
     }
 }

@@ -14,13 +14,14 @@ const Viewer = class{
     //     maximumLevel: Number
     // }
     constructor(options){
+        // 表示するライブラリの名前を取得
         this.display_name = options.display_name;
-        this.map = new Map("map");
-        this.maximumLevel = options.maximumLevel;
-
-        this.baselayers = [];
-        this.overlaylayers = [];
-
+        // ビュワの作成
+        const viewer = this.draw();
+        // レイヤマネージャを作成
+        const layer_manager = new layerManager(options.display_name, viewer);
+      
+        // レイヤの作成とマネージャへの追加
         const layer_types = [options.counter, options.vector];
         layer_types.forEach((layer_type) => {
             layer_type.forEach((layer) => {
@@ -34,50 +35,31 @@ const Viewer = class{
                     opacity: 255,
                 };
                 const layer_instance = new Layer(options_for_layer);
-                this.baselayers.push(layer_instance);
-                this.overlaylayers.push(layer_instance);
+                layer_manager.addBaseLayer(layer_instance.create(this.display_name), layer.name);
+                layer_manager.addOverlayLayer(layer_instance.create(this.display_name), layer.name);
             });
         });
+
+        layer_manager.updateLayerList();
+        layer_manager.initialize();
     }
 
     draw = () => {
-        this.map.create();
-        const viewer = this._getViewerFuncWithSuitableLib();
-        viewer(
-            this.map.getElement(),
-            this.baselayers.map(layer => layer.create(this.display_name)),
-            this.overlaylayers.map(layer => layer.create(this.display_name)),
-            { maximumLevel: this.maximumLevel, minimumLevel: 0 },
-        );
+        const map = new Map("map");
+        map.create();
+        const map_ele = map.getElement();
+        return this._getViewerWithSuitableLib(map_ele, 2);
     }
 
-    _getViewerFuncWithSuitableLib = () => {
+    _getViewerWithSuitableLib = (map_ele, maximumLevel) => {
         switch(this.display_name){
-            case "Cesium":      return viewer3D;
-            case "Leaflet":     return viewerCartesian;
-            case "OpenLayers":  return viewerProjection;
+            case "Cesium":
+                return viewer3D(map_ele);
+            case "Leaflet":
+                const options = { maximumLevel: maximumLevel, minimumLevel: 0 };
+                return viewerCartesian(map_ele, options);
+            case "OpenLayers":
+                return viewerProjection(map_ele);
         }
     }
-
-    addBaseLayer = (layer) => {
-        if(layer instanceof Array){
-            Array.prototype.push.apply(this.baselayers, layer);
-        }else if(layer instanceof Layer){
-            this.baselayers.push(layer);
-        }else{
-            console.error("Please pass an instance of Array or Layer to argument of addBaseLayer function !");
-        }
-    }
-
-    addOverlayLayer = (layer) => {
-        if(layer instanceof Array){
-            Array.prototype.push.apply(this.overlaylayers, layer);
-        }else if(layer instanceof Layer){
-            this.overlaylayers.push(layer);
-        }else{
-            console.error("Please pass an instance of Array or Layer to argument of addOverlayLayer function !");
-        }
-    }
-
-    getDisplayName = () => { return this.display_name; }
 } 

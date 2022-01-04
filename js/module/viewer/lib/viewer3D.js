@@ -1,9 +1,9 @@
-const viewer3D = (viewer_ele, baselayers, overlaylayers, options) => {
+const viewer3D = (viewer_ele) => {
     const viewer = new Cesium.Viewer(
-        viewer_ele, 
-        {   // 表示するhtml要素
+        viewer_ele, // 表示するhtml要素
+        {   
             // 画像参照を行うインスタンを設定
-            imageryProvider: baselayers[0],
+            imageryProvider: new Cesium.TileCoordinatesImageryProvider(),
             baseLayerPicker: false,
             requestRenderMode: true,
             masximumRenderTimeChange: Infinity,
@@ -25,4 +25,6 @@ const viewer3D = (viewer_ele, baselayers, overlaylayers, options) => {
 
     // 大気を消すことで球体の周りの奇妙な光を消す
     viewer.scene.globe.showGroundAtmosphere = false;
+
+    return viewer;
 }

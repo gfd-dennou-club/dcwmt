@@ -2,7 +2,6 @@ const layer3D = class extends Cesium.UrlTemplateImageryProvider{
     constructor(options){
         super(options);
         this._diagram = options.diagram;
-        this._name = options.name;
     }
 
     // override
@@ -26,6 +25,4 @@ const layer3D = class extends Cesium.UrlTemplateImageryProvider{
 
         return this._diagram.isCounter(counterFunc, vectorFunc)();
     }
-
-    getName(){ return this._name; }
 }

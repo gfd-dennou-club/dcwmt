@@ -37,6 +37,5 @@ const global = {
         vector: _vector,
         maximumLevel: DEFINE.MAXIMUMLEVEL,
     }),
-    layer_manager: new layerManager(global.viewer),
     modal: new Modal(),
 };

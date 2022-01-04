@@ -4,12 +4,12 @@
     // ...
     //   <div id="layer_controller">
     //     <table>
-    //       <tbody data-bind="foreach: overlaylayers">
+    //       <tbody data-bind="foreach: layers">
     //         <tr data-bind="css: { up: $parent.upLayer === $data, down: $parent.downLayer === $data }">
     //           <td><input type="checkbox" data-bind="checked: show"></td>
     //           <td>
     //             <span data-bind="text: name, visible: !$parent.isSelectableLayer($data)"></span>
-    //             <select data-bind="visible: $parent.isSelectableLayer($data), options: $parent.baseLayers, optionsText: 'name', value: $parent.selectedLayer"></select>
+    //             <select data-bind="visible: $parent.isSelectableLayer($data), options: $parent.baselayers, optionsText: 'name', value: $parent.selectedLayer"></select>
     //           </td>
     //           <td>
     //             <input type="range" min="0" max="1" step="0.01" data-bind="value: alpha, valueUpdate: 'input'">
@@ -37,7 +37,7 @@
 
     const table = document.createElement("table");
     const tbody = document.createElement("tbody");
-    tbody.setAttribute("data-bind", "foreach: overlaylayers");
+    tbody.setAttribute("data-bind", "foreach: layers");
     
     const tr = document.createElement("tr");
     tr.setAttribute("data-bind", "css: { up: $parent.upLayer === $data, down: $parent.downLayer === $data }");
@@ -66,7 +66,7 @@
             {
                 ele: "select",
                 attr: [
-                    { id: "data-bind", effect: "visible: $parent.isSelectableLayer($data), options: $parent.baseLayers, optionsText: 'name', value: $parent.selectedLayer" }
+                    { id: "data-bind", effect: "visible: $parent.isSelectableLayer($data), options: $parent.baselayers, optionsText: 'name', value: $parent.selectedLayer" }
                 ]
             }
         ],
@@ -115,6 +115,6 @@
                 ele.innerHTML = td_ele.innerHTML;
             td.appendChild(ele);
         });
-        tbody.appendChild(td);
+        tr.appendChild(td);
     });
 }
