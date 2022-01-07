@@ -9,6 +9,7 @@ DEFINE.COUNTER.forEach((pq) => {
         name: pq.NAME,
         url: path_ary,
         size: pq.SIZE,
+        maximumLevel: pq.MAXIMUMLEVEL,
     });
 });
 
@@ -27,15 +28,15 @@ DEFINE.VECTOR.forEach((pq) => {
         name: name_str,
         url: urls,
         size: pq.SIZE,
+        maximumLevel: pq.MAXIMUMLEVEL,
     });
 });
 
 const global = {
     viewer: new Viewer({
-        display_name: "Cesium", 
+        display_name: "OpenLayers", 
         counter: _counter,
         vector: _vector,
-        maximumLevel: DEFINE.MAXIMUMLEVEL,
     }),
     modal: new Modal(),
 };

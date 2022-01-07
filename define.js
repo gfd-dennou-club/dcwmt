@@ -33,6 +33,7 @@ const DEFINE = {
 			NAME: "Ps",
 			FIXED: ["time=32112"],
 			SIZE: {X: 256, Y: 256},
+			MAXIMUMLEVEL: 2
 		},
 	],
 	VECTOR: [
@@ -40,7 +41,7 @@ const DEFINE = {
 			NAME: ["VelX", "VelY"],
 			FIXED: ["1.4002e+06/z=47200"],
 			SIZE: {X: 320, Y: 320},
+			MAXIMUMLEVEL: 1,
 		},
 	],
-	MAXIMUMLEVEL: 2,
 };

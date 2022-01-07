@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="./css/design.css">
     <link rel="stylesheet" href="./css/animation.css">
 
-    <!---------- [ Web Map Tile Service関係のライブラリ ] ---------->
+    <!---------- [ 外部ライブラリ群 ] ---------->
     <!-- leaflet関連 -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
     integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
@@ -27,7 +27,7 @@
     <!-- OpenLayers関連 -->
     <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.9.0/build/ol.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.5.0/css/ol.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.7.5/proj4.js"></script> <!-- proj4js: 地図投影法に用いる -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.7.5/proj4.js"></script>                     <!-- proj4js: 地図投影法に用いる -->
     <!------------------------------------------------------->
 
     <!---------- [ 自作モジュール群 ] ---------->
@@ -44,6 +44,8 @@
     <!-- layerManager関連 -->
     <script src="./js/module/layerManager/layerManager.js" type="text/javascript"></script>
     <script src="./js/module/layerManager/lib/layerManager3D.js" type="text/javascript"></script>
+    <script src="./js/module/layerManager/lib/layerManagerCartesian.js" type="text/javascript"></script>
+    <script src="./js/module/layerManager/lib/layerManagerProjection.js" type="text/javascript"></script>
 
     <!-- viewer関連 -->
     <script src="./js/module/viewer/viewer.js" type="text/javascript"></script>
@@ -63,7 +65,7 @@
     <!------------------------------------------------------->
 
     <!-- knockout.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script> -->
 
     <!-- 定義ファイル -->
     <script src="./define.js" type="text/javascript"></script>

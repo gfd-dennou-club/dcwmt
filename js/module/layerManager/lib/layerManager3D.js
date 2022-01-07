@@ -1,7 +1,7 @@
 const layerManager3D = class{
     constructor(imageryLayers, layer_controller){
         this.imageryLayers = imageryLayers;
-        // this.imageryLayers.removeAll();
+        this.imageryLayers.removeAll();
         this.layer_controller = layer_controller;
         this.viewModel = {
             layers: [],
@@ -14,7 +14,7 @@ const layerManager3D = class{
                 imageryLayers.raise(layer);
                 this.viewModel.upLayer = layer;
                 this.viewModel.downLayer = this.viewModel.layers[Math.max(0, index - 1)];
-                this.updateLayerList();
+                this._updateLayerList();
                 window.setTimeout(() => {
                     this.viewModel.upLayer = this.viewModel.downLayer = null;
                 }, 10);
@@ -25,15 +25,14 @@ const layerManager3D = class{
                     Math.min(this.viewModel.layers.length - 1, index + 1)
                 ];
                 this.viewModel.downLayer = layer;
-                this.updateLayerList();
+                this._updateLayerList();
                 window.setTimeout(() => {
                     this.viewModel.upLayer = this.viewModel.downLayer = null;
                 }, 10);
             },
             canRaise: (layerindex) => layerindex > 0,
             canLower: (layerindex) => 0 <= layerindex && layerindex < imageryLayers.length - 1, 
-        }
-        this.addBaseLayer(undefined, "tile coordinate");
+        };
         this.addOverlayLayer(
             new Cesium.GridImageryProvider(),
             "Grid",
@@ -44,15 +43,9 @@ const layerManager3D = class{
     }
 
     addBaseLayer = (imageryProvider, name) => {
-        let layer;
-        if(typeof imageryProvider === "undefined"){
-            layer = this.imageryLayers.get(0);
-            this.viewModel.selectedLayer = layer;
-        }else{
-            layer = new Cesium.ImageryLayer(imageryProvider);
-        }
-
+        const layer = new Cesium.ImageryLayer(imageryProvider);
         layer.name = name;
+        this.viewModel.selectedLayer = layer;
         this.viewModel.baselayers.push(layer);
     }
 
@@ -64,8 +57,16 @@ const layerManager3D = class{
         Cesium.knockout.track(layer, ["alpha", "show", "name"]);
     }
 
+    setup = () => {
+        this._updateLayerList();
+        Cesium.knockout.cleanNode(this.layer_controller);
+        Cesium.knockout.applyBindings(this.viewModel, this.layer_controller);
+        Cesium.knockout
+            .getObservable(this.viewModel, "selectedLayer")
+            .subscribe(this._changeSelectedLayer);
+    }
 
-    updateLayerList = () => {
+    _updateLayerList = () => {
         this.viewModel.layers.splice(0, this.viewModel.layers.length);
 
         for(let i = this.imageryLayers.length - 1; i >= 0; i--){
@@ -73,14 +74,7 @@ const layerManager3D = class{
         }
     }
 
-    initialize = () => {
-        Cesium.knockout.applyBindings(this.viewModel, this.layer_controller);
-        Cesium.knockout
-            .getObservable(this.viewModel, "selectedLayer")
-            .subscribe(this._eventListener_changedSelectedLayer);
-    }
-
-    _eventListener_changedSelectedLayer = (baselayer) => {
+    _changeSelectedLayer = (baselayer) => {
         const isSelectableLayer = this.viewModel.isSelectableLayer;              
         const activelayer_index = this.viewModel.layers.findIndex(isSelectableLayer);
         const activelayer = this.viewModel.layers[activelayer_index];
@@ -91,6 +85,6 @@ const layerManager3D = class{
             this.viewModel.layers.length - activelayer_index - 1
         );
         [baselayer.show, baselayer.alpha] = [show, alpha];
-        this.updateLayerList();
+        this._updateLayerList();
     }
 }

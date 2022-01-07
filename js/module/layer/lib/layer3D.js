@@ -1,6 +1,8 @@
 const layer3D = class extends Cesium.UrlTemplateImageryProvider{
     constructor(options){
         super(options);
+        this._maximumLevel = options.maximumLevel;
+        this._minimumLevel = options.minimumLevel;
         this._diagram = options.diagram;
     }
 

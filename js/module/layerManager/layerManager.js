@@ -4,14 +4,11 @@ const layerManager = class{
         // レイヤをコントロールするLayerControllerをdocumentから取ってくる
         const layer_controller = document.getElementById("layer_controller");
 
+        // レイヤの元となるものを取得
         const original_layer = this._getOriginalLayer(viewer);
-        
+
         // ライブラリに適したLayerManagerを取ってくる
-        switch(display_name){
-            case "Cesium":  this.layer_manager = new layerManager3D(original_layer, layer_controller); break;
-            case "Leaflet": this.layer_manager = new layerManagerCartesian(original_layer); break;
-            case "OpenLayers": this.layer_manager = new layerManagerProjection(original_layer); break;
-        }
+        this.layer_manager = this._getLayerManager(original_layer, layer_controller);
     }
 
     addBaseLayer = (layer, name) => {
@@ -22,19 +19,23 @@ const layerManager = class{
         this.layer_manager.addOverlayLayer(layer, name, alpha, show);
     }
 
-    updateLayerList = () => {
-        this.layer_manager.updateLayerList();
-    }
-
-    initialize = () => {
-        this.layer_manager.initialize();
+    setup = (viewer) => {
+        this.layer_manager.setup(viewer);
     }
 
     _getOriginalLayer = (viewer) => {
         switch(this.display_name){
             case "Cesium": return viewer.imageryLayers;
             case "Leaflet": return new L.control.layers();
-            case "OpenLayers": return viewerProjection(map_ele);
+            case "OpenLayers": return viewer;
+        }
+    }
+
+    _getLayerManager = (original_layer, layer_controller) => {
+        switch(this.display_name){
+            case "Cesium": return new layerManager3D(original_layer, layer_controller);
+            case "Leaflet": return new layerManagerCartesian(original_layer);
+            case "OpenLayers": return new layerManagerProjection(original_layer);
         }
     }
 }

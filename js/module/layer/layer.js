@@ -14,7 +14,7 @@ const Layer = class{
     changeOpacity = (opacity) => { this.options.opacity = opacity; }
     changeClrindex = (clrindex) => { this.options.clrindex = clrindex; }
 
-    create = (display_name) => {
+    get = (display_name) => {
         const clrmap = new colormap(this.options.clrindex);
         const diagram = this._getDiagram(clrmap, this.options.opacity);
         diagram.calcMaxMin(this.options.url[0].concat("/0/0/0.png"));
@@ -43,7 +43,7 @@ const Layer = class{
             url: this.options.url,
             tileHeight: this.options.size.Y,
             tileWidth: this.options.size.X,
-            maximumLevel: this.options.muximumLevel,
+            maximumLevel: this.options.maximumLevel,
             minimumLevel: this.options.minimumLevel,
             diagram: diagram,
         };
@@ -55,6 +55,8 @@ const Layer = class{
             url: this.options.url,
             size: this.options.size,
             diagram: diagram,
+            maxZoom: this.options.maximumLevel,
+            minZoom: this.options.minimumLevel,
             name: this.options.name,
         };
         return layerCartesian(options);

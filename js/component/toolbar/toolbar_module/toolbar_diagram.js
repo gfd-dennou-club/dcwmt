@@ -19,19 +19,19 @@ const ToolbarDiagram = class{
     }
 
     _clickEvent_cesiumjs = () => {
-        const options = { viewer_name: "Cesium", }
+        const options = { display_name: "Cesium", }
         // [Caution] refarences global variables
         global.viewer.redraw(options);
     }
 
     _clickEvent_leaflet = () => {
-        const options = { viewer_name: "Leaflet", }
+        const options = { display_name: "Leaflet", }
         // [Caution] refarences global variables
         global.viewer.redraw(options);
     }
 
     _clickEvent_openlayers = () => {
-        const options = { viewer_name: "OpenLayers", }
+        const options = { display_name: "OpenLayers", }
         // [Caution] refarences global variables
         global.viewer.redraw(options);
     }

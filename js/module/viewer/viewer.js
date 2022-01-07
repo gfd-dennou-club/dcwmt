@@ -14,37 +14,46 @@ const Viewer = class{
     //     maximumLevel: Number
     // }
     constructor(options){
-        // 表示するライブラリの名前を取得
-        this.display_name = options.display_name;
-        // ビュワの作成
-        const viewer = this.draw();
-        // レイヤマネージャを作成
-        const layer_manager = new layerManager(options.display_name, viewer);
-      
-        // レイヤの作成とマネージャへの追加
-        const layer_types = [options.counter, options.vector];
-        layer_types.forEach((layer_type) => {
-            layer_type.forEach((layer) => {
-                const options_for_layer = {
-                    name: layer.name,
-                    url: layer.url,
-                    size: layer.size,
-                    maximumLevel: this.maximumLevel,
-                    minimumLevel: 0,
-                    clrindex: 4,
-                    opacity: 255,
-                };
-                const layer_instance = new Layer(options_for_layer);
-                layer_manager.addBaseLayer(layer_instance.create(this.display_name), layer.name);
-                layer_manager.addOverlayLayer(layer_instance.create(this.display_name), layer.name);
-            });
-        });
-
-        layer_manager.updateLayerList();
-        layer_manager.initialize();
+        this.options = options;
+        this.draw();
     }
 
     draw = () => {
+        // ビュワの作成
+        const viewer = this._getViewer();
+        // レイヤマネージャを作成
+        const layer_manager = new layerManager(this.options.display_name, viewer);
+
+        // レイヤの作成とマネージャへの追加
+        const layer_types = [this.options.counter, this.options.vector];
+        layer_types.forEach((layer_type) => {
+            layer_type.forEach((layer_info) => {
+                const options_for_layer = {
+                    name: layer_info.name,
+                    url: layer_info.url,
+                    size: layer_info.size,
+                    maximumLevel: layer_info.maximumLevel,
+                    minimumLevel: 0,
+                    clrindex: this.options.clrindex || 4,
+                    opacity: 255,
+                };
+                const layer = new Layer(options_for_layer);
+                layer_manager.addBaseLayer(layer.get(this.options.display_name), layer_info.name);
+                layer_manager.addOverlayLayer(layer.get(this.options.display_name), layer_info.name);
+            });
+        });
+
+        // レイヤ・マネージャのセットアップ
+        layer_manager.setup(viewer);
+    }
+
+    redraw = (options) => {
+        for(const prop in options)
+            this.options[prop] = options[prop];
+        this.draw();
+    }
+
+    _getViewer = () => {
         const map = new Map("map");
         map.create();
         const map_ele = map.getElement();
@@ -52,7 +61,7 @@ const Viewer = class{
     }
 
     _getViewerWithSuitableLib = (map_ele, maximumLevel) => {
-        switch(this.display_name){
+        switch(this.options.display_name){
             case "Cesium":
                 return viewer3D(map_ele);
             case "Leaflet":
