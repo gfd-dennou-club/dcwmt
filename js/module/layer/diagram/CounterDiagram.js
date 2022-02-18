@@ -137,9 +137,10 @@ const CounterDiagram = class{
         return ctx.getImageData(0, 0, canvas.width, canvas.height);
     }
 
-    calcMaxMin = (url) => {
+    calcMaxMin = async (url) => {
         const canvas = document.createElement("canvas");
-        this.url2canvas(url, canvas, true);
+        await this.url2canvas(url, canvas, true);
+        console.log(this.min, this.max);
     }
 
     isCounter = (t=true, f=false) => { return t; }

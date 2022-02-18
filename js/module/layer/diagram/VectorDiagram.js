@@ -62,7 +62,7 @@ const VectorDiagram = class{
                 let endPoint = {x: 0, y: 0};
                 // 矢印(<-)の制御点
                 const arrow = {
-                    length: 3, // <- の - の長さ
+                    length: 3,  // <- の - の長さ
                     bold: 1,    // <- の - の太さ
                     width: 3,   // <- の < の横幅
                 }
@@ -91,7 +91,7 @@ const VectorDiagram = class{
                     ctxs[index].drawImage(img, 0, 0);
                     resolve();
                 }
-                img.src = url;                                     // 描画用キャンバスに画像を描画
+                img.src = url; // 描画用キャンバスに画像を描画
             })
             promises.push(promise);
         });

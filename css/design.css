@@ -52,3 +52,15 @@ div#modal div.footer button.button {
     color: #7ba5ff;
 }
 
+/* ====================[layer controller]==================== */
+div#layer_controller>div#frame {
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    background-clip: padding-box;
+    box-shadow: none;
+    border-radius: 5px;
+    background-color: white;
+}
+
+div#layer_controller>div#frame>section#on_mouse>div#separator {
+    border-top: 1px solid #ddd;
+}

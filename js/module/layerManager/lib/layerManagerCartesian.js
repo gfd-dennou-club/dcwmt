@@ -11,7 +11,7 @@ const layerManagerCartesian = class{
         this.original_layer.addOverlay(layer, name);
     }
 
-    setup = (viewer) => {
+    setup = (viewer, ele) => {
         this.original_layer.addTo(viewer);
     }
 }

@@ -7,10 +7,10 @@ const layerManagerProjection = class{
         this.original_layer.addLayer(layer);
     }
 
-    addOverlayLayer = (layer, name, alpha, show) => {
-        
+    addOverlayLayer = (layer, name, show = false) => {
     }
 
-    setup = (viewer) => {
+    setup = (viewer, ele) => {
+
     }
 }

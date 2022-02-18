@@ -19,19 +19,19 @@ const ToolbarDiagram = class{
     }
 
     _clickEvent_cesiumjs = () => {
-        const options = { display_name: "Cesium", }
+        const options = { wmtsLibIdentifer: new wmtsLibIdentifer("Cesium") }
         // [Caution] refarences global variables
         global.viewer.redraw(options);
     }
 
     _clickEvent_leaflet = () => {
-        const options = { display_name: "Leaflet", }
+        const options = { wmtsLibIdentifer: new wmtsLibIdentifer("Leaflet") }
         // [Caution] refarences global variables
         global.viewer.redraw(options);
     }
 
     _clickEvent_openlayers = () => {
-        const options = { display_name: "OpenLayers", }
+        const options = { wmtsLibIdentifer: new wmtsLibIdentifer("OpenLayers") }
         // [Caution] refarences global variables
         global.viewer.redraw(options);
     }

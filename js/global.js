@@ -34,7 +34,7 @@ DEFINE.VECTOR.forEach((pq) => {
 
 const global = {
     viewer: new Viewer({
-        display_name: "OpenLayers", 
+        wmtsLibIdentifer: new wmtsLibIdentifer("OpenLayers"), 
         counter: _counter,
         vector: _vector,
     }),

@@ -14,11 +14,11 @@ const Layer = class{
     changeOpacity = (opacity) => { this.options.opacity = opacity; }
     changeClrindex = (clrindex) => { this.options.clrindex = clrindex; }
 
-    get = (display_name) => {
+    get = (wmtsLibIdentifer) => {
         const clrmap = new colormap(this.options.clrindex);
         const diagram = this._getDiagram(clrmap, this.options.opacity);
         diagram.calcMaxMin(this.options.url[0].concat("/0/0/0.png"));
-        const layer = this._getLayerWithSuitableLib(display_name, diagram);
+        const layer = this._getLayerWithSuitableLib(wmtsLibIdentifer, diagram);
         return layer;
     }
 
@@ -30,12 +30,11 @@ const Layer = class{
         }
     }
 
-    _getLayerWithSuitableLib = (display_name, diagram) => {
-        switch(display_name){
-            case "Cesium":      return this._for3D(diagram);
-            case "Leaflet":     return this._forCartesian(diagram);
-            case "OpenLayers":  return this._forProjection(diagram);
-        }
+    _getLayerWithSuitableLib = (wmtsLibIdentifer, diagram) => {
+        const cesium = this._for3D(diagram);
+        const leaflet = this._forCartesian(diagram);
+        const openlayers = this._forProjection(diagram);
+        return wmtsLibIdentifer.whichLib(cesium, leaflet, openlayers);
     }
 
     _for3D = (diagram) => {
@@ -46,6 +45,7 @@ const Layer = class{
             maximumLevel: this.options.maximumLevel,
             minimumLevel: this.options.minimumLevel,
             diagram: diagram,
+            name: this.options.name,
         };
         return new layer3D(options);
     }

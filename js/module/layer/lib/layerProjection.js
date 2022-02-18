@@ -8,11 +8,18 @@ const layerProjection = class extends ol.layer.Tile{
             tileLoadFunction: this._tileLoadFunction,
             maxZoom: this.options.maxZoom,
             minZoom: this.options.minZoom,
-            wrapX: false,
-            noWrap: true,
+            projection: 'EPSG:3857',
+            tileSize: [
+                this.options.size.X,
+                this.options.size.Y
+            ],
+            wrapX: true,
         };
 
+
         const source = new ol.source.XYZ(xyz_options);
+        this.setExtent([-20026376.39, -20048966.10, 20026376.39, 20048966.10]);
+        // source.setRenderReprojectionEdges(true)
         this.setSource(source);
     }
 

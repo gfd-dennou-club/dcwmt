@@ -32,7 +32,7 @@
 
     const main = document.getElementById("main-screen");
     const layer_controller = document.createElement("div");
-    layer_controller.setAttribute("id", "layer_controller");
+    layer_controller.setAttribute("id", "layer_controllera");
     main.appendChild(layer_controller);
 
     const table = document.createElement("table");

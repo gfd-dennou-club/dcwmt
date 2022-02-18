@@ -4,7 +4,7 @@ const viewerCartesian = (map_ele, options) => {
         {
             preferCanvas: true, // Canvasレンダラーを選択
             center:     [0, 0],
-            crs:        L.CRS.Simple,
+            // crs:        L.CRS.Simple,
             maxZoom:    options.maximumLevel,
             minZoom:    options.minimumLevel,
             zoom:       0,

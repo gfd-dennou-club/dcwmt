@@ -4,6 +4,7 @@ const layer3D = class extends Cesium.UrlTemplateImageryProvider{
         this._maximumLevel = options.maximumLevel;
         this._minimumLevel = options.minimumLevel;
         this._diagram = options.diagram;
+        this._name = options.name; 
     }
 
     // override

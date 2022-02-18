@@ -93,7 +93,7 @@ div#toolbar {
 div#modal {
     display: none;
     position: fixed;
-    z-index: 2;
+    z-index: 3;
     left: 0;
     right: 0;
     height: 100%;
@@ -130,4 +130,28 @@ div#modal div.footer {
 
 div#modal div.footer button.button {
     width: 40%;
+}
+
+/* ====================[layer controller]==================== */
+div#layer_controller {
+    position: absolute;
+    z-index: 1;
+    top: 0px;
+    right: 0px;
+    margin-right: 10px;
+    margin-top: 44px;
+}
+
+div#layer_controller>div#frame>div#leave_mouse {
+    width: 44px;
+    height: 44px;
+}
+
+div#layer_controller>div#frame>section#on_mouse {
+    display: none;
+}
+
+div#layer_controller>div#frame>div#separator {
+    height: 0;
+    margin: 5px -10px 5px -6px;
 }

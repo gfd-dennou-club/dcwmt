@@ -27,19 +27,27 @@
     <!-- OpenLayers関連 -->
     <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.9.0/build/ol.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.5.0/css/ol.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.7.5/proj4.js"></script>                     <!-- proj4js: 地図投影法に用いる -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.7.5/proj4.js"></script>          <!-- proj4js: 地図投影法に用いる -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4leaflet/1.0.2/proj4leaflet.min.js"></script> -->
+
+    <!-- VectorDiagramの矢印を描画するためのもの: [TODO] いずれは自作モジュールで完結させたい -->
+    <script src="https://frogcat.github.io/canvas-arrow/canvas-arrow.js" type="text/javascript"></script>
     <!------------------------------------------------------->
 
     <!---------- [ 自作モジュール群 ] ---------->
-    <!-- diagram関連 -->
-    <script src="./js/module/diagram/CounterDiagram.js" type="text/javascript"></script>
-    <script src="./js/module/diagram/VectorDiagram.js" type="text/javascript"></script>
-
+   
     <!-- layer関連 -->
     <script src="./js/module/layer/layer.js" type="text/javascript"></script>
     <script src="./js/module/layer/lib/layer3D.js" type="text/javascript"></script>
     <script src="./js/module/layer/lib/layerCartesian.js" type="text/javascript"></script>
     <script src="./js/module/layer/lib/layerProjection.js" type="text/javascript"></script>
+    <script src="./js/module/layer/diagram/CounterDiagram.js" type="text/javascript"></script>
+    <script src="./js/module/layer/diagram/VectorDiagram.js" type="text/javascript"></script>
+
+    <!-- layerController関連 -->
+    <script src="./js/module/layerController/layerController.js" type="text/javascript"></script>
+    <script src="./js/module/layerController/lib/layerController3D.js" type="text/javascript"></script>
+    <script src="./js/module/layerController/lib/layerControllerProjection.js" type="text/javascript"></script>
 
     <!-- layerManager関連 -->
     <script src="./js/module/layerManager/layerManager.js" type="text/javascript"></script>
@@ -53,24 +61,22 @@
     <script src="./js/module/viewer/lib/viewerCartesian.js" type="text/javascript"></script>
     <script src="./js/module/viewer/lib/viewerProjection.js" type="text/javascript"></script>
 
+    <!-- 汎用性の高いモジュール群 -->
     <!-- colorbar関連 -->
-    <script src="./js/module/colormap/colormap.js" type="text/javascript"></script>
-    <script src="./js/module/colormap/lib/colormap_lib.js" type="text/javascript"></script>
+    <script src="./js/module/utility/colormap/colormap.js" type="text/javascript"></script>
+    <script src="./js/module/utility/colormap/lib/colormap_lib.js" type="text/javascript"></script>
+    <!-- wmtsLibIdentifer -->
+    <script src="./js/module/utility/wmtsLibIdentifer.js" type="text/javascript"></script>
 
+    <!-- HTMl要素を返すモジュール群 -->
     <!-- map関連 -->
-    <script src="./js/module/map.js" type="text/javascript"></script>
-
+    <script src="./js/module/component/map.js" type="text/javascript"></script>
     <!-- modal関連 -->
-    <script src="./js/module/modal.js" type="text/javascript"></script>
+    <script src="./js/module/component/modal.js" type="text/javascript"></script>
     <!------------------------------------------------------->
-
-    <!-- knockout.js -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script> -->
 
     <!-- 定義ファイル -->
     <script src="./define.js" type="text/javascript"></script>
-
-    <script src="https://frogcat.github.io/canvas-arrow/canvas-arrow.js" type="text/javascript"></script>
   </head>
   <body>
     <div class="dcwmt-wrapper">
@@ -84,8 +90,7 @@
         <script src="./js/component/toolbar/toolbar.js"></script>
       </header>
       <div id="main-screen">
-        <!-- レイヤーコントローラ -->
-        <script src="./js/component/layer_controller.js"></script>
+        <!-- <script src="./js/component/layer_controller.js"></script> -->
       </div>
       <footer id="footer">
         <!-- カラーマップ -->

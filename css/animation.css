@@ -15,7 +15,7 @@ ul.tool_bar>li>ul#menu{
 ul.tool_bar>li:hover>ul#menu{
     display: block;
     position: absolute;
-    z-index: 1;
+    z-index: 2;
 }
 
 ul.tool_bar>li>ul#menu>li:hover{
@@ -39,4 +39,18 @@ div#modal div.footer button.button:hover {
 
 div#modal div.footer button.button:active {
     background-color: #4b64d1;
+}
+
+/* ====================[layer controller]==================== */
+div#layer_controller:hover>div#frame>div#leave_mouse {
+    display: none;
+}
+
+div#layer_controller:hover>div#frame>section#on_mouse {
+    display: block;
+    padding: 6px 10px 6px 6px;
+}
+
+div#layer_controller:hover>div#frame>section#on_mouse>label>div>span {
+    font: 12px/1.5 "Helvetica Neue", Arial, Helvetica, sans-serif;
 }

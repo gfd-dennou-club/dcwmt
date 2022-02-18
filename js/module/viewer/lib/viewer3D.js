@@ -3,7 +3,7 @@ const viewer3D = (viewer_ele) => {
         viewer_ele, // 表示するhtml要素
         {   
             // 画像参照を行うインスタンを設定
-            //imageryProvider: new Cesium.TileCoordinatesImageryProvider(),
+            imageryProvider: new Cesium.TileCoordinatesImageryProvider(),
             baseLayerPicker: false,
             requestRenderMode: true,
             masximumRenderTimeChange: Infinity,
