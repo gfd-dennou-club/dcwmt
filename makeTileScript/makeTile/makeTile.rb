@@ -45,7 +45,7 @@ def linearInterpolation(ary, rowLen, colLen)
 				if c0 == nil then
 					c0 = searchColDown(ary, col, rowLen)
 					c1 = searchColDown(ary, c0, rowLen)
-				# 上方向に値がなければ, 上方向のみで補完する
+				# 上方向に値がなければ, 上方向のみで補完する
 				elsif c1 == nil then
 					c0 = searchColUp(ary, col, rowLen)
 					c1 = searchColUp(ary, c0, rowLen)
@@ -239,7 +239,7 @@ def makeTileForPlane(dimInfo, fp, countAry, xindex, yindex, otherindex, dirPath,
 				pnm.end()
 
 				system("pnmtopng #{tempDirPath_y}.ppm > #{tempDirPath_y}.png")
-      		 	system("rm -f #{tempDirPath_y}.ppm")
+      		 	#system("rm -f #{tempDirPath_y}.ppm")
 			}
 		}
 	}
