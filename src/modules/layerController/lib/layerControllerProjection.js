@@ -1,3 +1,6 @@
+import View from 'ol/View';
+import { getCenter } from 'ol/extent';
+
 const layerControllerProjection = class{
     constructor(original_layer, baselayers, overlaylayers){
         this.map = original_layer;
@@ -24,9 +27,8 @@ const layerControllerProjection = class{
     eventListener_for_projection = (value) => {
         // 選択したレイヤを取得
         const purpose_projection = this.map.projections.find((item) => item.name === value.target.value).proj;
-        const getCenter = ol.extent.getCenter;
 
-        const view = new ol.View({
+        const view = new View({
             projection: purpose_projection,
             extent: purpose_projection.getExtent() || [0, 0, 0, 0],
             center: getCenter(purpose_projection.getExtent() || [0, 0, 0, 0]),

@@ -10,13 +10,12 @@ import layerManager from '../modules/layerManager/layerManager.js';
 import wmtsLibIdentifer from '../modules/utility/wmtsLibIdentifer.js';
 
 export default {
-    data: {
+    data: () => ({  
         wli: new wmtsLibIdentifer("OpenLayers"),
         tone: [],
         vector: [],
-        clrindex: 4,
-    },
-    created: function() {
+    }),
+    mounted: function() {
         const root = define.ROOT;
 
         define.TONE.forEach((pq) => {
@@ -42,6 +41,11 @@ export default {
 
         this.draw();
     },
+    computed: {
+        clrindex: function() {
+            return this.$store.getters.clrindex;
+        },
+    },
     methods: {
         draw: function() {
             // ビュワーの作成
@@ -61,7 +65,7 @@ export default {
                         size: layer_info.size,
                         maximumLevel: layer_info.maximumLevel,
                         minimumLevel: 0,
-                        clrindex: this.colormap,
+                        clrindex: this.clrindex,
                         opacity: 255,
                     };
                     const layer_obj = new layer(layer_option);
@@ -72,6 +76,11 @@ export default {
 
             // レイヤーマネージャのセットアップ
             layer_manager.setup(suitable_viewer);
+        }
+    },
+    watch: {
+        clrindex: function() {
+            this.draw();
         }
     }
 }

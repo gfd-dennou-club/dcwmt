@@ -3,7 +3,6 @@ const MODE = "development";
 const path = require("path");
 
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
 const RemoveEmptyScriptsPlugin = require("webpack-remove-empty-scripts");
 const {VueLoaderPlugin} = require("vue-loader");
 
@@ -11,8 +10,8 @@ module.exports = {
     entry: "./src/index.js",
 
     output: {
-        path: path.join(__dirname, "dist"),
         filename: "index.js",
+        path: path.join(__dirname, "dist"),
     },
 
     mode: MODE,
@@ -24,13 +23,16 @@ module.exports = {
                 loader: "vue-loader",
             },
             {
-                test: /\.css$/i,
+                test: /\.(sass|scss|css)$/i,
                 use: [ 
                     {
                         loader: MiniCssExtractPlugin.loader,
                     },
                     {
                         loader: 'css-loader',
+                    },
+                    {
+                        loader: 'sass-loader',
                     },
                 ],
             },
@@ -48,10 +50,6 @@ module.exports = {
     plugins: [
         new MiniCssExtractPlugin({
             filename: "./css/[name].css",
-        }),
-        new HtmlWebpackPlugin({
-            template: path.join(__dirname, "index.html"),
-            filename: path.join(__dirname, "dist", "index.html"),
         }),
         new RemoveEmptyScriptsPlugin(),
         new VueLoaderPlugin(),

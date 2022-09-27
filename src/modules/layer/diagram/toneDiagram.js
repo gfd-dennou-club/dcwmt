@@ -130,14 +130,9 @@ const toneDiagram = class{
                 resolve();
             };
 
-            img.onerror = () => {
-                alert("Error loading " + url);
-            };
-
             img.src = url;
         });
         await promise;
-        console.log(canvas);
         return canvas;
     }
 

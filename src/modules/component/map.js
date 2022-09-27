@@ -11,7 +11,6 @@ const map = class{
 
         // viewerを表示するためのdiv要素を作成
         const map_ele = document.createElement("div");
-        map_ele.setAttribute("width", "100%");
         map_ele.setAttribute("id", this.name);
 
         // viewer_elementを大枠のメインの要素に子要素として追加

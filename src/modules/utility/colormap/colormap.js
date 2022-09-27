@@ -1,4 +1,4 @@
-import clrmap from "./lib/colormap_lib.js";
+import clrmap from "../../../components/MenuContents/Menu-colormap/colormap_lib.js";
 
 const colormap = class{
     constructor(clrindex){
@@ -6,7 +6,12 @@ const colormap = class{
     }
 
     getClrmap = () => {
-        return clrmap[this.clrindex + 1];
+        return clrmap[this.clrindex];
+    }
+
+    getClrmapName = () => {
+        const _clrindex = this.clrindex + 1;
+        return (_clrindex < 10 ? "clrmap_0" + _clrindex : "clrmap_" + _clrindex);
     }
 
     draw = (width, height) => {
