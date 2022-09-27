@@ -1,4 +1,4 @@
-import clrmap from "../../../components/MenuContents/Menu-colormap/colormap_lib.js";
+import clrmap from "../../../components/DrawerContents/Drawer-colormap/colormap_lib.js";
 
 const colormap = class{
     constructor(clrindex){

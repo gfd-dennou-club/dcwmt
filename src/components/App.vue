@@ -1,12 +1,6 @@
 <template>
     <v-app id="app">
-        <v-navigation-drawer 
-            app
-            v-model="drawer"
-        >
-            <menu_colormap v-if="drawerComponent === 'カラーマップ関連'" />
-            <menu_tone v-if="drawerComponent === 'トーン関連'" />
-        </v-navigation-drawer>
+        <dcwmt_navigationdrawer :nowlink="nowlink" :canDraw="canDraw" />
         <v-app-bar app>
             <tab @onClick="selectMenu" />
         </v-app-bar>
@@ -14,7 +8,7 @@
             <dcwmt_map />
         </v-main>
         <v-footer app>
-            <legends />
+            <dcwmt_legend />
         </v-footer>
     </v-app>
 </template>
@@ -22,28 +16,27 @@
 <script>
 import dcwmt_map from './Dcwmt-map.vue';
 import tab from './Tab.vue';
-import { menu_colormap, menu_tone } from './MenuContents/Menu.js';
-import legends from './Legends.vue';
+import dcwmt_legend from './Dcwmt-legends.vue';
+import dcwmt_navigationdrawer from './Dcwmt-navigationdrawer.vue';
 
 export default {
     components: {
         dcwmt_map,
         tab,
-        menu_colormap,
-        menu_tone,
-        legends,
+        dcwmt_legend,
+        dcwmt_navigationdrawer,
     },
     data: () => ({
-        drawerComponent: undefined,
-        drawer: false,
+        canDraw: false,
+        nowlink: undefined,
         oldlink: undefined,
     }),
     methods: {
         selectMenu(link) {
             if(!this.oldlink || this.oldlink === link) {
-                this.drawer = !this.drawer;
+                this.canDraw = !this.canDraw;
             }
-            this.drawerComponent = link;
+            this.nowlink = link;
             this.oldlink = link; 
         }
     }
