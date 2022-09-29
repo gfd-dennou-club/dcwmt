@@ -9,8 +9,7 @@ const layer = class{
     // options: {
     //     name: String,
     //     url: [String, ...],
-    //     maximumLevel: Number,
-    //     minimumLevel: Number,
+    //     level: { min: Number, max: Number }
     //     clrindex: Number,
     //     opacity: Number,
     // };
@@ -21,7 +20,7 @@ const layer = class{
     changeOpacity = (opacity) => { this.options.opacity = opacity; }
     changeClrindex = (clrindex) => { this.options.clrindex = clrindex; }
 
-    get = (wmtsLibIdentifer) => {
+    create = (wmtsLibIdentifer) => {
         const clrmap = new colormap(this.options.clrindex);
         const diagram = this._getDiagram(clrmap, this.options.opacity);
         
@@ -53,8 +52,8 @@ const layer = class{
             url: this.options.url,
             tileHeight: this.options.size.Y,
             tileWidth: this.options.size.X,
-            maximumLevel: this.options.maximumLevel,
-            minimumLevel: this.options.minimumLevel,
+            maximumLevel: this.options.level.max,
+            minimumLevel: this.options.level.min,
             diagram: diagram,
             name: this.options.name,
         };
@@ -66,8 +65,8 @@ const layer = class{
             url: this.options.url,
             size: this.options.size,
             diagram: diagram,
-            maxZoom: this.options.maximumLevel,
-            minZoom: this.options.minimumLevel,
+            maxZoom: this.options.level.max,
+            minZoom: this.options.level.min,
             name: this.options.name,
         };
         return layerCartesian(options);
@@ -78,8 +77,8 @@ const layer = class{
             url: this.options.url,
             size: this.options.size,
             diagram: diagram,
-            maxZoom: this.options.maximumLevel,
-            minZoom: this.options.minimumLevel,
+            maxZoom: this.options.level.max,
+            minZoom: this.options.level.min,
             name: this.options.name,
         }
         return new layerProjection(options);

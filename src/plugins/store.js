@@ -1,20 +1,26 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
+import wmtsLibIdentifer from "../modules/utility/wmtsLibIdentifer";
+
 Vue.use(Vuex);
 
 const state = {
-    clrindex: 3,
+    config: {
+        clrindex: 3,
+        wmtsLibIdentifer: new wmtsLibIdentifer("OpenLayers"),
+    }
 };
 
 const getters = {
-    clrindex: state => state.clrindex,
+    config: state => state.config,
 };
 
 const mutations = {
-    setClrindex (state, newindex) {
-        state.clrindex = newindex;
-    }
+    setConfig: (state, config) => {
+        for(const props in config)
+            state.config[props] = config[props];
+    },
 }
 
 const actions = {

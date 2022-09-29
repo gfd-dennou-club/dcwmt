@@ -1,9 +1,5 @@
 <template>
-    <v-list
-	  subheader
-      dense
-      nav
-    >
+    <v-list subheader tile>
 		<v-subheader>カラーマップの変更</v-subheader>
 		<v-list-item-group v-model="selected">
     		<v-list-item
@@ -40,8 +36,10 @@ export default {
         );
     },
 	watch: {
-		selected: function(val) {
-			this.$store.commit("setClrindex", val);
+		selected: function(clrindex) {
+			if (clrindex) {
+				this.$store.commit("setConfig", { clrindex: clrindex });
+			}
 		}
 	},
 }

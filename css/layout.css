@@ -1,6 +1,6 @@
 /* 画面全体に関する */
 body {
-    margin: 0%;                 /* 要素外部の空白を0%(なし)にする */
+    margin: 0%;                
 }
 
 /* 
@@ -59,8 +59,7 @@ ul.tool_bar>li>ul#menu>li>a{
 
 /* ====================[main]==================== */
 div#main-screen {
-    /* height: 75%; */
-    height: 90%;
+    height: 100%;
     display: flex;
 }
 
@@ -91,7 +90,7 @@ div#toolbar {
 }
 
 /* ====================[modal window]==================== */
-div#modal {
+/* div#modal {
     display: none;
     position: fixed;
     z-index: 3;
@@ -131,7 +130,7 @@ div#modal div.footer {
 
 div#modal div.footer button.button {
     width: 40%;
-}
+} */
 
 /* ====================[layer controller]==================== */
 div#layer_controller {

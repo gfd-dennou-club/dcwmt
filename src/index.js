@@ -6,6 +6,7 @@ import store from "./plugins/store.js";
 import "../css/animation.css";
 import "../css/design.css";
 import "../css/layout.css";
+import "cesium/Build/Cesium/Widgets/widgets.css";
 
 new Vue({
     vuetify,

@@ -1,7 +1,11 @@
-import {TileCoordinatesImageryProvider, Color} from "cesium";
+import { 
+    Viewer, 
+    TileCoordinatesImageryProvider, 
+    Color 
+} from "cesium";
 
 const viewer3D = (viewer_ele) => {
-    const viewer = new Cesium.Viewer(
+    const viewer = new Viewer(
         viewer_ele, // 表示するhtml要素
         {   
             // 画像参照を行うインスタンを設定

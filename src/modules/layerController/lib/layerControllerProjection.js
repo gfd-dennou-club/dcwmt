@@ -56,6 +56,10 @@ const layerControllerProjection = class{
             }
         });
     }
+
+    getSelectedBaseLayer = () => {
+        return this.bottomlayer;
+    }
 }
 
 export default layerControllerProjection;

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-list subheader>
+        <v-list subheader tile>
             <v-subheader>不透明度</v-subheader>
             <opacity />  
         </v-list>

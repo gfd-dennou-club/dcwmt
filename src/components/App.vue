@@ -38,7 +38,7 @@ export default {
             }
             this.nowlink = link;
             this.oldlink = link; 
-        }
+        },
     }
 };
 </script>

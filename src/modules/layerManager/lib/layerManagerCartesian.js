@@ -1,5 +1,5 @@
 const layerManagerCartesian = class{
-    constructor(original_layer, layer_controller){
+    constructor(original_layer){
         this.original_layer = original_layer;
     }
 

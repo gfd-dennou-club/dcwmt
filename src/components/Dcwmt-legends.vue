@@ -22,7 +22,7 @@
         },
         computed: {
             clrindex: function() {
-                return this.$store.getters.clrindex;
+                return this.$store.getters.config.clrindex;
             }
         }
     }

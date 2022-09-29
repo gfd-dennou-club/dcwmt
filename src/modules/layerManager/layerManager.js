@@ -10,14 +10,11 @@ const layerManager = class{
     constructor(wmtsLibIdentifer, viewer){
         this.wmtsLibIdentifer = wmtsLibIdentifer;
 
-        // レイヤをコントロールするLayerControllerをdocumentから取ってくる
-        const layer_controller = document.getElementById("layer_controller");
-
         // レイヤの元となるものを取得
         const original_layer = this._getOriginalLayer(viewer);
 
         // ライブラリに適したLayerManagerを取ってくる
-        this.layer_manager = this._getLayerManager(original_layer, layer_controller);
+        this.layer_manager = this._getLayerManager(original_layer);
 
         this.baselayers = [];
         this.overlaylayers = [];
@@ -53,8 +50,8 @@ const layerManager = class{
         return this.wmtsLibIdentifer.whichLib(cesium, leaflet, openlayers);
     }
 
-    _getLayerManager = (original_layer, layer_controller) => {
-        const cesium = () => new layerManager3D(original_layer, layer_controller);
+    _getLayerManager = (original_layer) => {
+        const cesium = () => new layerManager3D(original_layer);
         const leaflet = () => new layerManagerCartesian(original_layer);
         const openlayers = () => new layerManagerProjection(original_layer);
         const suitableFunc = this.wmtsLibIdentifer.whichLib(cesium, leaflet, openlayers);

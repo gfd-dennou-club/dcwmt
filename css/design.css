@@ -27,7 +27,7 @@ ul.tool_bar>li>ul#menu>li>a{
 }
 
 /* ====================[modal window]==================== */
-div#modal {
+/* div#modal {
     background-color: rgba(0, 0, 0, 0.5);
 }
 
@@ -50,7 +50,7 @@ div#modal div.footer button.button {
     border: solid #7ba5ff;
     background-color: transparent;
     color: #7ba5ff;
-}
+} */
 
 /* ====================[layer controller]==================== */
 div#layer_controller>div#frame {

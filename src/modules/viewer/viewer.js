@@ -1,8 +1,8 @@
-import map from '../component/map.js';
-
 import viewer3D from './lib/viewer3D.js';
 import viewerCartesian from './lib/viewerCartesian.js';
 import viewerProjection from './lib/viewerProjection.js';
+
+import map from './map.js';
 
 const viewer = class{
     // options: { 
@@ -37,7 +37,7 @@ const viewer = class{
         return viewerCartesian(map_ele, options); 
     }
 
-    _forProjection = (map_ele, maximumLevel) => {
+    _forProjection = (map_ele) => {
         return viewerProjection(map_ele);
     }
 }

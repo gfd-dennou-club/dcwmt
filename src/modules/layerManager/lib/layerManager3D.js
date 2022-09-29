@@ -1,7 +1,11 @@
-import {GridImageryProvider, knockout, ImageryLayer}  from "cesium";
+import {
+    GridImageryProvider,
+    knockout,
+    ImageryLayer
+} from 'cesium';
 
 const layerManager3D = class{
-    constructor(imageryLayers, layer_controller){
+    constructor(imageryLayers){
         this.imageryLayers = imageryLayers;
         this.baselayer = "Ps";
         this.overlaylayers = [];
@@ -44,13 +48,6 @@ const layerManager3D = class{
         knockout.track(layer, ["alpha", "show", "name"]);
     }
 
-    // updateLayerList = () => {
-    //     this.viewModel.layers.splice(0, this.viewModel.layers.length);
-
-    //     for(let i = this.imageryLayers.length - 1; i >= 0; i--){
-    //         this.viewModel.layers.push(this.imageryLayers.get(i));
-    //     }
-    // }
 
     setup = (viewer, ele) => {
         knockout.applyBindings(this.viewModel, ele);

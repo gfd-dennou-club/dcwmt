@@ -5,6 +5,11 @@ const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const RemoveEmptyScriptsPlugin = require("webpack-remove-empty-scripts");
 const {VueLoaderPlugin} = require("vue-loader");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+const webpack = require("webpack");
+
+const cesiumSouece = "./node_modules/cesium/Source";
+const cesiumWorkers = "../Build/Cesium/Workers";
 
 module.exports = {
     entry: "./src/index.js",
@@ -53,6 +58,18 @@ module.exports = {
         }),
         new RemoveEmptyScriptsPlugin(),
         new VueLoaderPlugin(),
+        // for cesium
+        new CopyWebpackPlugin({
+            patterns: [
+                {from: path.join(cesiumSouece, cesiumWorkers), to: 'Workers'},
+                {from: path.join(cesiumSouece, 'Assets'), to: 'Assets'},
+                {from: path.join(cesiumSouece, 'Widgets'), to: 'Widgets'},
+                {from: path.join(cesiumSouece, 'ThirdParty/Workers'), to: 'ThirdParty/Workers'}
+            ]
+        }),
+        new webpack.DefinePlugin({
+            CESIUM_BASE_URL: JSON.stringify('./')
+        })
     ],
 
     resolve: {

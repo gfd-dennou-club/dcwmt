@@ -1,4 +1,4 @@
-import {UrlTemplateImageryProvider} from "cesium";
+import { UrlTemplateImageryProvider } from "cesium";
 
 const layer3D = class extends UrlTemplateImageryProvider{
     constructor(options){
@@ -13,7 +13,7 @@ const layer3D = class extends UrlTemplateImageryProvider{
     requestImage(x, y, level){
         const urls = [];
         this._resource.forEach((ele) => {
-            const url = ele.concat(`${ele}/${level}/${x}/${y}.png`);
+            const url = ele.concat(`/${level}/${x}/${y}.png`);
             urls.push(url);
         });
 
