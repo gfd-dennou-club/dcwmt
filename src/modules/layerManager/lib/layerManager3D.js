@@ -1,86 +1,100 @@
-import {
-    GridImageryProvider,
-    knockout,
-    ImageryLayer
-} from 'cesium';
+import { ImageryLayer } from 'cesium';
 
 const layerManager3D = class{
-    constructor(imageryLayers){
-        this.imageryLayers = imageryLayers;
-        this.baselayer = "Ps";
-        this.overlaylayers = [];
-        this.viewModel = {
-            layer: [],
-            overlaylayers: [],
-            baselayers: [],
-            upLayer: null,
-            downLayer: null,
-            selectedLayer: null,
-            isSelectableLayer: (layer) => this.viewModel.baselayers.indexOf(layer) >= 0,
+    constructor(original_layer){
+        this.original_layer = original_layer;
+        this.baselayers = [];
+        this.layers = [];
+    }
+
+    addBaseLayer = (layer, name) => {
+        let _layer;
+        if ( typeof layer === "undefined" ) {
+            _layer = layer.get(0);
+        } else {
+            _layer = new ImageryLayer(layer); 
         }
-        this.addBaseLayer(undefined, "tile coordinate");
-        this.addOverlayLayer(
-            new GridImageryProvider(),
-            "Grid",
-            1.0,
-            false
-        );
-        knockout.track(this.viewModel);
+        _layer.name = name;
+        _layer.isBaseLayer = true;
+        this.baselayers.push(_layer);
     }
 
-    addBaseLayer = (imageryProvider, name) => {
-        let layer;
-        if(typeof imageryProvider === "undefined"){
-            layer = this.imageryLayers.get(0);
-            this.viewModel.selectedLayer = layer;
-        }else{
-            layer = new ImageryLayer(imageryProvider);
+    addOverlayLayer = (layer, name, alpha, show) => {
+        const _layer = this.original_layer.addImageryProvider(layer);
+        _layer.name = name;
+        _layer.alpha = alpha;
+        _layer.show = show;
+        _layer.isBaseLayer = false;
+        this.layers.push(_layer);
+    }
+
+    getOverlayLayers = () => {
+        return this.layers;
+    }
+
+    getBaseLayers = () => {
+        return this.baselayers;
+    }
+
+    setup = () => { }
+
+    update = () => {
+        const numLayers = this.original_layer.length;
+        this.layers.splice(0, this.original_layer.length);
+        for ( let i = numLayers - 1; i >= 0; i++) {
+            this.layers.push(this.original_layer.get(i))
         }
-        layer.name = name;
-        this.viewModel.baselayers.push(layer);
     }
 
-    addOverlayLayer = (imageryProvider, name, alpha, show) => {
-        const layer = this.imageryLayers.addImageryProvider(imageryProvider);
-        layer.alpha = alpha || 0.5;
-        layer.show = show || true;
-        layer.name = name;
-        knockout.track(layer, ["alpha", "show", "name"]);
+    remove = (layer) => {
+        this.original_layer.remove(layer, false);
     }
 
-
-    setup = (viewer, ele) => {
-        knockout.applyBindings(this.viewModel, ele);
-        knockout
-            .getObservable(this.viewModel, "baselayers")
-            .subscribe(this._eventListener_changedBaseLayer);
-        knockout
-            .getObservable(this.viewModel, "overlaylayers")
-            .subscribe(this._eventListener_changedOverlayLayer);
-        this.layers = this.imageryLayers._layers;
-        this._layer();
+    add = (layer, index) => {
+        this.original_layer.add(layer, index);
     }
 
-    _eventListener_changedBaseLayer = (baselayer) => {
-        this.baselayer = baselayer;
-        this._layer();
+    raise = (layer) => {
+        this.original_layer.raise(layer);
     }
 
-    _eventListener_changedOverlayLayer = (overlaylayers) => {
-        this.overlaylayers = overlaylayers;
-        this._layer();
+    lower = (layer) => {
+        this.original_layer.lower(layer);
     }
 
-    _layer = () => {
-        this.imageryLayers.removeAll(false);
-        const baselayer = this.layers.find((layer) => this.baselayer === layer.name);
-        this.imageryLayers.add(baselayer, 0);
-        this.overlaylayers.forEach((layer, index) => {
-            if(this.baselayer === layer.name) return;
-            const overlay = this.layers.find((overlay) => overlay.name === layer)
-            this.imageryLayers.add(overlay, index + 1);
-        });
-    }
+    // setup = (viewer, ele) => {
+    //     document.getElementsByName("baselayer").forEach( layer => {
+    //         layer.addEventListener("change", this._eventListerner_changeBaseLayer);
+    //     });
+
+    //     document.getElementsByName("overlay").forEach( layer => {
+    //         layer.addEventListener("change", this._eventListerner_changeOverlayLayer);
+    //     });
+    // }
+
+    // _eventListerner_changeBaseLayer = (baselayer) => {
+    //     const purpose_layer = this.baselayers.find(item => item.options.name === baselayer.target.value);
+    //     this.bottomlayer = purpose_layer;
+    //     this._update();
+    // }
+
+    // _eventListerner_changeOverlayLayer = (overlaylayer) => {
+    //     const purpose_layer = this.overlaylayers.find(item => item.layer.options.name === overlaylayer.target.value);
+    //     purpose_layer.show = overlaylayer.target.checked;
+    //     this._update();
+    // }
+
+    // _update = () => {
+    //     console.log(this.bottomlayer);
+    //     console.log(this.original_layer);
+    //     this.original_layer.removeAll(false);
+    //     this.original_layer.add(this.bottomlayer, 0);
+    //     this.overlaylayers.forEach( ( layer, index ) => {
+    //         if ( layer.show && layer.layer.options.name !== this.bottomlayer.options.name ) {
+    //             this.original_layers.add(layer.layer, index + 1);
+    //         }
+    //     });
+    // }
 }
 
 export default layerManager3D;

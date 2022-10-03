@@ -19,7 +19,6 @@ const layerProjection = class extends tileLayer{
             wrapX: true,
         };
 
-
         const source_obj = new XYZ(xyz_options);
         this.setExtent([-20026376.39, -20048966.10, 20026376.39, 20048966.10]);
         // source.setRenderReprojectionEdges(true)

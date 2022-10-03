@@ -9,7 +9,7 @@ const state = {
     config: {
         clrindex: 3,
         wmtsLibIdentifer: new wmtsLibIdentifer("OpenLayers"),
-    }
+    },
 };
 
 const getters = {

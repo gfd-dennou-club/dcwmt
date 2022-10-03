@@ -1,3 +1,32 @@
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/lib/index.js??vue-loader-options!./src/components/Layerselecter.vue?vue&type=style&index=0&id=f80c440c&scoped=true&lang=css& ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************/
+.v-speed-dial[data-v-f80c440c] {
+  position: absolute !important;
+}
+#toolbar[data-v-f80c440c] {
+  background: rgba(255, 255, 255, 0.8);
+  padding: 4px;
+  border-radius: 4px;
+}
+#toolbar input[data-v-f80c440c] {
+  vertical-align: middle;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+#toolbar table tr[data-v-f80c440c] {
+  transform: translateY(0);
+  transition: transform 0.4s ease-out;
+}
+
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/lib/index.js??vue-loader-options!./src/components/Dcwmt-map.vue?vue&type=style&index=0&id=53b101e4&scoped=true&lang=css& ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************/
+div#main-screen[data-v-53b101e4] {
+  height: 99%;
+  display: flex;
+}
+
 /*!************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vuetify/dist/vuetify.min.css ***!
   \************************************************************************************************************************************/
@@ -20914,42 +20943,6 @@ html.overflow-y-hidden {
 /*!************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./css/animation.css ***!
   \************************************************************************************************************/
-@charset "UTF-8";
-/* ====================[header]==================== */
-/* ツールバーの各要素 */
-ul.tool_bar > li:hover {
-  background: #4b64d1; }
-
-ul.tool_bar > li > ul#menu {
-  position: relative;
-  display: none;
-  padding: 0; }
-
-ul.tool_bar > li:hover > ul#menu {
-  display: block;
-  position: absolute;
-  z-index: 2; }
-
-ul.tool_bar > li > ul#menu > li:hover {
-  background: #7ba5ff; }
-
-/* ====================[modal window]==================== */
-div#modal > div.content {
-  animation-name: modalopen;
-  animation-duration: 0.5s; }
-
-@keyframes modalopen {
-  from {
-    opacity: 0; }
-  to {
-    opacity: 1; } }
-
-div#modal div.footer button.button:hover {
-  background-color: #7ba5ff; }
-
-div#modal div.footer button.button:active {
-  background-color: #4b64d1; }
-
 /* ====================[layer controller]==================== */
 div#layer_controller:hover > div#frame > div#leave_mouse {
   display: none; }
@@ -20964,58 +20957,6 @@ div#layer_controller:hover > div#frame > section#on_mouse > label > div > span {
 /*!*********************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./css/design.css ***!
   \*********************************************************************************************************/
-@charset "UTF-8";
-/* ====================[header]==================== */
-/* ツールバー */
-ul.tool_bar {
-  list-style-type: none;
-  /* リストのマーカは何も表記しない */
-  color: #fff;
-  /* 色は白色 */ }
-
-/* ツールバーの各要素 */
-ul.tool_bar > li {
-  cursor: pointer;
-  /* マウスホバー時カーソルをポインタにする */
-  background: #7ba5ff; }
-
-ul.tool_bar > li > ul#menu {
-  scroll-behavior: smooth; }
-
-ul.tool_bar > li > ul#menu > li {
-  list-style-type: none;
-  /* リストのマーカは何も表記しない */
-  background: #9bb7f5; }
-
-ul.tool_bar > li > ul#menu > li > a {
-  color: white;
-  text-decoration: none; }
-
-/* ====================[modal window]==================== */
-/* div#modal {
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-div#modal>div.content {
-    background-color: #f4f4f4;
-    box-shadow: 0 5px 8px 0 rgba(0,0,0,0.2),0 7px 20px 0 rgba(0,0,0,0.17);
-}
-
-div#modal div.header {
-    background: #9bb7f5;
-    justify-content: space-between;
-}
-
-div#modal div.footer {
-    color: black;
-}
-
-div#modal div.footer button.button {
-    border-radius: 10px;
-    border: solid #7ba5ff;
-    background-color: transparent;
-    color: #7ba5ff;
-} */
 /* ====================[layer controller]==================== */
 div#layer_controller > div#frame {
   border: 2px solid rgba(0, 0, 0, 0.2);
@@ -21030,136 +20971,9 @@ div#layer_controller > div#frame > section#on_mouse > div#separator {
 /*!*********************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./css/layout.css ***!
   \*********************************************************************************************************/
-@charset "UTF-8";
-/* 画面全体に関する */
-body {
-  margin: 0%; }
-
-/* 
-    DCMWTの全ての要素を包括する要素.
-    bodyと役割はほとんど同じだが, bodyの子要素として存在する.
-*/
-div.dcwmt-wrapper {
-  position: absolute;
-  /* 画面の絶対位置に対して要素を配置する */
-  width: 100%;
-  height: 100%; }
-
-/* ====================[header]==================== */
-/* ヘッダーの全ての要素を包括する要素 */
-header {
-  padding-bottom: 10px;
-  /* 高さを100pxにして, 固定長にする */ }
-
-/* ツールバー */
-ul.tool_bar {
-  margin: 0%;
-  /* 要素外部の横方向の空白を0%, 縦方向の空白をautoにしておく */
-  padding: 0%;
-  /* 要素内部の空白を0%にしておく */
-  display: flex;
-  /* 要素が被らずに並ぶようにする */
-  justify-content: center;
-  /* アイテムを中央寄せする */
-  text-align: center;
-  /* テキストを中央寄せする */ }
-
-/* ツールバーの各要素 */
-ul.tool_bar > li {
-  position: relative;
-  /* 元々配置されていた場所を基準座標とする */
-  width: 100%;
-  height: 100%;
-  display: inline;
-  /* 文中に挿入する. inlineの要素同士は横に並ぶ */
-  text-align: center;
-  /* テキストを中央寄せする */ }
-
-ul.tool_bar > li > div#title {
-  width: 100%;
-  height: 10%; }
-
-ul.tool_bar > li > ul#menu {
-  width: 100%;
-  height: auto;
-  max-height: 100px;
-  overflow-x: hidden; }
-
-ul.tool_bar > li > ul#menu > li {
-  width: 100%; }
-
-ul.tool_bar > li > ul#menu > li > a {
-  text-align: center;
-  /* テキストを中央寄せする */ }
-
-/* ====================[main]==================== */
-div#main-screen {
-  height: 100%;
-  display: flex; }
-
 div#main-screen > div#map {
   width: 100%; }
 
-/* ====================[footer]==================== */
-footer {
-  height: 15%;
-  padding-top: 5px;
-  display: flex; }
-
-div.color-range {
-  height: 100%;
-  width: 35%; }
-
-div.animation {
-  height: 100%;
-  width: 45%; }
-
-div#toolbar {
-  height: 100%;
-  width: 20%; }
-
-/* ====================[modal window]==================== */
-/* div#modal {
-    display: none;
-    position: fixed;
-    z-index: 3;
-    left: 0;
-    right: 0;
-    height: 100%;
-    width: 100%;
-    overflow: auto;
-}
-
-div#modal>div.content {
-    margin: 20% auto;
-    width: 25%;
-}
-
-div#modal div.header>h1.title {
-    margin: 0.5rem 0;
-    font-size: 24px;
-    font-family:'Courier New', Courier, monospace;
-}
-
-div#modal div.header {
-    padding: 3px 15px;
-    display: flex;
-}
-
-div#modal div.body {
-    display: flex;
-    justify-content: center;
-}
-
-div#modal div.footer {
-    padding: 10px 20px;
-    display: flex;
-    justify-content: space-between;
-}
-
-div#modal div.footer button.button {
-    width: 40%;
-} */
 /* ====================[layer controller]==================== */
 div#layer_controller {
   position: absolute;

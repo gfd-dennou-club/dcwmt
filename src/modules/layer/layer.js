@@ -17,9 +17,6 @@ const layer = class{
         this.options = options;
     }
 
-    changeOpacity = (opacity) => { this.options.opacity = opacity; }
-    changeClrindex = (clrindex) => { this.options.clrindex = clrindex; }
-
     create = (wmtsLibIdentifer) => {
         const clrmap = new colormap(this.options.clrindex);
         const diagram = this._getDiagram(clrmap, this.options.opacity);

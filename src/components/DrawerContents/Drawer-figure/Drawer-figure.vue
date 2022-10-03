@@ -37,7 +37,6 @@ export default {
                         config_obj.wmtsLibIdentifer = new wmtsLibIdentifer("OpenLayers");
                         break;
                 }
-                console.log(config_obj)
                 this.$store.commit("setConfig", config_obj);
             }
         }

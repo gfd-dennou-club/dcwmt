@@ -1,17 +1,26 @@
 <template>
-    <div id="main-screen"></div>
+    <div id="main-screen">
+        <layerselecter :layer_manager="layer_manager" />
+    </div>
 </template>
 
 <script>
+import layerselecter from './Layerselecter.vue';
+
 import define from '../define.js';
 import viewer from '../modules/viewer/viewer.js';
 import layer from '../modules/layer/layer.js';
 import layerManager from '../modules/layerManager/layerManager.js';
 
 export default {
+    components: {
+        layerselecter,
+    },
     data: () => ({  
         tone: [],
         vector: [],
+        projection: [ "メルカトル図法", "正距方位図法", "モルワイデ図法", "サンソン図法" ],
+        layer_manager: undefined,
     }),
     created: function() {
         this.read_deinejs();
@@ -56,7 +65,7 @@ export default {
             const suitable_viewer = viewer_obj.getSuitableViewer();
 
             // レイヤマネージャーを作成
-            const layer_manager = new layerManager(wli, suitable_viewer);
+            this.layer_manager = new layerManager(wli, suitable_viewer);
 
             // レイヤの作成とマネージャへの追加
             const layer_types = [this.tone, this.vector];
@@ -70,15 +79,17 @@ export default {
                         clrindex: this.config.clrindex,
                         opacity: 255,
                     };
-                    const layer_obj = new layer(layer_option).create(wli);
-                    const args_layer = [ layer_obj, layer_info.name ];
-                    layer_manager.addBaseLayer(...args_layer);
-                    layer_manager.addOverlayLayer(...args_layer);
+
+                    const baselayer = new layer(layer_option).create(wli);
+                    this.layer_manager.addBaseLayer(baselayer, layer_info.name);
+                    
+                    const overlaylayer = new layer(layer_option).create(wli);
+                    this.layer_manager.addLayer(overlaylayer, layer_info.name);
                 })
             });
 
             // レイヤーマネージャのセットアップ
-            layer_manager.setup(suitable_viewer);
+            this.layer_manager.setup(suitable_viewer);
         }
     },
     watch: {
@@ -91,3 +102,10 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+    div#main-screen {
+        height: 99%;
+        display: flex;
+    }
+</style>

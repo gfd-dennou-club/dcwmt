@@ -1,6 +1,3 @@
-import layerController3D from "./lib/layerController3D";
-import layerControllerProjection from "./lib/layerControllerProjection";
-
 const layerController = class{
     constructor(original_layer){
         this.name = "layer_controller";
@@ -18,7 +15,7 @@ const layerController = class{
     create = (wmtsLibIdentifer, original_layer, baselayers, overlaylayers) => {
         this._clear();
 
-        const create_element = (suitableInstance) => {
+        const create_element = () => {
             const main_screen = document.getElementById("main-screen");
             const top_right = this._create_top_left();
             const frame = this._create_frame();
@@ -28,27 +25,12 @@ const layerController = class{
             frame.appendChild(on_mouse);
             top_right.appendChild(frame);
             main_screen.appendChild(top_right);
-            this._addEventListner(suitableInstance);
             return top_right;
         }
 
         const leaflet = () => {};
-        const cesium = () => { 
-            const layer_controller = new layerController3D(
-                original_layer,
-                baselayers,
-                overlaylayers
-            );
-            return create_element(layer_controller);
-        };
-        const openlayers = () => {
-            const layer_controller = new layerControllerProjection(
-                original_layer,
-                baselayers,
-                overlaylayers
-            );
-            return create_element(layer_controller);
-        }
+        const cesium = () => create_element();
+        const openlayers = () =>  create_element();
         const suitableFunc = wmtsLibIdentifer.whichLib(cesium, leaflet, openlayers);
         return suitableFunc();
     }
@@ -170,22 +152,6 @@ const layerController = class{
         const separator = document.createElement("div");
         separator.setAttribute("id", "separator");
         return separator;
-    }
-
-    _addEventListner = (suitableInstance) => {
-        document.getElementsByName("baselayer").forEach( layer => {
-            layer.addEventListener("change", suitableInstance.eventListener_for_baselayers);
-        });
-
-        document.getElementsByName("overlay").forEach( layer => {
-            layer.addEventListener("change", suitableInstance.eventListener_for_overlaylayers);
-        });
-
-        if(this.layers.getArray){
-            document.getElementsByName("projection").forEach( layer => {
-                layer.addEventListener("change", suitableInstance.eventListener_for_projection);
-            });
-        }
     }
 }
 
