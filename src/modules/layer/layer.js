@@ -15,25 +15,33 @@ const layer = class{
     // };
     constructor(options){
         this.options = options;
+
+        const clrmap = new colormap(options.clrindex);
+        this.diagram = this._getDiagram(clrmap);
+        
+        const url = options.url[0].concat("/0/0/0.png");
+        const size = options.size;
+        this.maxmin = this.diagram.calcMaxMin(url, size);
     }
 
     create = (wmtsLibIdentifer) => {
-        const clrmap = new colormap(this.options.clrindex);
-        const diagram = this._getDiagram(clrmap, this.options.opacity);
-        
-        const url = this.options.url[0].concat("/0/0/0.png");
-        const size = this.options.size;
-        diagram.calcMaxMin(url, size);
-        
-        const layer = this._getLayerWithSuitableLib(wmtsLibIdentifer, diagram);
-        return layer;
+        return this._getLayerWithSuitableLib(wmtsLibIdentifer, this.diagram);;
     }
 
-    _getDiagram = (clrmap, opacity) => {
+    getProps = async () => {
+        if ( this.maxmin ){
+            const maxmin = await this.maxmin;
+            return { name: this.options.name, max: maxmin.max, min: maxmin.min };
+        } else {
+            return undefined;
+        }
+    }
+
+    _getDiagram = (clrmap) => {
         if(this.options.url.length === 2){
             return new vectorDiagram(clrmap.getClrmap());
         }else{
-            return new toneDiagram(clrmap.getClrmap(), opacity);
+            return new toneDiagram(clrmap.getClrmap());
         }
     }
 
@@ -77,6 +85,7 @@ const layer = class{
             maxZoom: this.options.level.max,
             minZoom: this.options.level.min,
             name: this.options.name,
+            alpha: this.options.alpha
         }
         return new layerProjection(options);
     }

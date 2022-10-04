@@ -22,7 +22,7 @@ export default {
     data: () => ({
         selected: 1,
         drawing_methods: [
-            "2次元平面への投影", "３次元球面への投影"
+            "2次元平面への投影", "3次元球面への投影"
         ],
     }),
     watch: {

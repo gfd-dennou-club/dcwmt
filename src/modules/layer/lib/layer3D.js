@@ -30,6 +30,10 @@ const layer3D = class extends UrlTemplateImageryProvider{
 
         return this._diagram.isTone(toneFunc, vectorFunc)();
     }
+
+    setAlpha = (alpha) => {
+        this.alpha = alpha;
+    }
 }
 
 export default layer3D;

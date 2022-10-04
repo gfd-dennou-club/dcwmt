@@ -1,74 +1,55 @@
-import { View } from 'ol';
-import { getCenter } from 'ol/extent';
-
 const layerManagerProjection = class {
     constructor(original_layer){
         this.original_layer = original_layer;
-        this.original_layers = original_layer.getLayers();
-        this.layers = [];
         this.baselayers = [];
     }
 
     addBaseLayer = (layer, name) => {
         layer.name = name;
-        layer.isBaseLayer = true;
+        layer.setAlpha = this._setAlpha;
+        layer.setShow = this._setShow;
+
+        layer.isBaselayer = true;
         if ( this.baselayers.length === 0 ) {
-            this.layers.push(layer);
+            layer.setAlpha(1.0);
+            layer.setShow(true);
+            this.original_layer.addLayer(layer);
         }
         this.baselayers.push(layer);
-        
-
-        // this.original_layer.addLayer(layer);
-        // this.baselayers.push(layer);
-        // if ( this.bottomlayer === undefined ) {
-        //     this.bottomlayer = layer;
-        // }
     }
 
     addLayer = (layer, name, alpha, show) => {
         layer.name = name;
-        layer.alpha = alpha;
-        layer.show = show;
-        layer.isBaseLayer = false;
+        layer.setAlpha = this._setAlpha;
+        layer.setShow = this._setShow;
+        layer.setAlpha(alpha);
+        layer.setShow(show);
+
+        layer.isBaselayer = false;
         this.original_layer.addLayer(layer);
-        this.layers.push(layer);
     }
 
     getLayers = () => {
-        return this.layers;
+        return this.original_layer.getLayers().getArray();
     }
 
     getBaseLayers = () => {
         return this.baselayers;
     }
 
+    _setAlpha = function ( alpha ) {
+        this.alpha = alpha;
+        this.setOpacity(alpha);
+    }
+
+    _setShow = function ( show ) {
+        this.show = show;
+        this.setVisible(show);
+    }
+
     setup = () => { }
 
-    update = () => {
-        console.log("Start: update")
-        console.log(this.layers.map(v => v.name));
-        this.layers.splice(0, this.layers.length);
-        const ary = this.original_layers.getArray();
-        ary.forEach( layer => {
-            this.layers.push(layer);
-        });
-        console.log(this.layers.map( v => v.name ));
-        console.log("End: update")
-
-        
-
-        // document.getElementsByName("baselayer").forEach( layer => {
-        //     layer.addEventListener("change", this._eventListerner_changeBaseLayer);
-        // });
-
-        // document.getElementsByName("overlay").forEach( layer => {
-        //     layer.addEventListener("change", this._eventListerner_changeOverlayLayer);
-        // });
-
-        // document.getElementsByName("projection").forEach( proj => {
-        //     proj.addEventListener("change", this._eventListerner_changeProjection);
-        // });
-    }
+    update = () => { } 
 
     remove = (layer) => {
         const ary = this.original_layer.getLayers();
@@ -84,10 +65,11 @@ const layerManagerProjection = class {
 
     raise = (layer) => {
         const ary = this.original_layer.getLayers();
-        ary.forEach( (_layer, index) => {
+        ary.getArray().some( (_layer, index) => {
             if ( index > 0 && _layer === layer) {
                 ary.remove(layer);
                 ary.insertAt(index - 1, layer);
+                return true;
             }
         });
         this.original_layer.setLayers(ary);
@@ -95,63 +77,16 @@ const layerManagerProjection = class {
 
     lower = (layer) => {
         const ary = this.original_layer.getLayers();
-        console.log("Start: lower")
-        console.log(ary.getArray().map( v => v.name ));
-        console.log(layer);
-        ary.forEach( (_layer, index) => {
-            console.log(_layer);
-            if ( index < ary.getLength() - 1 && _layer === layer) {
+        const maxindex = ary.getLength() - 1;
+        ary.getArray().some( (_layer, index) => {
+            if ( index < maxindex && _layer === layer) {
                 ary.remove(layer);
-                ary.insetAt(index + 1, layer);
+                ary.insertAt(index + 1, layer);
+                return true;
             }
         });
         this.original_layer.setLayers(ary);
-        console.log(ary.getArray().map( v => v.name ));
-        console.log("End: lower")
     }
-
-    // _eventListerner_changeBaseLayer = (baselayer) => {
-    //     const purpose_layer = this.baselayers.find(item => item.options.name === baselayer.target.value);
-    //     this.bottomlayer = purpose_layer;
-    //     this._update();
-    // }
-
-    // _eventListerner_changeOverlayLayer = (overlaylayer) => {
-    //     const purpose_layer = this.overlaylayers.find(item => item.layer.options.name === overlaylayer.target.value);
-    //     purpose_layer.show = overlaylayer.target.checked;
-    //     this._update();
-    // }
-
-    // _eventListerner_changeProjection = (projection) => {
-    //     const purpose_projection = this.original_layer.projections.find(item => item.name === projection.target.value).proj;
-
-    //     const view = new View({
-    //         projection: purpose_projection,
-    //         extent: purpose_projection.getExtent() || [0, 0, 0, 0],
-    //         center: getCenter(purpose_projection.getExtent() || [0, 0, 0, 0]),
-    //         zoom: 0,
-    //     });
-
-    //     this.original_layer.setView(view);
-    // }
-
-    // _update = () => {
-    //     this.original_layers.remove(this.bottomlayer);
-    //     this.original_layers.push(this.bottomlayer);
-    //     this.original_layers.forEach( layer => {
-    //         if( !layer || layer.options.name === this.bottomlayer.options.name ) {
-    //             return;
-    //         } else {
-    //             this.original_layers.remove(layer);
-    //         }
-    //     })
-
-    //     this.overlaylayers.forEach( layer => {
-    //         if ( layer.show && layer.layer.options.name !== this.bottomlayer.options.name ) {
-    //             this.original_layers.push(layer.layer);
-    //         }
-    //     })
-    // }
 }   
 
 export default layerManagerProjection;

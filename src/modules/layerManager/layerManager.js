@@ -13,17 +13,23 @@ const layerManager = class{
 
         // ライブラリに適したLayerManagerを取ってくる
         this.layer_manager = this._getLayerManager(original_layer);
+
+        this.layer_props = [];
     }
 
     addBaseLayer = (layer, name) => {
-        this.layer_manager.addBaseLayer(layer, name);
-        // this.baselayers.push(layer);
-        // if(this.bottomLayer === undefined) this.bottomLayer = layer;
+        const layer_props = layer.getProps();
+        if ( !this.layer_props.includes(layer_props) ) {
+            this.layer_props.push(layer_props);
+        }
+
+        const baselayer = layer.create(this.wmtsLibIdentifer);
+        this.layer_manager.addBaseLayer(baselayer, name);
     }
 
-    addLayer = (layer, name, alpha = 1.0, show = false) => {
-        this.layer_manager.addLayer(layer, name, alpha, show);
-        // this.overlaylayers.push({ layer: layer, show: false });
+    addLayer = (layer, name, alpha = 1.0, show = true) => {
+        const overlaylayer = layer.create(this.wmtsLibIdentifer); 
+        this.layer_manager.addLayer(overlaylayer, name, alpha, show);
     }
 
     getLayers = () => {
@@ -35,12 +41,8 @@ const layerManager = class{
     }
 
     setup = (viewer) => {
-        // const original_layer = this._getOriginalLayer(viewer);
-        // const layer_controller = new layerController(original_layer);
-        // const ele = layer_controller.create(
-        //     this.wmtsLibIdentifer
-        // );
         this.layer_manager.setup(viewer);
+        return this.layer_props;
     }
 
     update = () => {
@@ -76,7 +78,6 @@ const layerManager = class{
         const openlayers = () => new layerManagerProjection(original_layer);
         const suitableFunc = this.wmtsLibIdentifer.whichLib(cesium, leaflet, openlayers);
         return suitableFunc();
-
     }
 }
 

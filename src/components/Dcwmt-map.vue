@@ -32,6 +32,14 @@ export default {
         config: function() {
             return this.$store.getters.config;
         },
+        layersprops: {
+            get: function () {
+                return this.$store.getters.layersprops;
+            },
+            set: function ( value ) {
+                this.$store.commit("setLayersProps", value);
+            }
+        }
     },
     methods: {
         read_deinejs: function() {
@@ -58,7 +66,7 @@ export default {
                 });
             });
         },
-        draw: function() {
+        draw: async function() {
             // ビュワーの作成
             const wli = this.config.wmtsLibIdentifer;
             const viewer_obj = new viewer({ wmtsLibIdentifer: wli });
@@ -77,19 +85,19 @@ export default {
                         size: layer_info.size,
                         level: { min: 0, max: layer_info.maximumLevel },
                         clrindex: this.config.clrindex,
-                        opacity: 255,
+                        alpha: 1.0,
                     };
 
-                    const baselayer = new layer(layer_option).create(wli);
-                    this.layer_manager.addBaseLayer(baselayer, layer_info.name);
-                    
-                    const overlaylayer = new layer(layer_option).create(wli);
-                    this.layer_manager.addLayer(overlaylayer, layer_info.name);
+                    const layer_obj = new layer(layer_option);
+                    this.layer_manager.addBaseLayer(layer_obj, layer_info.name);
+                    this.layer_manager.addLayer(layer_obj, layer_info.name);
                 })
             });
 
             // レイヤーマネージャのセットアップ
-            this.layer_manager.setup(suitable_viewer);
+            let layersprops = this.layer_manager.setup(suitable_viewer);
+            layersprops = await Promise.all(layersprops);
+            this.layersprops = layersprops.filter( v => v );
         }
     },
     watch: {

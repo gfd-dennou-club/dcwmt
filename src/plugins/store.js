@@ -1,3 +1,4 @@
+import { set } from "lodash";
 import Vue from "vue";
 import Vuex from "vuex";
 
@@ -10,17 +11,28 @@ const state = {
         clrindex: 3,
         wmtsLibIdentifer: new wmtsLibIdentifer("OpenLayers"),
     },
+    layersprops: [],
+    selectedlayer: undefined,
 };
 
 const getters = {
     config: state => state.config,
+    layersprops: state => state.layersprops,
+    selectedlayer: state => state.selectedlayer,
 };
 
 const mutations = {
     setConfig: (state, config) => {
-        for(const props in config)
+        for ( const props in config ) {
             state.config[props] = config[props];
+        }
     },
+    setLayersProps: (state, layersprops) => {
+        state.layersprops = layersprops;
+    },
+    setSelectedLayer: (state, selectedlayer) => {
+        state.selectedlayer = selectedlayer;
+    }
 }
 
 const actions = {

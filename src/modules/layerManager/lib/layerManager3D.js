@@ -1,34 +1,37 @@
-import { ImageryLayer } from 'cesium';
+import ImageryLayer from "cesium/Source/Scene/ImageryLayer";
 
 const layerManager3D = class{
     constructor(original_layer){
         this.original_layer = original_layer;
-        this.baselayers = [];
         this.layers = [];
+        this.baselayers = [];
     }
 
     addBaseLayer = (layer, name) => {
-        let _layer;
-        if ( typeof layer === "undefined" ) {
-            _layer = layer.get(0);
-        } else {
-            _layer = new ImageryLayer(layer); 
-        }
+        const _layer = new ImageryLayer(layer);
         _layer.name = name;
-        _layer.isBaseLayer = true;
+        _layer.setAlpha = this._setAlpha;
+        _layer.setShow = this._setShow; 
+        _layer.isBaselayer = true;
+        if ( this.baselayers.length === 0 ) {
+            this.original_layer.add(_layer);
+        }
         this.baselayers.push(_layer);
     }
 
-    addOverlayLayer = (layer, name, alpha, show) => {
-        const _layer = this.original_layer.addImageryProvider(layer);
+    addLayer = (layer, name, alpha, show) => {
+        const _layer = new ImageryLayer(layer);
         _layer.name = name;
-        _layer.alpha = alpha;
-        _layer.show = show;
-        _layer.isBaseLayer = false;
-        this.layers.push(_layer);
+        _layer.setAlpha = this._setAlpha;
+        _layer.setShow = this._setShow;
+        _layer.setAlpha(alpha);
+        _layer.setShow(show);
+
+        _layer.isBaselayer = false;
+        this.original_layer.add(_layer);
     }
 
-    getOverlayLayers = () => {
+    getLayers = () => {
         return this.layers;
     }
 
@@ -36,14 +39,18 @@ const layerManager3D = class{
         return this.baselayers;
     }
 
-    setup = () => { }
+    _setAlpha = function ( alpha ) {
+        this.alpha = alpha;
+    }
 
-    update = () => {
-        const numLayers = this.original_layer.length;
-        this.layers.splice(0, this.original_layer.length);
-        for ( let i = numLayers - 1; i >= 0; i++) {
-            this.layers.push(this.original_layer.get(i))
-        }
+    _setShow = function ( show ) {
+        this.show = show;
+    }
+
+    setup = () => {
+        const defaultlayer = this.original_layer.get(0);
+        this.original_layer.remove(defaultlayer, false);
+        this.update();
     }
 
     remove = (layer) => {
@@ -55,46 +62,22 @@ const layerManager3D = class{
     }
 
     raise = (layer) => {
-        this.original_layer.raise(layer);
+        this.original_layer.lower(layer);
+        this.update();
     }
 
     lower = (layer) => {
-        this.original_layer.lower(layer);
+        this.original_layer.raise(layer);
+        this.update();
     }
 
-    // setup = (viewer, ele) => {
-    //     document.getElementsByName("baselayer").forEach( layer => {
-    //         layer.addEventListener("change", this._eventListerner_changeBaseLayer);
-    //     });
-
-    //     document.getElementsByName("overlay").forEach( layer => {
-    //         layer.addEventListener("change", this._eventListerner_changeOverlayLayer);
-    //     });
-    // }
-
-    // _eventListerner_changeBaseLayer = (baselayer) => {
-    //     const purpose_layer = this.baselayers.find(item => item.options.name === baselayer.target.value);
-    //     this.bottomlayer = purpose_layer;
-    //     this._update();
-    // }
-
-    // _eventListerner_changeOverlayLayer = (overlaylayer) => {
-    //     const purpose_layer = this.overlaylayers.find(item => item.layer.options.name === overlaylayer.target.value);
-    //     purpose_layer.show = overlaylayer.target.checked;
-    //     this._update();
-    // }
-
-    // _update = () => {
-    //     console.log(this.bottomlayer);
-    //     console.log(this.original_layer);
-    //     this.original_layer.removeAll(false);
-    //     this.original_layer.add(this.bottomlayer, 0);
-    //     this.overlaylayers.forEach( ( layer, index ) => {
-    //         if ( layer.show && layer.layer.options.name !== this.bottomlayer.options.name ) {
-    //             this.original_layers.add(layer.layer, index + 1);
-    //         }
-    //     });
-    // }
+    update = () => {
+        this.layers.splice(0, this.original_layer.length);
+        for ( let i = 0; i < this.original_layer.length; i++ ) {
+            const layer = this.original_layer.get(i);
+            this.layers.push(layer);
+        }
+    }
 }
 
 export default layerManager3D;

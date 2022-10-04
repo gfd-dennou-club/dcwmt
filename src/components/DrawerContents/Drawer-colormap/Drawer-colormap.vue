@@ -1,6 +1,6 @@
 <template>
     <v-list subheader tile>
-		<v-subheader>カラーマップの変更</v-subheader>
+		<v-subheader>カラーマップの切り替え</v-subheader>
 		<v-list-item-group v-model="selected">
     		<v-list-item
     			v-for="(clrmap_name, i) in clrmap_names"

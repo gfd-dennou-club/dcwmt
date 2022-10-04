@@ -3,9 +3,9 @@
         app
         :value="canDraw"
     >
-        <drawer_colormap v-if="nowlink === 'カラーマップ関連'" />
-        <drawer_tone v-if="nowlink === 'トーン関連'" />
-        <drawer_figure v-if="nowlink === '図'" />
+        <drawer_colormap v-if="nowlink === 'カラーマップの切り替え'" />
+        <drawer_tone v-if="nowlink === '数学的操作'" />
+        <drawer_figure v-if="nowlink === '描画方法の切り替え'" />
     </v-navigation-drawer>
 </template>
 

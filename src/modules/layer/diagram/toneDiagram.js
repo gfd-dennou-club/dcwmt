@@ -10,12 +10,11 @@
 // canvas:      数値データタイルを描画したcanvas(HTMLElement<canvas>)
 
 const toneDiagram = class{
-    constructor(colormap, opacity){
+    constructor(colormap){
         // [TODO] min, maxを更新するべし
         this.min = undefined;
         this.max = undefined;
         this.colormap = colormap;
-        this.opacity = opacity;
     }
 
     /**
@@ -74,7 +73,7 @@ const toneDiagram = class{
             imageData.data[bias_rgb_index   ] = rgb.r;
             imageData.data[bias_rgb_index +1] = rgb.g;
             imageData.data[bias_rgb_index +2] = rgb.b;
-            imageData.data[bias_rgb_index +3] = this.opacity;
+            imageData.data[bias_rgb_index +3] = 255;
         }
 
         return imageData;
@@ -146,6 +145,7 @@ const toneDiagram = class{
         const canvas = document.createElement("canvas");
         [canvas.width, canvas.height] = [size.X, size.Y];
         await this.url2canvas(url, canvas, true);
+        return { min: this.min, max: this.max };
     }
 
     isTone = (t=true, f=false) => { return t; }
