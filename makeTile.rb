@@ -1,19 +1,17 @@
 require "numru/netcdf"
 require 'optparse'
-require 'pp'
 
-require './pnm.rb'
-require './getter.rb'
-require './util.rb'
-require './projectionToMercator.rb'
-require './colormap.rb'
-require './makeTile.rb'
-require './circle.rb'
-
-# [MEMO]他の次元が存在していない時の処理ができていないよ
+require './makeTileLib/pnm.rb'
+require './makeTileLib/getter.rb'
+require './makeTileLib/util.rb'
+require './makeTileLib/projectionToMercator.rb'
+require './makeTileLib/colormap.rb'
+require './makeTileLib/tiles.rb'
+require './makeTileLib/circle.rb'
 
 # 固定次元についての情報を格納しておく配列を確保
 @fix = Array.new()
+@fixname = []
 # 数値データタイルを保存しておくパス
 @dirname = "./"
 # 軸とする次元
@@ -45,6 +43,7 @@ option.on('-f', '--fix DIMENTION', 'fix dimention'){|dim|
 			:end => ( v.split('=')[1].split(':')[1] ? v.split('=')[1].split(':')[1].to_i : v.split('=')[1].split(':')[0].to_i ) 
 		} 
 	}
+	@fixname.push(dim)
 }
 
 # 数値データタイルを保存するディレクトリのパスを決定
@@ -111,15 +110,17 @@ physicalQuantity = ARGV[0].gsub(/^.\//, "").match(/@.*/)[0].delete("@").split(",
 @dirname += '/' if @dirname[-1] != '/'
 
 # 定義ファイルを作成
-file = File.open("define.js", "w")
+file = File.open("./define.js", "w")
 file.puts("const DEFINE = {")
-file.puts("\tROOT: \"#{@dirname}\",")
-file.puts("\tPHYSICAL_QUANTITY: {")
+file.puts("\tROOT: \"#{@dirname}tile\",")
+file.puts("\tTONE: [")
 
 
 # 物理量の数だけ回す
 physicalQuantity.each{|fp|
-	file.puts("\t\t#{fp}: {")
+	file.puts("\t\t{")
+	file.puts("\t\t\tNAME: \"#{fp}\",")
+	file.puts("\t\t\tFIXED: #{@fixname},")
 
 	# 物理量のディレクトリツリーを作成
 	dirPath = "#{@dirname}tile/#{@netCDF.var(fp).name}/"
@@ -166,6 +167,7 @@ physicalQuantity.each{|fp|
 	file.puts("\t\t}")
 }
 
-file.puts("\t}")
+file.puts("\t],")
+file.puts("\tVECTOR: [],")
 file.puts("}")
 file.close()

@@ -120,5 +120,5 @@ const VectorDiagram = class{
 
     calcMaxMin = (url) => {}
 
-    isCounter = (t=true, f=false) => { return f; }
+    isTone = (t=true, f=false) => { return f; }
 }

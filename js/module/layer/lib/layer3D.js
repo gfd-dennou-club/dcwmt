@@ -18,7 +18,7 @@ const layer3D = class extends Cesium.UrlTemplateImageryProvider{
         const canvas = document.createElement("canvas");
         [canvas.width, canvas.height] = [this._tileWidth, this._tileHeight];
 
-        const counterFunc = () => {
+        const toneFunc = () => {
             return this._diagram.url2tile(urls[0], canvas);
         }
 
@@ -26,6 +26,6 @@ const layer3D = class extends Cesium.UrlTemplateImageryProvider{
             return this._diagram.urls2tile(urls, canvas);
         }
 
-        return this._diagram.isCounter(counterFunc, vectorFunc)();
+        return this._diagram.isTone(toneFunc, vectorFunc)();
     }
 }

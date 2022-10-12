@@ -13,7 +13,7 @@ const LayerCartesian = L.GridLayer.extend({
         [canvas.width, canvas.height] = [this.options.size.X, this.options.size.Y];
         const url = this.options.url.map(v => v.concat(`/${coords.z}/${coords.x}/${coords.y}.png`));
 
-        const counterFunc = () => {
+        const toneFunc = () => {
             this.options.diagram.url2canvas(url[0], canvas);
         }
 
@@ -21,7 +21,7 @@ const LayerCartesian = L.GridLayer.extend({
             this.options.diagram.urls2canvas(url, canvas);
         }
         
-        this.options.diagram.isCounter(counterFunc, vectorFunc)();
+        this.options.diagram.isTone(toneFunc, vectorFunc)();
 
         return canvas;
     },

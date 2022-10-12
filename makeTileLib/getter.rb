@@ -57,17 +57,15 @@ def getDimInfo(dim, index, fname = nil, fstart = nil, fend = nil)
 		# 該当する次元が固定されているかどうか
 		isFixed = @fix.select{|s| s[:dimention] === name}
 
-		# 固定次元としオプションで渡されていれば, その値に設定
-		# そうでなければ, 0を入れておく
-		_start = (isFixed.empty? ? 0 : isFixed[0][:start])
-
-		# 固定次元としオプションで渡されていれば, その値に設定
-		# そうでなければ, 0 を入れておく
-		_end = (isFixed.empty? ? 0 : isFixed[0][:end])
-
-		# 固定次元としオプションで渡されていれば, _endと_startから長さを求める
-		# そうでなければ, 元々の次元の長さを入れておく
-		_length = (isFixed.empty? ? dim.length : _end - _start + 1)
+		if isFixed.empty? then
+			_start = 0
+			_end = 0
+			_length = dim.length
+		else
+			_start = getOtherDimVar(name, isFixed[0][:start])
+			_end = getOtherDimVar(name, isFixed[0][:end])
+			_length = _start - _end + 1
+		end
 	end
 	
 	# ハッシュ配列にして返す
@@ -95,6 +93,7 @@ def getVariableRule(dimInfo)
 end
 
 def getOtherDimVar(name, index)
-	p a = @netCDF.var(name).get({"start" => [index], "end" => [index], "stride" => [1]})[0]
-	return a
+	option = { "start" => [0], "end" => [-1], "stride" => [1] }
+	allvalues = @netCDF.var(name).get(option)
+	return allvalues.to_a.find_index(index)
 end

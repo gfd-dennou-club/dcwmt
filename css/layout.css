@@ -60,6 +60,7 @@ ul.tool_bar>li>ul#menu>li>a{
 /* ====================[main]==================== */
 div#main-screen {
     height: 75%;
+    /* height: 90%; */
     display: flex;
 }
 

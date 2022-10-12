@@ -1,20 +1,20 @@
 // [TODO] 中間ファイルとのインターフェースの部分をよく考える必要がある!
 //        今はめちゃくちゃテキトー
 
-const _counter = [];
-DEFINE.COUNTER.forEach((pq) => {
+const _tone = [];
+for ( const pq of DEFINE.TONE ) { 
     const imcomplete_path = DEFINE.ROOT.concat("/", pq.NAME, "/");
     const path_ary = pq.FIXED.map(fixed => imcomplete_path.concat(fixed));
-    _counter.push({
+    _tone.push({
         name: pq.NAME,
         url: path_ary,
         size: pq.SIZE,
         maximumLevel: pq.MAXIMUMLEVEL,
     });
-});
+}
 
 const _vector = [];
-DEFINE.VECTOR.forEach((pq) => {
+for ( const pq of DEFINE.VECTOR ) {
     let name_str = "";
     pq.NAME.forEach((name) => name_str = name_str.concat(name, "-"));
     name_str = name_str.slice(0, -1);
@@ -30,12 +30,12 @@ DEFINE.VECTOR.forEach((pq) => {
         size: pq.SIZE,
         maximumLevel: pq.MAXIMUMLEVEL,
     });
-});
+}
 
 const global = {
     viewer: new Viewer({
         wmtsLibIdentifer: new wmtsLibIdentifer("OpenLayers"), 
-        counter: _counter,
+        tone: _tone,
         vector: _vector,
     }),
     modal: new Modal(),

@@ -45,7 +45,7 @@ def linearInterpolation(ary, rowLen, colLen)
 				if c0 == nil then
 					c0 = searchColDown(ary, col, rowLen)
 					c1 = searchColDown(ary, c0, rowLen)
-				# 上方向に値がなければ, 上方向のみで補完する
+				# 上方向に値がなければ, 上方向のみで補完する
 				elsif c1 == nil then
 					c0 = searchColUp(ary, col, rowLen)
 					c1 = searchColUp(ary, c0, rowLen)
@@ -87,11 +87,13 @@ def makeTileForPlane(dimInfo, fp, countAry, xindex, yindex, otherindex, dirPath,
 	p "tileSize : #{tileSize[:x]} * #{tileSize[:y]}, maxZoomLevel : #{zoomLevel}でタイルを作ります"
 
 	file.puts("\t\t\tSIZE: {X: #{tileSize[:x]}, Y: #{tileSize[:y]}},")
-	file.puts("\t\t\tMAX_ZOOM: #{zoomLevel},")
-	file.puts("\t\t\tAXIS: {X: \"#{dimInfo[xindex][:name]}\", Y: \"#{dimInfo[yindex][:name]}}\",")
+	file.puts("\t\t\tMAXIMUMLEVEL: #{zoomLevel},")
+	file.puts("\t\t\tAXIS: {X: \"#{dimInfo[xindex][:name]}\", Y: \"#{dimInfo[yindex][:name]}\"},")
 
 	# ベースとなるタイルのディレクトリパスを作成 および ディレクトリ作成
-	tempDirPath_base = "#{dirPath}#{dimInfo[otherindex[0]][:name]}=#{getOtherDimVar(dimInfo[otherindex[0]][:name], countAry[otherindex[0]]).to_i}/"
+	option = { "start" => [countAry[otherindex[0]].to_i], "end" => [countAry[otherindex[0]].to_i], "stride" => [1] }
+	othervalue = @netCDF.var(dimInfo[otherindex[0]][:name]).get(option)[0].to_i
+	tempDirPath_base = "#{dirPath}#{dimInfo[otherindex[0]][:name]}=#{othervalue}/"
 	mkdir(tempDirPath_base)
 
 	# 軸の変数を取得
@@ -198,36 +200,6 @@ def makeTileForPlane(dimInfo, fp, countAry, xindex, yindex, otherindex, dirPath,
 				ary = linearInterpolation(ary, tileSize[:x], tileSize[:y])						# y軸方向
 				ary = linearInterpolation(ary.transpose, tileSize[:y], tileSize[:x]).transpose	# x軸方向
 
-				# if min == nil && max == nil then
-				# 	tileSize[:y].times{|y|
-				# 		tileSize[:x].times{|x|
-				# 			if min == nil || max == nil then
-				# 				min = max = ary[y][x]
-				# 			elsif min > ary[y][x] then
-				# 				min = ary[y][x]
-				# 			elsif max < ary[y][x] then
-				# 				max = ary[y][x]
-				# 			end
-				# 		}
-				# 	}
-				# end
-
-				# # PNMファイルに書き込む
-				# tileSize[:y].times{|y|
-				# 	tileSize[:x].times{|x|
-				# 		colormap_per_scalardata = @clrmap_04.length / (max - min)
-				# 		colormap_index = (colormap_per_scalardata * (ary[y][x] - min)).to_i
-
-				# 		if (colormap_index >= @clrmap_04.length) then
-				# 			pnm.write(@clrmap_04[@clrmap_04.length - 1])
-				# 		elsif colormap_index < 0 then
-				# 			pnm.write(@clrmap_04[0])
-				# 		else 
-				# 			pnm.write(@clrmap_04[colormap_index])
-				# 		end
-				# 	}
-				# }
-
 				# PNMファイルに書き込む
 				tileSize[:y].times{|y|
 					tileSize[:x].times{|x|
@@ -254,7 +226,7 @@ def makeTileForPlane(dimInfo, fp, countAry, xindex, yindex, otherindex, dirPath,
 	if otherindex.empty? then
 		return																    # 再帰を終了
 	else
-		makeTileForPlane(dimInfo, fp, countAry, xindex, yindex, otherindex, dirPath, file)	# 軸ではない次元をカウントアップしたもので再帰
+		makeTileForPlane(dimInfo, fp, countAry, xindex, yindex, otherindex, dirPath)	# 軸ではない次元をカウントアップしたもので再帰
 	end
 end
 
@@ -301,28 +273,6 @@ def makeTileForBaumkuchen(dimInfo, fp, countAry, xindex, yindex, otherindex, dir
 			
 			# データ長と暫定的な円周の長さは diff 分だけ重複している
 			diff = dimInfo[windex][:length] % temp_circmference
-
-			# puts "dimInfo[windex][:length]: #{dimInfo[windex][:length]}"
-			# puts "temp_circmference: #{temp_circmference}"
-
-			# puts "ratio: #{dimInfo[windex][:length] / temp_circmference}"
-			# puts "diff: #{dimInfo[windex][:length] % temp_circmference}"
-
-			# パッディング数を計算
-			# if diff == 0 then			# 重複していなければ
-			# 	ratio -= 1
-			# else
-			# 	loop{
-			# 		# 重複している数を計算
-			# 		padding = diff / temp_circmference
-			# 		if padding >= 1 then # 1回以上重複していたら
-			# 			ratio += 1					# データから取り出す値をひとつ増やして
-			# 			diff -= temp_circmference	# diffから暫定的な円周の長さをひく
-			# 		else				 # 1度も重複していなければ 
-			# 			break			  
-			# 		end
-			# 	}
-			# end
 
 			# 値を取り出す個数に関する情報がある配列
 			takeOut = Array.new(temp_circmference).map.with_index{|v, i|
@@ -435,7 +385,8 @@ def makeTileForBaumkuchen(dimInfo, fp, countAry, xindex, yindex, otherindex, dir
 	p "tileSize : #{tileSize[:x]} * #{tileSize[:y]}, maxZoomLevel : #{zoomLevel}}でタイルを作ります"
 
 	# ディレクトリパスの設定
-	tempDirPath_base = "#{dirPath}#{dimInfo[otherindex[0]][:name]}=#{getOtherDimVar(dimInfo[otherindex[0]][:name], countAry[otherindex[0]])}/"
+	p countAry[otherindex[0]]
+	tempDirPath_base = "#{dirPath}#{dimInfo[otherindex[0]][:name]}=#{countAry[otherindex[0]].to_i}/"
 
 	# ディレクトリの作成
 	mkdir(tempDirPath_base)
@@ -499,190 +450,3 @@ def makeTileForBaumkuchen(dimInfo, fp, countAry, xindex, yindex, otherindex, dir
 		makeTileForPlane(dimInfo, fp, countAry, xindex, yindex, otherindex, dirPath)	# 軸ではない次元をカウントアップしたもので再帰
 	end
 end
-
-	# # ================== Test Space ==================
-	# # 高度の半分の地点で丁度な円周の長さになるように設定
-	# # それ以下の高度は円周の長さに合わせて平均を計算して, その値にする
-	# # それ以上の高度はひとつの色が複数ビットを担うようにして円周の長さに合わせる
-
-	# dims = @netCDF.var(fp).dims()
-
-	# lon = dims.select{|s| s.name == "lon"}[0]
-	# level = dims.select{|s| s.name == "level"}[0]
-	# datas = @netCDF.var(lon.name).get({"start" => [0], "end" => [-1], "stride" => [1]})
-
-	# dimInfo2 = Array.new(dims.length)
-	# dims.each.with_index{|v, i|
-	# 	if v.name == "lon" then
-	# 		dimInfo2[i] = { :name => v.name, :index => i, :length => v.length, :start => 0, :end => -1, :stride => 1 }
-	# 	elsif v.name == "level" then
-	# 		dimInfo2[i] = getDimInfo(v, i, v.name, -1, -1)
-	# 	else
-	# 		dimInfo2[i] = getDimInfo(v, i)
-	# 	end
-	# }
-	
-	# circle = Circle.new({:x => 0, :y => 0})						# 円作成用のインスタンスを用意
-	# radius = circle.getRadiusFromCircumference(datas.length)	# データ数を元に半径を取得
-	
-	# level = level.length						# 高度の設定
-	# # puts "level: #{level}"
-	# size = 2*radius + 1 + 2*level				# 画像のサイズの設定
-	# # puts "size: #{size}"
-
-	# # 図を作成するための配列を用意
-	# ary = Array.new(size).map{ Array.new(size).map{-1} }
-
-	# puts "radius: #{radius}"
-	# puts "level: #{level}"
-
-	# # 高度ごとに円を書いていく
-	# level.times{|l|
-	# 	temp_r = radius - level/2 + l
-	# 	# 暫定的な半径から円周の長さを求める
-	# 	temp_circmference = circle.getCircumferenceFromRadius(temp_r)
-	# 	# 高度の半分の地点がデータ数の半径になるように再度インスタンスを生成
-	# 	circle = Circle.new({:x => 0, :y => 0}, temp_r)
-
-	# 	# もし暫定的な半径が大元の円の半径よりも小さかったら
-	# 	if temp_r <= radius then
-	# 		# 円周の長さの比率を計算
-	# 		# "データ長" を "暫定的な半径から求めた円周の長さ" で割る
-	# 		# パディング数を求める
-	# 		ratio = datas.length / temp_circmference + 1
-			
-	# 		# データ長と暫定的な円周の長さは diff 分だけ重複している
-	# 		diff = datas.length - temp_circmference
-
-	# 		# パッディング数を計算
-	# 		if diff == 0 then		# 重複していなければ
-	# 			ratio = 1
-	# 		else
-	# 			loop{
-	# 				# 重複数を計算
-	# 				padding = diff / temp_circmference
-	# 				if padding >= 1 then # 1回以上重複していたら
-	# 					ratio += 1					# データから取り出す値をひとつ増やして
-	# 					diff -= temp_circmference	# diffから暫定的な円周の長さをひく
-	# 				else				 # 1度も重複していなければ 
-	# 					break			  
-	# 				end
-	# 			}
-	# 		end
-
-	# 		# 値を取り出す個数に関する情報がある配列
-	# 		takeOut = Array.new()
-	# 		temp_circmference.times{|index|
-	# 			if index < diff then
-	# 				takeOut.push(ratio)
-	# 			else
-	# 				takeOut.push(ratio - 1 <= 0 ? 1 : ratio - 1)
-	# 			end
-	# 		}
-			
-	# 		# getCircumferenceFromRadiusメソッドを使用した場合, setRadius()をしたほうが良いです.
-	# 		circle.setRadius(temp_r)
-
-	# 		# levelの低い方からとっていく
-	# 		# 決めうちはあまりよろしくない
-	# 		dimInfo2[2] = getDimInfo(dims[2], 2, "level", -(l+1), -(l+1))
-			
-	# 		num = Array.new
-	# 		# データを取得(四次元配列で帰ってくるため, 一次元にしておく)
-	# 		count = 0
-	# 		temp_circmference.times{|index|
-	# 			dimInfo2[0] = getDimInfo(dims[0], 0, "lon", count, count + takeOut[index] - 1)
-	# 			count += takeOut[index]
-	# 			# 符号あり整数で計算されているようで普通に計算をするとスタックオーバしてしまう
-	# 			# 即席で解決をしたが根本的な解決には至っていない
-	# 			num.push(@netCDF.var(fp).get(getVariableRule(dimInfo2)).flatten.map{|v| v / takeOut[index].to_f}.sum)
-	# 			# num.push(@netCDF.var(fp).get(getVariableRule(dimInfo2)).sum / takeOut[index].to_f)
-	# 		}
-	# 		count = 0
-	# 		while (c = circle.draw()) do
-	# 			ary[c[:x] + radius + level][c[:y] + radius + level] = num[count]
-	# 			count += 1
-	# 		end
-	# 	else
-	# 		ratio = temp_circmference / datas.length + 1
-
-	# 		# データ長と暫定的な円周の長さは diff 分だけ重複している
-	# 		diff = temp_circmference - datas.length
-
-	# 		# パッディング数を計算
-	# 		if diff == 0 then		# 重複していなければ
-	# 			ratio = 1
-	# 		else
-	# 			loop{
-	# 				# 重複数を計算
-	# 				padding =  diff / temp_circmference
-	# 				if padding >= 1 then # 1回以上重複していたら
-	# 					ratio += 1					# データから取り出す値をひとつ増やして
-	# 					diff -= temp_circmference	# diffから暫定的な円周の長さをひく
-	# 				else				 # 1度も重複していなければ 
-	# 					break			  
-	# 				end
-	# 			}
-	# 		end
-
-	# 		putOn = Array.new()
-	# 		datas.length.times{|index|
-	# 			if index < diff then
-	# 				putOn.push(ratio)
-	# 			else
-	# 				putOn.push(ratio - 1 <= 0 ? 1 : ratio - 1)
-	# 			end
-	# 		}
-
-	# 		# getCircumferenceFromRadiusメソッドを使用した場合, setRadius()をしたほうが良いです.
-	# 		circle.setRadius(temp_r)
-
-	# 		# levelの低い方からとっていく
-	# 		# 決めうちはあまりよろしくない
-	# 		dimInfo2[2] = getDimInfo(dims[2], 2, "level", -(l+1), -(l+1))
-
-	# 		num = Array.new
-	# 		# データを取得(四次元配列で帰ってくるため, 一次元にしておく)
-	# 		datas.length.times{|index|
-	# 			dimInfo2[0] = getDimInfo(dims[0], 0, "lon", index, index)
-	# 			putOn[index].times{
-	# 				num.push(@netCDF.var(fp).get(getVariableRule(dimInfo2)).sum)
-	# 			}
-	# 		}
-	# 		count = 0
-	# 		while (c = circle.draw()) do
-	# 			ary[c[:x] + radius + level][c[:y] + radius + level] = num[count]
-	# 			count += 1
-	# 		end
-	# 	end	
-		
-	# 	circle = Circle.new({:x => 0, :y => 0}, radius + l + 1)
-	# }
-
-	# (size).times{|y|
-	# 	(size).times{|x|
-	# 		if x > 1 then
-	# 			if (ary[x-2][y] != -1 && ary[x][y] != -1) && ary[x-1][y] == -1 then
-	# 				ary[x-1][y] = ary[x][y]
-	# 			end
-	# 		end
-	# 	}
-	# }
-
-	# file = PNM.new("circle_#{lon.name}", { :tileSize => {:x => size, :y => size} })
-
-	# (size).times{|y|
-	# 	(size).times{|x|
-	# 		if ary[x][y] == -1 then
-	# 			file.write({:r => 255, :g => 255, :b => 255})
-	# 		else
-	# 			file.writeFromByte(ary[x][y])
-	# 		end
-	# 	}
-	# }
-
-	# file.end()
-	# system("pnmtopng ./circle_#{lon.name}.ppm > ./circle_#{lon.name}.png");
-	# system("rm -f ./circle_#{lon.name}.ppm")
-
-	# # ================== Test Space ==================

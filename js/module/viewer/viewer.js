@@ -1,7 +1,7 @@
 const Viewer = class{
     // options: { 
     //     wmtsLibIdentifer: wmtsLibIdentifer, 
-    //     counter: [{
+    //     tone: [{
     //         name: String, 
     //         url: [String], 
     //         size: {X: Number, Y: Number},
@@ -28,7 +28,7 @@ const Viewer = class{
         const layer_manager = new layerManager(wmtsLibIdentifer, viewer);
 
         // レイヤの作成とマネージャへの追加
-        const layer_types = [this.options.counter, this.options.vector];
+        const layer_types = [this.options.tone, this.options.vector];
         layer_types.forEach((layer_type) => {
             layer_type.forEach((layer_info) => {
                 const options_for_layer = {

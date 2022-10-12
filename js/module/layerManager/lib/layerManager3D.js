@@ -59,22 +59,23 @@ const layerManager3D = class{
             .getObservable(this.viewModel, "overlaylayers")
             .subscribe(this._eventListener_changedOverlayLayer);
         this.layers = this.imageryLayers._layers;
-        this._layer_aaa();
+        this._layer();
     }
 
     _eventListener_changedBaseLayer = (baselayer) => {
         this.baselayer = baselayer;
-        this._layer_aaa();
+        this._layer();
     }
 
     _eventListener_changedOverlayLayer = (overlaylayers) => {
         this.overlaylayers = overlaylayers;
-        this._layer_aaa();
+        this._layer();
     }
 
-    _layer_aaa = () => {
+    _layer = () => {
         this.imageryLayers.removeAll(false);
         const baselayer = this.layers.find((layer) => this.baselayer === layer.name);
+        console.log(this.baselayer)
         this.imageryLayers.add(baselayer, 0);
         this.overlaylayers.forEach((layer, index) => {
             if(this.baselayer === layer.name) return;

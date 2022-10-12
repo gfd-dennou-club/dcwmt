@@ -17,7 +17,11 @@ const Layer = class{
     get = (wmtsLibIdentifer) => {
         const clrmap = new colormap(this.options.clrindex);
         const diagram = this._getDiagram(clrmap, this.options.opacity);
-        diagram.calcMaxMin(this.options.url[0].concat("/0/0/0.png"));
+        
+        const path = this.options.url[0].concat("/0/0/0.png");
+        const size = this.options.size;
+        diagram.calcMaxMin(path, size);
+        
         const layer = this._getLayerWithSuitableLib(wmtsLibIdentifer, diagram);
         return layer;
     }
@@ -26,7 +30,7 @@ const Layer = class{
         if(this.options.url.length === 2){
             return new VectorDiagram(clrmap.getClrmap());
         }else{
-            return new CounterDiagram(clrmap.getClrmap(), opacity);
+            return new ToneDiagram(clrmap.getClrmap(), opacity);
         }
     }
 

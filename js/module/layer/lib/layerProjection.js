@@ -33,7 +33,7 @@ const layerProjection = class extends ol.layer.Tile{
         const canvas = document.createElement("canvas");
         [canvas.width, canvas.height] = [this.options.size.X, this.options.size.Y];
 
-        const counterFunc = async () => {
+        const toneFunc = async () => {
             await this.options.diagram.url2canvas(url[0], canvas);
         }
 
@@ -41,7 +41,7 @@ const layerProjection = class extends ol.layer.Tile{
             await this.options.diagram.urls2canvas(url, canvas);
         }
 
-        await this.options.diagram.isCounter(counterFunc, vectorFunc)();
+        await this.options.diagram.isTone(toneFunc, vectorFunc)();
         imageTile.getImage().src = canvas.toDataURL();
     }
 }

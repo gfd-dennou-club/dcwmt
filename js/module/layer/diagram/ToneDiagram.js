@@ -9,7 +9,7 @@
 // tile:        数値データタイル (ImageData)
 // canvas:      数値データタイルを描画したcanvas(HTMLElement<canvas>)
 
-const CounterDiagram = class{
+const ToneDiagram = class{
     constructor(colormap, opacity){
         // [TODO] min, maxを更新するべし
         this.min = undefined;
@@ -26,10 +26,12 @@ const CounterDiagram = class{
      */
     bitmap2data = (imageData, size, isCalcMaxMin) => {
         const rgba = imageData.data;
+        console.log(size)
         let red, green, blue;
         let dataView = new DataView(new ArrayBuffer(32));
         let scalarData = new Array();
-        
+        let zeroFrag = false;
+
         for(let i = 0; i < size.width * size.height; i++){
             const bias_rgb_index = i * 4;
             red   = rgba[bias_rgb_index    ] << 24;
@@ -40,6 +42,12 @@ const CounterDiagram = class{
             scalarData[i] = dataView.getFloat32(0);
 
             if(isCalcMaxMin){
+                if(!zeroFrag && this.min == 0){
+                    console.log(rgba[bias_rgb_index], rgba[bias_rgb_index+1], rgba[bias_rgb_index+2])
+                    console.log(scalarData[i])
+                    console.log(i)
+                    zeroFrag = true;
+                }
                 if(this.min === undefined){
                     this.min = this.max = scalarData[i];
                 }else{
@@ -137,13 +145,14 @@ const CounterDiagram = class{
         return ctx.getImageData(0, 0, canvas.width, canvas.height);
     }
 
-    calcMaxMin = async (url) => {
+    calcMaxMin = async (url, size) => {
         const canvas = document.createElement("canvas");
+        [canvas.width, canvas.height] = [size.X, size.Y];
         await this.url2canvas(url, canvas, true);
         console.log(this.min, this.max);
     }
 
-    isCounter = (t=true, f=false) => { return t; }
+    isTone = (t=true, f=false) => { return t; }
 
     _whereDrawGridLine = (index, width, height) => {
         const total_pixels = width * height;
