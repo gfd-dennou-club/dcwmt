@@ -10,10 +10,14 @@
 // canvas:      数値データタイルを描画したcanvas(HTMLElement<canvas>)
 
 const toneDiagram = class{
-    constructor(colormap){
-        // [TODO] min, maxを更新するべし
-        this.min = undefined;
-        this.max = undefined;
+    constructor(colormap, range){
+        if ( !range ) {
+            this.min = undefined;
+            this.max = undefined;
+        } else {
+            this.min = range.min;
+            this.max = range.max;
+        }
         this.colormap = colormap;
     }
 
@@ -25,29 +29,29 @@ const toneDiagram = class{
      */
     bitmap2data = (imageData, size, isCalcMaxMin) => {
         const rgba = imageData.data;
-        let red, green, blue;
         let dataView = new DataView(new ArrayBuffer(32));
-        let scalarData = new Array();
+        const scalarData = new Array();
         let zeroFrag = false;
 
         for(let i = 0; i < size.width * size.height; i++){
-            const bias_rgb_index = i * 4;
-            red   = rgba[bias_rgb_index    ] << 24;
-            green = rgba[bias_rgb_index + 1] << 16;
-            blue  = rgba[bias_rgb_index + 2] << 8;
+            const bias_rgb_index = i * 4
+            const red   = rgba[ bias_rgb_index     ] << 24;
+            const green = rgba[ bias_rgb_index + 1 ] << 16;
+            const blue  = rgba[ bias_rgb_index + 2 ] << 8;
 
             dataView.setUint32(0, red + green + blue);
-            scalarData[i] = dataView.getFloat32(0);
+            const buf = dataView.getFloat32(0);
+            scalarData.push(buf);
 
             if(isCalcMaxMin){
                 if(!zeroFrag && this.min == 0){
                     zeroFrag = true;
                 }
                 if(this.min === undefined){
-                    this.min = this.max = scalarData[i];
+                    this.min = this.max = buf;
                 }else{
-                    if(this.min > scalarData[i]) this.min = scalarData[i];
-                    if(this.max < scalarData[i]) this.max = scalarData[i];
+                    if(this.min > buf) this.min = buf;
+                    if(this.max < buf) this.max = buf;
                 }
             }
         }
@@ -142,9 +146,11 @@ const toneDiagram = class{
     }
 
     calcMaxMin = async (url, size) => {
-        const canvas = document.createElement("canvas");
-        [canvas.width, canvas.height] = [size.X, size.Y];
-        await this.url2canvas(url, canvas, true);
+        if ( !this.min ) {
+            const canvas = document.createElement("canvas");
+            [canvas.width, canvas.height] = [size.X, size.Y];
+            await this.url2canvas(url, canvas, true);
+        }
         return { min: this.min, max: this.max };
     }
 

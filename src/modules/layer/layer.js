@@ -17,15 +17,20 @@ const layer = class{
         this.options = options;
 
         const clrmap = new colormap(options.clrindex);
-        this.diagram = this._getDiagram(clrmap);
-        
-        const url = options.url[0].concat("/0/0/0.png");
-        const size = options.size;
-        this.maxmin = this.diagram.calcMaxMin(url, size);
+        if ( !options.diagram ) {
+            this.diagram = this._getDiagram(clrmap, options.range);
+            if ( this.diagram.isTone() ) {
+                const url = options.url[0].concat("/0/0/0.png");
+                const size = options.size;
+                this.maxmin = this.diagram.calcMaxMin(url, size);
+            }
+        } else {
+            this.diagram = options.diagram;
+        }
     }
 
     create = (wmtsLibIdentifer) => {
-        return this._getLayerWithSuitableLib(wmtsLibIdentifer, this.diagram);;
+        return this._getLayerWithSuitableLib(wmtsLibIdentifer, this.diagram);
     }
 
     getProps = async () => {
@@ -37,11 +42,11 @@ const layer = class{
         }
     }
 
-    _getDiagram = (clrmap) => {
+    _getDiagram = (clrmap, range) => {
         if(this.options.url.length === 2){
             return new vectorDiagram(clrmap.getClrmap());
         }else{
-            return new toneDiagram(clrmap.getClrmap());
+            return new toneDiagram(clrmap.getClrmap(), range);
         }
     }
 
@@ -85,7 +90,6 @@ const layer = class{
             maxZoom: this.options.level.max,
             minZoom: this.options.level.min,
             name: this.options.name,
-            alpha: this.options.alpha
         }
         return new layerProjection(options);
     }

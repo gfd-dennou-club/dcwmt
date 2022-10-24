@@ -15,16 +15,16 @@
 
 <script>
 import dcwmt_map from './Dcwmt-map.vue';
-import tab from './Tab.vue';
 import dcwmt_legend from './Dcwmt-legends.vue';
 import dcwmt_navigationdrawer from './Dcwmt-navigationdrawer.vue';
+import tab from './Tab.vue';
 
 export default {
     components: {
         dcwmt_map,
-        tab,
         dcwmt_legend,
         dcwmt_navigationdrawer,
+        tab,
     },
     data: () => ({
         canDraw: false,

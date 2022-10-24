@@ -1,4 +1,3 @@
-import { set } from "lodash";
 import Vue from "vue";
 import Vuex from "vuex";
 
@@ -10,6 +9,7 @@ const state = {
     config: {
         clrindex: 3,
         wmtsLibIdentifer: new wmtsLibIdentifer("OpenLayers"),
+        toneRange: { name: undefined, min: undefined, max: undefined },
     },
     layersprops: [],
     selectedlayer: undefined,

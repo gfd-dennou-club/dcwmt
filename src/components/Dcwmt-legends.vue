@@ -6,24 +6,24 @@
             </v-col>
         </v-row>
         <v-row no-gutters>
-            <v-col cols="3" align="center"> 
+            <v-col cols="3" align="center">
                 <v-text-field
                     height="50"
-                    v-model="legendinfo.min"
+                    v-model="min"
                     label="min"
                     outlined
                     hide-details="auto"
                     append-icon="✓"
                     @click:append="changeRange()"
-                />    
+                />
             </v-col>
             <v-col cols="6" align="center">
-                {{ legendinfo.name }} 
+                {{ legendinfo.name }}
             </v-col>
-            <v-col cols="3"  align="center"> 
+            <v-col cols="3"  align="center">
                 <v-text-field
                     height="50"
-                    v-model="legendinfo.max"
+                    v-model="max"
                     label="max"
                     outlined
                     hide-details="auto"
@@ -37,28 +37,29 @@
 
 <script>
     import colorbar from "./DrawerContents/Drawer-colormap/Colorbar.vue";
-    
+
     export default {
         components: {
             colorbar,
         },
         data: () => ({
-            temp_layersparops: [],
+            updatedlayerProp: undefined,
         }),
         computed: {
             clrindex: function() {
                 return this.$store.getters.config.clrindex;
             },
-            layersprops: {
-                get: function () {
-                    return this.$store.getters.layersprops;
-                },
-                set: function ( value ) {
-                    this.$store.commit("setLayersProps", value);
-                }
+            layersprops: function () {
+                return this.$store.getters.layersprops;
             },
             selectedlayer: function () {
                 return this.$store.getters.selectedlayer;
+            },
+            toneRange: {
+                get: function () {},
+                set: function ( value ) {
+                    this.$store.commit("setConfig", { toneRange: value });
+                }
             },
             legendinfo: {
                 get: function () {
@@ -73,33 +74,33 @@
                     } else {
                         return prop;
                     }
-                },
-                set: function ( value ) {
-                    let layersprops = this.layersprops;
-                    const isExist = prop => prop.name === this.selectedlayer;
-                    let propIndex = this.layersprops.findIndex(isExist);
-                    layersprops[propIndex] = { ...value };
-                    this.temp_layersprops = layersprops;
                 }
-            }
+            },
+            min: {
+                get: function () {  return this.legendinfo.min; },
+                set: function ( value ) {
+                    this.updatedlayerProp = {...this.legendinfo, min: parseInt(value)}
+                }
+            },
+            max: {
+                get: function () {  return this.legendinfo.max; },
+                set: function ( value ) {
+                    this.updatedlayerProp = {...this.legendinfo, max: parseInt(value)}
+                }
+            },
         },
         methods: {
             changeRange: function () {
-                if ( this.temp_layersprops.length !== 0 ) {
-                    this.layersprops = this.temp_layersprops;
-                    console.log(this.layersprops)
+                const isUpdatedlayer = layer => layer.name === this.updatedlayerProp.name;
+                const updatedlayerProp = this.layersprops.find(isUpdatedlayer);
+                if ( 
+                    updatedlayerProp 
+                    && (updatedlayerProp.min !== this.updatedlayerProp.min 
+                    || updatedlayerProp.max !== this.updatedlayerProp.max)
+                ) {
+                    this.toneRange = this.updatedlayerProp;
                 }
             }
         },
-        watch: {
-            'legendinfo.min': function (min) {
-                min = parseFloat(min)
-                this.legendinfo = { min };
-            },
-            'legendinfo.max': function (max) {
-                max = parseFloat(max);
-                this.legendinfo = { max };
-            }
-        }
     }
 </script>

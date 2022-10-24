@@ -1,11 +1,13 @@
 <template>
     <div id="main-screen">
+        <ruler :viewer="viewer" />
         <layerselecter :layer_manager="layer_manager" />
     </div>
 </template>
 
 <script>
 import layerselecter from './Layerselecter.vue';
+import ruler from './Dcwmt-ruler.vue';
 
 import define from '../define.js';
 import viewer from '../modules/viewer/viewer.js';
@@ -15,12 +17,14 @@ import layerManager from '../modules/layerManager/layerManager.js';
 export default {
     components: {
         layerselecter,
+        ruler,
     },
     data: () => ({  
         tone: [],
         vector: [],
         projection: [ "メルカトル図法", "正距方位図法", "モルワイデ図法", "サンソン図法" ],
         layer_manager: undefined,
+        viewer: undefined,
     }),
     created: function() {
         this.read_deinejs();
@@ -39,7 +43,7 @@ export default {
             set: function ( value ) {
                 this.$store.commit("setLayersProps", value);
             }
-        }
+        },
     },
     methods: {
         read_deinejs: function() {
@@ -70,10 +74,10 @@ export default {
             // ビュワーの作成
             const wli = this.config.wmtsLibIdentifer;
             const viewer_obj = new viewer({ wmtsLibIdentifer: wli });
-            const suitable_viewer = viewer_obj.getSuitableViewer();
+            this.viewer = viewer_obj.getSuitableViewer();
 
             // レイヤマネージャーを作成
-            this.layer_manager = new layerManager(wli, suitable_viewer);
+            this.layer_manager = new layerManager(wli, this.viewer);
 
             // レイヤの作成とマネージャへの追加
             const layer_types = [this.tone, this.vector];
@@ -88,6 +92,11 @@ export default {
                         alpha: 1.0,
                     };
 
+                    const toneRange = this.config.toneRange;
+                    if ( layer_option.name === toneRange.name ) {
+                        layer_option.range = { min: toneRange.min, max: toneRange.max };
+                    }
+
                     const layer_obj = new layer(layer_option);
                     this.layer_manager.addBaseLayer(layer_obj, layer_info.name);
                     this.layer_manager.addLayer(layer_obj, layer_info.name);
@@ -95,7 +104,7 @@ export default {
             });
 
             // レイヤーマネージャのセットアップ
-            let layersprops = this.layer_manager.setup(suitable_viewer);
+            let layersprops = this.layer_manager.setup(this.viewer);
             layersprops = await Promise.all(layersprops);
             this.layersprops = layersprops.filter( v => v );
         }
@@ -113,7 +122,18 @@ export default {
 
 <style scoped>
     div#main-screen {
-        height: 99%;
+        height: 100%;
         display: flex;
+    }
+
+    div#main-screen>div#map {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        border: none;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
     }
 </style>
