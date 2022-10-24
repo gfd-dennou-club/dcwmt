@@ -211,7 +211,7 @@ def makeTileForPlane(dimInfo, fp, countAry, xindex, yindex, otherindex, dirPath,
 				pnm.end()
 
 				system("pnmtopng #{tempDirPath_y}.ppm > #{tempDirPath_y}.png")
-      		 	system("rm -f #{tempDirPath_y}.ppm")
+      		 	#system("rm -f #{tempDirPath_y}.ppm")
 			}
 		}
 	}
