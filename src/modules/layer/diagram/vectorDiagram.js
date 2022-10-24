@@ -75,8 +75,6 @@ const vectorDiagram = class{
             datas.map( data => data / max[direction] )
         );
 
-        console.log(meanOfBlockArrays);
-
         for ( let y = 0; y < dencityOfVectorInCanvas.y; y++ ) {
             for (let x = 0; x < dencityOfVectorInCanvas.x; x++ ) {
                 const halfOfBlockSize = {

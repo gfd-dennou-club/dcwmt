@@ -1,5 +1,5 @@
 const DEFINE = {
-	ROOT: "../../tile",
+	ROOT: "../tile",
 	TONE: [
 		{
 			NAME: "Ps",

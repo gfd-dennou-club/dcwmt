@@ -15,8 +15,18 @@ module.exports = {
     entry: "./src/index.js",
 
     output: {
+        publicPath: '/',
         filename: "index.js",
         path: path.join(__dirname, "dist"),
+    },
+
+    devServer: {
+        static: {
+            directory: path.join(__dirname, 'dist'),
+        },
+        hot: true,
+        liveReload: true,
+        historyApiFallback: true,
     },
 
     mode: MODE,

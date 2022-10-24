@@ -14,9 +14,6 @@ export default {
     }),
     mounted: function () {
         Array.prototype.forEach.call(this.$el.children, ele => {
-            console.log(ele.clientLeft)
-            console.log(ele.clientHeight)
-            console.log(ele.clientWidth)
             if ( ele.id === this.vertical ) {
                 
             }
