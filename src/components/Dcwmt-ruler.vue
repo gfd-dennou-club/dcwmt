@@ -33,7 +33,7 @@ export default {
     background-color: green; /* for test */
     top: 0;
   }
-  div#horizonal {
+  div#holizonal {
     background-color: yellow; /* for test */
     left: 0;
     right: 0;
