@@ -29,15 +29,9 @@ const vectorDiagram = class{
         return scalarData;
     }
 
-    data2canvas = (datas, canvas, dencityOfVectorInCanvas, sizeOfVector) => {
+    data2canvas = (datas, canvas, dencityOfVectorInCanvas) => {
         const HORIZON = 0, VERTICAL = 1;
         const ctx = canvas.getContext("2d");
-
-        // ベクトルの描画設定
-        ctx.strokeStyle = "#000000";
-        ctx.lineWidth = 2;
-        ctx.fillStyle = "#000000";
-        ctx.font = "bold 9px 'Arial'";
 
         // 1つのベクトルを描画するためのブロックのサイズを計算
         const blockSizeForDrawingVector = { 
@@ -50,14 +44,14 @@ const vectorDiagram = class{
             new Array( dencityOfVectorInCanvas.x * dencityOfVectorInCanvas.y ).fill(0).map((_, i) => {
                 const startPoint = {
                     x: ( ( i * blockSizeForDrawingVector.x ) % canvas.width ) / blockSizeForDrawingVector.x,
-                    y: ( i * blockSizeForDrawingVector.x ) / canvas.width
+                    y: Math.floor( ( i * blockSizeForDrawingVector.x ) / canvas.width )
                 };
 
                 let applicable_array = new Array();
                 for ( let y = 0; y < blockSizeForDrawingVector.y; y++ ) {
                     const slice = {
-                        start:  ( startPoint.x * blockSizeForDrawingVector.x ) + ( y * blockSizeForDrawingVector.y * canvas.width ),
-                        end:    ( (startPoint.x + 1) * blockSizeForDrawingVector.x ) + ( y * blockSizeForDrawingVector.y * canvas.width ),
+                        start:  ( startPoint.x * blockSizeForDrawingVector.x ) + ( startPoint.y * blockSizeForDrawingVector.y + y ) * canvas.width,
+                        end:    ( (startPoint.x + 1) * blockSizeForDrawingVector.x ) + ( startPoint.y * blockSizeForDrawingVector.y + y ) * canvas.width,
                     };
                     const xSlicedArray = datas[direction].slice(slice.start, slice.end);
                     applicable_array = applicable_array.concat(xSlicedArray);
@@ -75,6 +69,7 @@ const vectorDiagram = class{
             datas.map( data => data / max[direction] )
         );
 
+        // ブロックごとにベクトルを描画していく
         for ( let y = 0; y < dencityOfVectorInCanvas.y; y++ ) {
             for (let x = 0; x < dencityOfVectorInCanvas.x; x++ ) {
                 const halfOfBlockSize = {
@@ -88,10 +83,12 @@ const vectorDiagram = class{
                     bold: 1,    // <- の - の太さ
                     width: 3,   // <- の < の横幅
                 }
+                // ベクトルの始点: 各ブロックの中点
                 const startPoint = {
                     x: ( x * blockSizeForDrawingVector.x ) + halfOfBlockSize.x,
                     y: ( y * blockSizeForDrawingVector.y ) + halfOfBlockSize.y,
                 };
+                // ベクトルの終点: ベクトルの長さ <= ブロックの半分の長さ
                 const endPoint = {
                     x: startPoint.x + ( meanOfBlockArrays[HORIZON][x + ( y * dencityOfVectorInCanvas.x )] * halfOfBlockSize.x ),
                     y: startPoint.y + ( meanOfBlockArrays[VERTICAL][x + ( y * dencityOfVectorInCanvas.x )] * halfOfBlockSize.y ),
@@ -136,9 +133,8 @@ const vectorDiagram = class{
         // 数値データ群の取得(dataの取得)
         const datas = bitmaps.map(bitmap => this.bitmap2data(bitmap));
 
-        const dencityOfVectorInCanvas = { x: 16, y: 16 };
-        const sizeOfVector = { width: 5, height: 5 };
-        this.data2canvas(datas, canvas, dencityOfVectorInCanvas, sizeOfVector);
+        const dencityOfVectorInCanvas = { x: 8, y: 8 };
+        this.data2canvas(datas, canvas, dencityOfVectorInCanvas);
     }
 
     urls2tile = async (urls, canvas) => {

@@ -27,12 +27,18 @@ const DEFINE = {
 		// },
 	],
 	VECTOR: [
+		// {
+		// 	NAME: ["VelX", "VelY"],
+		// 	FIXED: ["1.4002e+06/z=47200"],
+		// 	SIZE: {X: 320, Y: 320},
+		// 	MAXIMUMLEVEL: 1,
+		// },
 		{
-			NAME: ["VelX", "VelY"],
-			FIXED: ["1.4002e+06/z=47200"],
-			SIZE: {X: 320, Y: 320},
-			MAXIMUMLEVEL: 1,
-		},
+			NAME: ["U", "V"],
+			FIXED: ["time=32112.0"],
+			SIZE: {X: 256, Y:256},
+			MAXIMUMLEVEL: 2,
+		}
 	],
 };
 
