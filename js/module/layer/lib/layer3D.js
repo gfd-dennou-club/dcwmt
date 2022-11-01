@@ -4,7 +4,7 @@ const layer3D = class extends Cesium.UrlTemplateImageryProvider{
         this._maximumLevel = options.maximumLevel;
         this._minimumLevel = options.minimumLevel;
         this._diagram = options.diagram;
-        this._name = options.name; 
+        this._name = options.name;
     }
 
     // override
@@ -14,6 +14,7 @@ const layer3D = class extends Cesium.UrlTemplateImageryProvider{
             const url = ele.concat(`/${level}/${x}/${y}.png`);
             urls.push(url);
         });
+	console.log(urls)
 
         const canvas = document.createElement("canvas");
         [canvas.width, canvas.height] = [this._tileWidth, this._tileHeight];

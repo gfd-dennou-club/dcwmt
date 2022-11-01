@@ -26,11 +26,9 @@ const ToneDiagram = class{
      */
     bitmap2data = (imageData, size, isCalcMaxMin) => {
         const rgba = imageData.data;
-        console.log(size)
         let red, green, blue;
         let dataView = new DataView(new ArrayBuffer(32));
         let scalarData = new Array();
-        let zeroFrag = false;
 
         for(let i = 0; i < size.width * size.height; i++){
             const bias_rgb_index = i * 4;
@@ -42,12 +40,6 @@ const ToneDiagram = class{
             scalarData[i] = dataView.getFloat32(0);
 
             if(isCalcMaxMin){
-                if(!zeroFrag && this.min == 0){
-                    console.log(rgba[bias_rgb_index], rgba[bias_rgb_index+1], rgba[bias_rgb_index+2])
-                    console.log(scalarData[i])
-                    console.log(i)
-                    zeroFrag = true;
-                }
                 if(this.min === undefined){
                     this.min = this.max = scalarData[i];
                 }else{
@@ -67,21 +59,27 @@ const ToneDiagram = class{
      * @return {ImageData} 再度色付けされたビットマップ画像のimageData 
      */
     bitmap2tile = (canvas, isCalcMaxMin) => {
-        const ctx = canvas.getContext("2d");
+	try {
+       		 const ctx = canvas.getContext("2d");
 
-        let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const size = {width: canvas.width, height: canvas.height};
-        const datas = this.bitmap2data(imageData, size, isCalcMaxMin);
-        for(let i = 0; i < canvas.width * canvas.height; i++){
-            const bias_rgb_index = i * 4;
-            const rgb = this.data2color(datas[i]);
-            imageData.data[bias_rgb_index   ] = rgb.r;
-            imageData.data[bias_rgb_index +1] = rgb.g;
-            imageData.data[bias_rgb_index +2] = rgb.b;
-            imageData.data[bias_rgb_index +3] = this.opacity;
-        }
+       		 let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+       		 const size = {width: canvas.width, height: canvas.height};
+       		 const datas = this.bitmap2data(imageData, size, isCalcMaxMin);
+       		 for(let i = 0; i < canvas.width * canvas.height; i++){
+       		     const bias_rgb_index = i * 4;
+       		     const rgb = this.data2color(datas[i]);
+       		     imageData.data[bias_rgb_index   ] = rgb.r;
+       		     imageData.data[bias_rgb_index +1] = rgb.g;
+       		     imageData.data[bias_rgb_index +2] = rgb.b;
+       		     imageData.data[bias_rgb_index +3] = this.opacity;
+       		 }
 
-        return imageData;
+       		 return imageData;
+	} catch(err) {
+		if (!alert("タイルの読み込みに失敗しました\n再読み込みを行います. 「閉じる」を押してください.") ) {
+			location.reload();
+		}
+	}
     }
 
     /**
@@ -149,7 +147,6 @@ const ToneDiagram = class{
         const canvas = document.createElement("canvas");
         [canvas.width, canvas.height] = [size.X, size.Y];
         await this.url2canvas(url, canvas, true);
-        console.log(this.min, this.max);
     }
 
     isTone = (t=true, f=false) => { return t; }

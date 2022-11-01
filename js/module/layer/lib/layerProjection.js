@@ -3,22 +3,38 @@ const layerProjection = class extends ol.layer.Tile{
         super({});
         this.options = options;
 
-        const xyz_options = {
+	// const projection = options.proj || ol.proj.get('EPSG:3857');
+	const projection = ol.proj.get('EPSG:3857');
+	//const projection = ol.proj.get('ESRI:54032');
+
+	const defaultTileGrid = ol.tilegrid.createXYZ({
+		extent: projection.getExtent(),
+		minZoom: this.options.minZoom,
+		maxZoom: this.options.maxZoom,
+	});
+
+	const tilegrid_options = {
+		origin: defaultTileGrid.getOrigin(0),
+		resolutions: defaultTileGrid.getResolutions(),
+		tileSize: [
+			this.options.size.X,
+			this.options.size.Y
+		],
+	}
+
+	const tileGrid = new ol.tilegrid.WMTS(tilegrid_options);
+        
+	const xyz_options = {
             tileUrlFunction: this._tileUrlFunction,
             tileLoadFunction: this._tileLoadFunction,
-            maxZoom: this.options.maxZoom,
-            minZoom: this.options.minZoom,
-            projection: 'EPSG:3857',
-            tileSize: [
-                this.options.size.X,
-                this.options.size.Y
-            ],
+            projection: projection.getCode(),
+	    tileGrid: tileGrid,
             wrapX: true,
         };
 
 
         const source = new ol.source.XYZ(xyz_options);
-        this.setExtent([-20026376.39, -20048966.10, 20026376.39, 20048966.10]);
+        this.setExtent(projection.getExtent());
         // source.setRenderReprojectionEdges(true)
         this.setSource(source);
     }
@@ -30,7 +46,7 @@ const layerProjection = class extends ol.layer.Tile{
     }
 
     _tileLoadFunction = async (imageTile, url) => {
-        const canvas = document.createElement("canvas");
+	const canvas = document.createElement("canvas");
         [canvas.width, canvas.height] = [this.options.size.X, this.options.size.Y];
 
         const toneFunc = async () => {

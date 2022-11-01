@@ -1,9 +1,15 @@
 const viewer3D = (viewer_ele) => {
+    const imageryProvider = new Cesium.TileCoordinatesImageryProvider({
+	    tilingScheme: new Cesium.WebMercatorTilingScheme(),
+    });
+
+    console.log(imageryProvider)
+
     const viewer = new Cesium.Viewer(
         viewer_ele, // 表示するhtml要素
         {   
             // 画像参照を行うインスタンを設定
-            imageryProvider: new Cesium.TileCoordinatesImageryProvider(),
+            imageryProvider: imageryProvider,
             baseLayerPicker: false,
             requestRenderMode: true,
             masximumRenderTimeChange: Infinity,

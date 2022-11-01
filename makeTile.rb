@@ -35,15 +35,15 @@ option = OptionParser.new
 # 	[ time次元を2174に固定. level次元を290に固定]
 # 	ruby mekrTile.rb -f time=2174,level=290 sample.nc@temp
 # 	(注意)カンマは空白を開けないでください
-option.on('-f', '--fix DIMENTION', 'fix dimention'){|dim|
-	@fix = dim.split(',').map{|v| 
+option.on('-f', '--fix DIMENTION', Array, 'fix dimention'){|dim|
+	@fix = dim.map{|v| 
 		{ 
 			:dimention => v.split('=')[0], 
-			:start => v.split('=')[1].split(':')[0].to_i, 
-			:end => ( v.split('=')[1].split(':')[1] ? v.split('=')[1].split(':')[1].to_i : v.split('=')[1].split(':')[0].to_i ) 
+			:start => v.split('=')[1].split(':')[0].to_f, 
+			:end => ( v.split('=')[1].split(':')[1] ? v.split('=')[1].split(':')[1].to_f : v.split('=')[1].split(':')[0].to_f ) 
 		} 
 	}
-	@fixname.push(dim)
+	@fixname = dim
 }
 
 # 数値データタイルを保存するディレクトリのパスを決定
@@ -83,6 +83,10 @@ option.on('-b', '--baumkuchen', 'Whether to create a map of shape such as baumku
 	@warp_dim = true
 }
 
+option.on('-v', '--vector PHYSICALQUANTITYS', Array, 'Whether to create a vector graph'){|pqs|
+
+}
+
 # option.on('-c', '--clrmap CLRMAP', 'color map'){|color|
 # 	@clrmap = color
 # }
@@ -92,7 +96,7 @@ option.parse!(ARGV)
 
 # 物理量を取得
 if !ARGV[0].gsub(/^.\//, "").match(/@.*/) then
-	puts "[ERROR] Please choice physical quantity !"
+	STDERR.puts "[ERROR] Please choice physical quantity !"
 	exit
 end
 
@@ -110,17 +114,21 @@ physicalQuantity = ARGV[0].gsub(/^.\//, "").match(/@.*/)[0].delete("@").split(",
 @dirname += '/' if @dirname[-1] != '/'
 
 # 定義ファイルを作成
-file = File.open("./define.js", "w")
-file.puts("const DEFINE = {")
-file.puts("\tROOT: \"#{@dirname}tile\",")
-file.puts("\tTONE: [")
-
+# file = File.open("./define.js", "w")
+# file.puts("const DEFINE = {")
+# file.puts("\tROOT: \"#{@dirname}tile\",")
+# file.puts("\tTONE: [")
+msg = ""
+msg_header = ""
 
 # 物理量の数だけ回す
 physicalQuantity.each{|fp|
-	file.puts("\t\t{")
-	file.puts("\t\t\tNAME: \"#{fp}\",")
-	file.puts("\t\t\tFIXED: #{@fixname},")
+	# file.puts("\t\t{")
+	# file.puts("\t\t\tNAME: \"#{fp}\",")
+	# file.puts("\t\t\tFIXED: #{@fixname},")
+	msg_header << "{\n"
+	msg_header << "\tNAME: \"#{fp}\",\n"
+	msg_header << "\tFIXED: [\""
 
 	# 物理量のディレクトリツリーを作成
 	dirPath = "#{@dirname}tile/#{@netCDF.var(fp).name}/"
@@ -129,12 +137,14 @@ physicalQuantity.each{|fp|
 	# 次元を取得
 	physDim = @netCDF.var(fp).dims
 	# データを取り出す際の範囲や間隔を設定
-	dimInfo = physDim.map.with_index{|dim, index| getDimInfo(dim, index)}
+	dimInfo = physDim.map.with_index{|dim, index| 
+		getDimInfo(dim, index)
+	}
 
 	# ===== 数値データタイルを作成する際に必要なデータを用意 =====
 
 	# 各次元のデータを走査する変数
-	countAry = Array.new(dimInfo.length).map{0}
+	# countAry = Array.new(dimInfo.length).map{0}
 	
 	# x軸を決定						
 	xindex = dimInfo.select{|info| info[:name].include?(@axis[:x]) }[0][:index]
@@ -145,29 +155,34 @@ physicalQuantity.each{|fp|
 	throwError(!yindex, "Sorry... y axis can't set correctly, please set y axis by using options such as \'-a x:lon,y:lat\'")
 	
 	# 軸として選ばれなかった次元を取得
-	otherindex = dimInfo.select{|info| !info[:name].include?(@axis[:x]) && !info[:name].include?(@axis[:y])}.map{|info| info[:index]}
+	otherindex = dimInfo.select{|info| !info[:name].include?(@axis[:x]) && !info[:name].include?(@axis[:y])}.map{|info| info[:index]}.reverse
 
 	# 軸として選ばれなかった次元についてnetCDFからの取り出し方を選択
 	otherindex.each{|o|
 		# 固定される次元が空だったら
 		if @fix.empty? then
 			# 配列の0番目の要素を取得
-			dimInfo[o] = getDimInfo(dimInfo[o], dimInfo[o][:index], dimInfo[o][:name], 0, 0)
+			# dimInfo[o] = getDimInfo(dimInfo[o], dimInfo[o][:index], dimInfo[o][:name], 0, 0)
 		else
 			# 空でなければ, getDimInfoメソッドに任せる
 			dimInfo[o] = getDimInfo(dimInfo[o], dimInfo[o][:index])
 		end
-		countAry[dimInfo[o][:index]] = dimInfo[o][:start]
+		# countAry[dimInfo[o][:index]] = dimInfo[o][:start]
 	}
 
 	if @warp_dim then
-		makeTileForBaumkuchen(dimInfo, fp, countAry, xindex, yindex, otherindex, dirPath) 
+		# makeTileForBaumkuchen(dimInfo, fp, countAry, xindex, yindex, otherindex, dirPath) 
 	end
-	makeTileForPlane(dimInfo, fp, countAry, xindex, yindex, otherindex, dirPath, file)
-	file.puts("\t\t}")
+	makeTileForPlane(dimInfo, fp, 0, xindex, yindex, otherindex, dirPath, msg_header, msg)
+	# file.puts("\t\t}")
 }
 
-file.puts("\t],")
-file.puts("\tVECTOR: [],")
-file.puts("}")
-file.close()
+puts "\n\n数値データタイルの作成が終了しました."
+puts "以下の文字列を「define.js」に追加してください."
+puts ""
+puts msg
+puts ""
+# file.puts("\t],")
+# file.puts("\tVECTOR: [],")
+# file.puts("}")
+# file.close()

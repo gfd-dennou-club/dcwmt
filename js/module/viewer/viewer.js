@@ -66,7 +66,7 @@ const Viewer = class{
     _getViewerWithSuitableLib = (map_ele, maximumLevel) => {
         const ceisum = () => this._for3D(map_ele);
         const leaflet = () => this._forCartesian(map_ele, maximumLevel);
-        const openlayers = () => this._forProjection(map_ele);
+        const openlayers = () => this._forProjection(map_ele, maximumLevel);
         const suitableFunc = this.options.wmtsLibIdentifer.whichLib(ceisum, leaflet, openlayers);
         return suitableFunc();
     }
@@ -81,6 +81,10 @@ const Viewer = class{
     }
 
     _forProjection = (map_ele, maximumLevel) => {
-        return viewerProjection(map_ele);
+	const options = { 
+		maxLevel: maximumLevel, 
+		minLevel: 0, 
+	};
+        return viewerProjection(map_ele, options);
     }
 } 

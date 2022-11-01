@@ -42,7 +42,7 @@ const layerController = class{
             const layer_controller = new layerControllerProjection(
                 original_layer,
                 baselayers,
-                overlaylayers
+                overlaylayers,
             );
             return create_element(layer_controller);
         }

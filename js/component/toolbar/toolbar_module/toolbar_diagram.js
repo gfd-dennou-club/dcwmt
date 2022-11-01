@@ -1,6 +1,6 @@
 const ToolbarDiagram = class{
     getMenuElement = () => {
-        const names = ["図の切り替え", "グリッド表示の切り替え", "CesiumJS表示", "Leaflet表示", "OpenLayers表示"];
+        const names = ["図の切り替え(準備中)", "グリッド表示の切り替え(準備中)", "CesiumJS表示", "Leaflet表示(準備中)", "OpenLayers表示"];
         const events = this._eventListener();
         const menuElements = Array(names.length).fill(undefined).map((_, index) => {
             return { name: names[index], event: events[index] };
@@ -24,11 +24,11 @@ const ToolbarDiagram = class{
         global.viewer.redraw(options);
     }
 
-    _clickEvent_leaflet = () => {
-        const options = { wmtsLibIdentifer: new wmtsLibIdentifer("Leaflet") }
-        // [Caution] refarences global variables
-        global.viewer.redraw(options);
-    }
+    // _clickEvent_leaflet = () => {
+    //     const options = { wmtsLibIdentifer: new wmtsLibIdentifer("Leaflet") }
+    //     // [Caution] refarences global variables
+    //     global.viewer.redraw(options);
+    // }
 
     _clickEvent_openlayers = () => {
         const options = { wmtsLibIdentifer: new wmtsLibIdentifer("OpenLayers") }

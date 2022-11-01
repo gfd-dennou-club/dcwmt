@@ -23,15 +23,28 @@ const layerControllerProjection = class{
 
     eventListener_for_projection = (value) => {
         // 選択したレイヤを取得
-        const purpose_projection = this.map.projections.find((item) => item.name === value.target.value).proj;
-        const getCenter = ol.extent.getCenter;
+	const purpose_projection = this.map.projections.find((item) => item.name === value.target.value).proj;
+ 	
+  	const getCenter = ol.extent.getCenter;
 
-        const view = new ol.View({
-            projection: purpose_projection,
-            extent: purpose_projection.getExtent() || [0, 0, 0, 0],
-            center: getCenter(purpose_projection.getExtent() || [0, 0, 0, 0]),
-            zoom: 0,
+        const old_view = this.map.getView();
+	
+
+        const defaultTileGrid = ol.tilegrid.createXYZ({
+        	extent: purpose_projection.getExtent(),
+        	maxZoom: old_view.getMaxZoom(),
+        	minZoom: old_view.getMinZoom(),
         });
+
+        const view_options = {
+            projection: purpose_projection,
+            resolutions: defaultTileGrid.getResolutions(),
+	    center: getCenter(purpose_projection.getExtent() || [0, 0, 0, 0]),
+	    resolution: defaultTileGrid.getResolution(old_view.getMinZoom()),
+            multiWorld: true,
+        };
+
+        const view = new ol.View(view_options);
 
         this.map.setView(view);
     }
@@ -41,7 +54,7 @@ const layerControllerProjection = class{
         this.original_layers.remove(this.bottomlayer);          // 選択したレイヤをレイヤ群の中から削除
         this.original_layers.push(this.bottomlayer);            // 選択したレイヤをレイヤ群のtopに挿入
         this.original_layers.forEach(layer => {
-            // 対象のレイヤだった場合は飛ばす
+           // 対象のレイヤだった場合は飛ばす
             if(layer === undefined || layer.options.name === this.bottomlayer.options.name)
                 return;  
             else this.original_layers.remove(layer);            // それ以外のレイヤはすべて削除

@@ -29,46 +29,72 @@ const VectorDiagram = class{
         return scalarData;
     }
 
-    data2canvas = (datas, canvas, dencityOfVector, sizeOfVector) => {
+    data2canvas = (datas, canvas, dencityOfVectorInCanvas) => {
+        const HORIZON = 0, VERTICAL = 1;
         const ctx = canvas.getContext("2d");
 
-        // ベクトルの描画設定
-        ctx.strokeStyle = "#000000";
-        ctx.lineWidth = 2;
-        ctx.fillStyle = "#000000";
-        ctx.font = "bold 9px 'Arial'";
+        // 1つのベクトルを描画するためのブロックのサイズを計算
+        const blockSizeForDrawingVector = { 
+            x: canvas.width / dencityOfVectorInCanvas.x, 
+            y: canvas.height / dencityOfVectorInCanvas.y,
+        };
 
-        // canvas内のベクトルの数を取得
-        let numOfVectorInCanvas = {x: 0, y: 0};
-        numOfVectorInCanvas.x = canvas.width / dencityOfVector.x;
-        numOfVectorInCanvas.y = canvas.height / dencityOfVector.y;
+        // ブロックごとで平均を計算して, 配列にする
+        let meanOfBlockArrays = new Array(2).fill(0).map((_, direction) => 
+            new Array( dencityOfVectorInCanvas.x * dencityOfVectorInCanvas.y ).fill(0).map((_, i) => {
+                const startPoint = {
+                    x: ( ( i * blockSizeForDrawingVector.x ) % canvas.width ) / blockSizeForDrawingVector.x,
+                    y: Math.floor( ( i * blockSizeForDrawingVector.x ) / canvas.width )
+                };
 
-        // canvas内のベクトルの数分だけ回す
-        for(let y = 0; y < canvas.height; y+=numOfVectorInCanvas.y){
-            for(let x = 0; x < canvas.width; x+=numOfVectorInCanvas.x){
-                // 指定したベクトルのサイズの区画全ての値を加算し, 平均値を求める.
-                let means = new Array(2).fill(0);
-                for(let dy = y; dy < y + numOfVectorInCanvas.y; dy++){
-                    for(let dx = x; dx < x + numOfVectorInCanvas.x; dx++){
-                        for(let i = 0; i < 2; i++){ means[i] += datas[i][dy * canvas.height + dx]; }
-                    }
+                let applicable_array = new Array();
+                for ( let y = 0; y < blockSizeForDrawingVector.y; y++ ) {
+                    const slice = {
+                        start:  ( startPoint.x * blockSizeForDrawingVector.x ) + ( startPoint.y * blockSizeForDrawingVector.y + y ) * canvas.width,
+                        end:    ( (startPoint.x + 1) * blockSizeForDrawingVector.x ) + ( startPoint.y * blockSizeForDrawingVector.y + y ) * canvas.width,
+                    };
+                    const xSlicedArray = datas[direction].slice(slice.start, slice.end);
+                    applicable_array = applicable_array.concat(xSlicedArray);
                 }
+                const mean = applicable_array.reduce((accumulator, current, _, { length }) => accumulator + current / length );
+                return mean;
+            }
+        ));
 
-                means = means.map(mean => mean / (numOfVectorInCanvas.x * numOfVectorInCanvas.y));
+        // 正規化をするために絶対値の最大値を計算
+        const max = meanOfBlockArrays.map(datas => Math.max(...datas.map(Math.abs)) );
 
-                // ベクトルを描画
+        // -1〜1の範囲に正規化する.
+        meanOfBlockArrays = meanOfBlockArrays.map( ( datas, direction ) => 
+            datas.map( data => data / max[direction] )
+        );
+
+        // ブロックごとにベクトルを描画していく
+        for ( let y = 0; y < dencityOfVectorInCanvas.y; y++ ) {
+            for (let x = 0; x < dencityOfVectorInCanvas.x; x++ ) {
+                const halfOfBlockSize = {
+                    x: blockSizeForDrawingVector.x / 2,
+                    y: blockSizeForDrawingVector.y / 2,
+                };
+
                 ctx.beginPath();
-                let startPoint = {x: 0, y: 0};
-                let endPoint = {x: 0, y: 0};
-                // 矢印(<-)の制御点
                 const arrow = {
                     length: 3,  // <- の - の長さ
                     bold: 1,    // <- の - の太さ
                     width: 3,   // <- の < の横幅
                 }
-                const controlPoint = [0, arrow.bold, -arrow.length, arrow.bold, -arrow.length*1.5, arrow.width];
-                [startPoint.x, startPoint.y]    = [x+numOfVectorInCanvas.x*0.5, y+numOfVectorInCanvas.y*0.5];
-                [endPoint.x, endPoint.y]        = [startPoint.x + means[0]*sizeOfVector.width, startPoint.y - means[1]*sizeOfVector.height];
+                // ベクトルの始点: 各ブロックの中点
+                const startPoint = {
+                    x: ( x * blockSizeForDrawingVector.x ) + halfOfBlockSize.x,
+                    y: ( y * blockSizeForDrawingVector.y ) + halfOfBlockSize.y,
+                };
+                // ベクトルの終点: ベクトルの長さ <= ブロックの半分の長さ
+                const endPoint = {
+                    x: startPoint.x + ( meanOfBlockArrays[HORIZON][x + ( y * dencityOfVectorInCanvas.x )] * halfOfBlockSize.x ),
+                    y: startPoint.y + ( meanOfBlockArrays[VERTICAL][x + ( y * dencityOfVectorInCanvas.x )] * halfOfBlockSize.y ),
+                }
+                const controlPoint = [ 0, arrow.bold, -arrow.length, arrow.bold, -arrow.length, arrow.width ];
+
                 ctx.arrow(startPoint.x, startPoint.y, endPoint.x, endPoint.y, controlPoint);
                 ctx.fill();
             }
@@ -107,9 +133,8 @@ const VectorDiagram = class{
         // 数値データ群の取得(dataの取得)
         const datas = bitmaps.map(bitmap => this.bitmap2data(bitmap));
 
-        const dencityOfVector = {x: 20, y: 20};
-        const sizeOfVector = {width: 5, height: 5};
-        this.data2canvas(datas, canvas, dencityOfVector, sizeOfVector);
+        const dencityOfVectorInCanvas = { x: 8, y: 8 };
+        this.data2canvas(datas, canvas, dencityOfVectorInCanvas);
     }
 
     urls2tile = async (urls, canvas) => {
