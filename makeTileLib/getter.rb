@@ -46,7 +46,7 @@ end
 def getDimInfo(dim, index, fname = nil, fstart = nil, fend = nil)
 	name = dim.name if dim.kind_of?(NumRu::NetCDFDim)
 	name = dim[:name] if dim.kind_of?(Hash)
-	
+
 	# 走査する固定次元が設定されていたら
 	# 走査する箇所に次元を固定するようにしておく
 	if fname && fname === name then
@@ -67,7 +67,7 @@ def getDimInfo(dim, index, fname = nil, fstart = nil, fend = nil)
 			_length = _start - _end + 1
 		end
 	end
-	
+
 	# ハッシュ配列にして返す
 	return { :name => name, :index => index, :length => _length, :start => _start, :end => _end, :stride => 1 }
 end
@@ -95,5 +95,12 @@ end
 def getOtherDimVar(name, index)
 	option = { "start" => [0], "end" => [-1], "stride" => [1] }
 	allvalues = @netCDF.var(name).get(option)
-	return allvalues.to_a.find_index(index)
+
+	diff = 6 - index.to_i.abs.to_s.length
+
+	if diff > 0 then
+		allvalues *= 10**diff
+		index *= 10**diff
+	end
+	return allvalues.to_i.to_a.find_index(index.to_i)
 end

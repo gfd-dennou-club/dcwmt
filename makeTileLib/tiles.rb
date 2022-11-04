@@ -77,7 +77,28 @@ end
 #
 # dimInfo: Hash{ :name: String, :length: Number, :start: Number, :end: Number, :stride: Number}
 # countAry: Hash{ :name: String, :length: 0, ...}
-def makeTileForPlane(dimInfo, fp, countAry, xindex, yindex, otherindex, dirPath, file)	
+def makeTileForPlane(dimInfo, fp, count, xindex, yindex, otherindex, dirPath, msg_header, msg, tempindex = 0)
+	if otherindex.instance_of?(Array) then
+		# index = otherindex
+		index = otherindex[tempindex]
+		tempindex += 1
+		for i in 0...dimInfo[index][:length] do
+			# if otherindex.empty? then
+			cnt = dimInfo[index][:length] == 1 ? dimInfo[index][:start] : i
+			if tempindex >= otherindex.length then
+				makeTileForPlane(dimInfo, fp, cnt, xindex, yindex, index, dirPath, msg_header, msg, tempindex)
+			else
+				option = { "start" => [cnt], "end" => [cnt], "stride" => [1] }
+				value = @netCDF.var(dimInfo[index][:name]).get(option)[0]
+				temppath = "#{dirPath}#{dimInfo[index][:name]}=#{value}/"
+				header = "#{msg_header}#{dimInfo[index][:name]}=#{value}/"
+				makeTileForPlane(dimInfo, fp, cnt, xindex, yindex, otherindex, temppath, header, msg, tempindex)
+			end
+
+		end
+		return
+	end
+
 	# 拡大率を計算
 	zoomLevel = getMaxZoomLevel(dimInfo[xindex][:length], dimInfo[yindex][:length], 256)
 
@@ -86,16 +107,23 @@ def makeTileForPlane(dimInfo, fp, countAry, xindex, yindex, otherindex, dirPath,
 	tileSize = { :x => 256, :y => 256 }
 	p "tileSize : #{tileSize[:x]} * #{tileSize[:y]}, maxZoomLevel : #{zoomLevel}でタイルを作ります"
 
-	file.puts("\t\t\tSIZE: {X: #{tileSize[:x]}, Y: #{tileSize[:y]}},")
-	file.puts("\t\t\tMAXIMUMLEVEL: #{zoomLevel},")
-	file.puts("\t\t\tAXIS: {X: \"#{dimInfo[xindex][:name]}\", Y: \"#{dimInfo[yindex][:name]}\"},")
+	# file.puts("\t\t\tSIZE: {X: #{tileSize[:x]}, Y: #{tileSize[:y]}},")
+	# file.puts("\t\t\tMAXIMUMLEVEL: #{zoomLevel},")
+	# file.puts("\t\t\tAXIS: {X: \"#{dimInfo[xindex][:name]}\", Y: \"#{dimInfo[yindex][:name]}\"},")
 
 	# ベースとなるタイルのディレクトリパスを作成 および ディレクトリ作成
-	option = { "start" => [countAry[otherindex[0]].to_i], "end" => [countAry[otherindex[0]].to_i], "stride" => [1] }
-	othervalue = @netCDF.var(dimInfo[otherindex[0]][:name]).get(option)[0].to_i
-	tempDirPath_base = "#{dirPath}#{dimInfo[otherindex[0]][:name]}=#{othervalue}/"
+	option = { "start" => [count], "end" => [count], "stride" => [1] }
+	othervalue = @netCDF.var(dimInfo[otherindex][:name]).get(option)[0]
+	tempDirPath_base = "#{dirPath}#{dimInfo[otherindex][:name]}=#{othervalue}/"
 	mkdir(tempDirPath_base)
 
+	msg << msg_header
+	msg << "#{dimInfo[otherindex][:name]}=#{othervalue}\"],\n"
+	msg << "\tSIZE: {X: #{tileSize[:x]}, Y: #{tileSize[:y]}},\n"
+	msg << "\tMAXIMUMLEVEL: #{zoomLevel},\n"
+	msg << "\tAXIS: {X: \"#{dimInfo[xindex][:name]}\", Y: \"#{dimInfo[yindex][:name]}\"},\n"
+	msg << "},\n"
+	
 	# 軸の変数を取得
 	xAxisAry = @netCDF.var(dimInfo[xindex][:name]).get("start" => [0], "end" => [-1], "stride" => [1])
 	yAxisAry = @netCDF.var(dimInfo[yindex][:name]).get("start" => [0], "end" => [-1], "stride" => [1])
@@ -174,7 +202,11 @@ def makeTileForPlane(dimInfo, fp, countAry, xindex, yindex, otherindex, dirPath,
 											elsif dim[:name] === dimInfo[yindex][:name] then
 												getDimInfo(dim, index, dim[:name], yinfo[:indexOfNetCDF], yinfo[:indexOfNetCDF])
 											else
-												getDimInfo(dim, index)
+												if dim[:length] == 1 then
+													getDimInfo(dim, index)
+												else
+													getDimInfo(dim, index, dim[:name], count, count)
+												end
 											end
 										}
 										value += @netCDF.var(fp).get(getVariableRule(tempInfo))[0] * xinfo[:weight] * yinfo[:weight]
@@ -211,23 +243,14 @@ def makeTileForPlane(dimInfo, fp, countAry, xindex, yindex, otherindex, dirPath,
 				pnm.end()
 
 				system("pnmtopng #{tempDirPath_y}.ppm > #{tempDirPath_y}.png")
-      		 	#system("rm -f #{tempDirPath_y}.ppm")
+      		 	system("rm -f #{tempDirPath_y}.ppm")
 			}
 		}
 	}
 
 	# ===== 軸ではない次元の作成 =====
 
-	# 軸ではない次元について0番目の次元をカウントアップ
-	countAry[otherindex[0]] += 1
-	# カウントが次元の長さを超えた場合, 配列の0番目を削除
-	otherindex.delete_at(0) if (countAry[otherindex[0]] >= dimInfo[otherindex[0]][:length])
-	# 配列が空になった場合
-	if otherindex.empty? then
-		return																    # 再帰を終了
-	else
-		makeTileForPlane(dimInfo, fp, countAry, xindex, yindex, otherindex, dirPath)	# 軸ではない次元をカウントアップしたもので再帰
-	end
+	return
 end
 
 
@@ -447,6 +470,6 @@ def makeTileForBaumkuchen(dimInfo, fp, countAry, xindex, yindex, otherindex, dir
 	if otherindex.empty? then
 		return																    # 再帰を終了
 	else
-		makeTileForPlane(dimInfo, fp, countAry, xindex, yindex, otherindex, dirPath)	# 軸ではない次元をカウントアップしたもので再帰
+		makeTileForPlane(dimInfo, fp, countAry, xindex, yindex, otherindex, dirPath, msg_header, msg)	# 軸ではない次元をカウントアップしたもので再帰
 	end
 end
