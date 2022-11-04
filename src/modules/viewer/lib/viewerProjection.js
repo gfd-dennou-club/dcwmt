@@ -1,8 +1,8 @@
 import * as olProj from "ol/proj";
-import {register} from "ol/proj/proj4";
 import * as olExtent from "ol/extent";
 import {View, Map} from "ol";
 import proj4 from "proj4";
+import {register} from "ol/proj/proj4";
 import { createXYZ } from "ol/tilegrid";
 
 
@@ -18,22 +18,8 @@ const viewerProjection = (viewer_ele, options) => {
     proj4.defs("ESRI:54008","+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs");
     register(proj4);
 
-    const proj3857 = getProjection('EPSG:3857');
-    const proj54032 = getProjection('ESRI:54032');
-    proj54032.setExtent([-21e6, -21e6, 21e6, 21e6]);
-    const proj54009 = getProjection('ESRI:54009');
-    proj54009.setExtent([-18e6, -9e6, 18e6, 9e6]);
-    const proj54008 = getProjection('ESRI:54008');
-    proj54008.setExtent([-18e6, -9e6, 18e6, 9e6]);
-
-    const projections = [
-        {name: "メルカトル図法", proj: proj3857},
-        {name: "正距方位図法", proj: proj54032},
-        {name: "モルワイデ図法", proj: proj54009},
-        {name: "サンソン図法", proj: proj54008},
-    ];
-
-    const projection = proj3857;
+    const projection = getProjection(options.projection.code);
+    projection.setExtent( projection.getExtent() || options.projection.extent );
 
     const tileGrid = createXYZ({
         extent: projection.getExtent(),
@@ -41,22 +27,20 @@ const viewerProjection = (viewer_ele, options) => {
         minZoom: options.minZoom,
     });
 
-    const view1 = new View({
+    const view = new View({
         projection: projection,
-        resolution: tileGrid.getResolution(options.minZoom),
+        resolution: tileGrid.getResolution(options.zoom || options.minZoom),
         resolutions: tileGrid.getResolutions(),
-        center: getCenter(projection.getExtent() || [0, 0, 0, 0]),
+        center: options.center || getCenter(projection.getExtent() || [0, 0, 0, 0]),
         multiWorld: true,
     });
 
     const map = new Map({
         target: viewer_ele,
-        view: view1
+        view: view
     });
 
-    map.projections = projections;
-
-    map.setView(view1);
+    map.setView(view);
 
     return map;
 };

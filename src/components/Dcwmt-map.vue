@@ -14,6 +14,8 @@ import viewer from '../modules/viewer/viewer.js';
 import layer from '../modules/layer/layer.js';
 import layerManager from '../modules/layerManager/layerManager.js';
 
+import { recreateView } from '../modules/viewer/lib/viewerProjection.js';
+
 export default {
     components: {
         layerselecter,
@@ -22,7 +24,7 @@ export default {
     data: () => ({  
         tone: [],
         vector: [],
-        projection: [ "メルカトル図法", "正距方位図法", "モルワイデ図法", "サンソン図法" ],
+        //projection: [ "メルカトル図法", "正距方位図法", "モルワイデ図法", "サンソン図法" ],
         layer_manager: undefined,
         viewer: undefined,
     }),
@@ -44,6 +46,22 @@ export default {
                 this.$store.commit("setLayersProps", value);
             }
         },
+        zoom: {
+            get: function () {
+                return this.$store.getters.zoom;
+            },
+            set: function ( value ) {
+                this.$store.commit("setZoom", value); 
+            }
+        },
+        center: {
+            get: function () {
+                return this.$store.getters.center;
+            },
+            set: function ( value ) {
+                this.$store.commit("setCenter", value); 
+            }
+        }
     },
     methods: {
         read_deinejs: function() {
@@ -73,7 +91,12 @@ export default {
         draw: async function() {
             // ビュワーの作成
             const wli = this.config.wmtsLibIdentifer;
-            const viewer_obj = new viewer({ wmtsLibIdentifer: wli });
+            const viewer_obj = new viewer({ 
+                wmtsLibIdentifer: wli,
+                projection: this.config.projection,
+                zoom: this.zoom,
+                center: this.center
+            });
             this.viewer = viewer_obj.getSuitableViewer();
 
             // レイヤマネージャーを作成
@@ -112,10 +135,15 @@ export default {
     watch: {
         config: {
             handler: function(){
+                if ( this.viewer.getView ) {
+                    const view = this.viewer.getView();
+                    this.zoom = view.getZoom();
+                    this.center = view.getCenter();
+                }
                 this.draw();
             },
             deep: true,
-        }
+        },
     }
 }
 </script>

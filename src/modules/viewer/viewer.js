@@ -38,7 +38,13 @@ const viewer = class{
     }
 
     _forProjection = (map_ele, maximumLevel) => {
-        const options = { maxZoom: maximumLevel, minZoom: 0 }; 
+        const options = { 
+            projection: this.options.projection, 
+            maxZoom: maximumLevel, 
+            minZoom: 0,
+            zoom: this.options.zoom,
+            center: this.options.center
+        }; 
         return viewerProjection(map_ele, options);
     }
 }

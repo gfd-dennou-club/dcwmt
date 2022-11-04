@@ -9,16 +9,24 @@ const state = {
     config: {
         clrindex: 3,
         wmtsLibIdentifer: new wmtsLibIdentifer("OpenLayers"),
+        projection: {
+            code: 'EPSG:3857',
+            extent: undefined,
+        },
         toneRange: { name: undefined, min: undefined, max: undefined },
     },
     layersprops: [],
     selectedlayer: undefined,
+    zoom: 0,
+    center: [0, 0],
 };
 
 const getters = {
     config: state => state.config,
     layersprops: state => state.layersprops,
     selectedlayer: state => state.selectedlayer,
+    zoom: state => state.zoom,
+    center: state => state.center,
 };
 
 const mutations = {
@@ -32,7 +40,13 @@ const mutations = {
     },
     setSelectedLayer: (state, selectedlayer) => {
         state.selectedlayer = selectedlayer;
-    }
+    },
+    setZoom: (state, zoom) => {
+        state.zoom = zoom;
+    },
+    setCenter: (state, center) => {
+        state.center = center; 
+    },
 }
 
 const actions = {
