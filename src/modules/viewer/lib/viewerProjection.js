@@ -3,8 +3,10 @@ import {register} from "ol/proj/proj4";
 import * as olExtent from "ol/extent";
 import {View, Map} from "ol";
 import proj4 from "proj4";
+import { createXYZ } from "ol/tilegrid";
 
-const viewerProjection = (viewer_ele) => {
+
+const viewerProjection = (viewer_ele, options) => {
     const getProjection = olProj.get;
     const getCenter = olExtent.getCenter;
 
@@ -18,7 +20,7 @@ const viewerProjection = (viewer_ele) => {
 
     const proj3857 = getProjection('EPSG:3857');
     const proj54032 = getProjection('ESRI:54032');
-    proj54032.setExtent([-20e6, -20e6, 20e6, 20e6]);
+    proj54032.setExtent([-21e6, -21e6, 21e6, 21e6]);
     const proj54009 = getProjection('ESRI:54009');
     proj54009.setExtent([-18e6, -9e6, 18e6, 9e6]);
     const proj54008 = getProjection('ESRI:54008');
@@ -33,17 +35,25 @@ const viewerProjection = (viewer_ele) => {
 
     const projection = proj3857;
 
+    const tileGrid = createXYZ({
+        extent: projection.getExtent(),
+        maxZoom: options.maxZoom,
+        minZoom: options.minZoom,
+    });
+
     const view1 = new View({
         projection: projection,
-        extent: projection.getExtent() || [0, 0, 0, 0],
+        resolution: tileGrid.getResolution(options.minZoom),
+        resolutions: tileGrid.getResolutions(),
         center: getCenter(projection.getExtent() || [0, 0, 0, 0]),
-        zoom: 0,
+        multiWorld: true,
     });
 
     const map = new Map({
         target: viewer_ele,
         view: view1
     });
+
     map.projections = projections;
 
     map.setView(view1);
