@@ -10,7 +10,7 @@
 // canvas:      数値データタイルを描画したcanvas(HTMLElement<canvas>)
 
 const toneDiagram = class{
-    constructor(colormap, range){
+    constructor(colormap, range, math_method){
         if ( !range ) {
             this.min = undefined;
             this.max = undefined;
@@ -18,7 +18,14 @@ const toneDiagram = class{
             this.min = range.min;
             this.max = range.max;
         }
+        this.means = {
+            mean: undefined,
+            mean_x: undefined,
+            mean_y: undefined,
+        };
+
         this.colormap = colormap;
+        this.math_method = math_method;
     }
 
     /**
@@ -27,11 +34,10 @@ const toneDiagram = class{
      * @param {HTMLElement<Image>} img データを取得したいhtml要素
      * @return {Object} 画像の色の明度および透過度, 最小値, 最大値
      */
-    bitmap2data = (imageData, size, isCalcMaxMin) => {
+    bitmap2data = (imageData, size) => {
         const rgba = imageData.data;
         let dataView = new DataView(new ArrayBuffer(32));
         const scalarData = new Array();
-        let zeroFrag = false;
 
         for(let i = 0; i < size.width * size.height; i++){
             const bias_rgb_index = i * 4
@@ -42,21 +48,45 @@ const toneDiagram = class{
             dataView.setUint32(0, red + green + blue);
             const buf = dataView.getFloat32(0);
             scalarData.push(buf);
-
-            if(isCalcMaxMin){
-                if(!zeroFrag && this.min == 0){
-                    zeroFrag = true;
-                }
-                if(this.min === undefined){
-                    this.min = this.max = buf;
-                }else{
-                    if(this.min > buf) this.min = buf;
-                    if(this.max < buf) this.max = buf;
-                }
-            }
         }
        
         return scalarData;
+    }
+
+    calcMeans = ( datas, size ) => {
+        let min = undefined, max = undefined;
+        let maean = undefined, mean_x = undefined, mean_y = undefined;
+       
+        let sum = 0;
+        let sum_x = new Array(size.height).fill(0);
+        let sum_y = new Array(size.width).fill(0);
+        for ( let y = 0; y < size.height; y++ ) {
+            const offset = y * size.width;
+            for ( let x = 0; x < size.width; x++ ) {
+                const data = datas[ x + offset ];
+                sum_x[y] += data;
+                if ( min === undefined ) {
+                    min = max = data;
+                } else {
+                    if ( min > data ) min = data;
+                    if ( max < data ) max = data;
+                }
+            }
+            sum += sum_x[y];
+        }
+
+        for ( let x = 0; x < size.width; x++ ) {
+            for ( let y = 0; y < size.height; y++ ) {
+                const offset = y * size.width;
+                sum_y[x] += datas[ x + offset ];
+            }
+        }
+        
+        return {
+            mean_x: sum_x.map( v => v / size.width ),
+            mean_y: sum_y.map( v => v / size.height ),
+            mean: sum / datas.length,
+        }
     }
 
     /**
@@ -65,12 +95,30 @@ const toneDiagram = class{
      * @param {HTMLElement<Canvas>} canvas ビットマップ
      * @return {ImageData} 再度色付けされたビットマップ画像のimageData 
      */
-    bitmap2tile = (canvas, isCalcMaxMin) => {
+    bitmap2tile = (canvas, isCalcMaxMinMean) => {
         const ctx = canvas.getContext("2d");
 
         let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const size = {width: canvas.width, height: canvas.height};
-        const datas = this.bitmap2data(imageData, size, isCalcMaxMin);
+        let datas = this.bitmap2data(imageData, size, isCalcMaxMinMean);
+        if ( isCalcMaxMinMean ) {
+            const means = this.calcMeans(datas, size);
+            this.means = { ...means };
+        }
+        datas = this.math_method( datas, size, this.means );
+        if ( isCalcMaxMinMean ) {
+            let min = undefined, max = undefined;
+            datas.forEach( data => {
+                if ( min == undefined ) {
+                    min = max = data;
+                } else {
+                    if ( min > data ) min = data;
+                    if ( max < data ) max = data;
+                }
+            });
+            this.min = this.min ? this.min : min;
+            this.max = this.max ? this.max : max;
+        }
         for(let i = 0; i < canvas.width * canvas.height; i++){
             const bias_rgb_index = i * 4;
             const rgb = this.data2color(datas[i]);
@@ -88,9 +136,10 @@ const toneDiagram = class{
      *
      * @param {HTMLElement<Canvas>} canvas ビットマップ
      */
-    bitmap2canvas = (canvas, isCalcMaxMin) => {
+    bitmap2canvas = (canvas, isCalcMaxMinMean) => {
         const ctx = canvas.getContext("2d");
-        const imageData = this.bitmap2tile(canvas, isCalcMaxMin);
+        const imageData = this.bitmap2tile(canvas, isCalcMaxMinMean);
+        if ( !imageData ) return;
         ctx.putImageData(imageData, 0, 0);
     }
 
@@ -119,7 +168,7 @@ const toneDiagram = class{
      * @param {String} url 画像のurl
      * @param {HTMLElement<Canvas>} canvas ビットマップ
      */
-    url2canvas = async (url, canvas, isCalcMaxMin = false) => {
+    url2canvas = async (url, canvas, isCalcMaxMinMean = false) => {
         const ctx = canvas.getContext("2d");
 
         const promise = new Promise(resolve => {    
@@ -129,7 +178,7 @@ const toneDiagram = class{
             
             img.onload = () => {
                 ctx.drawImage(img, 0, 0);
-                this.bitmap2canvas(canvas, isCalcMaxMin);
+                this.bitmap2canvas(canvas, isCalcMaxMinMean);
                 resolve();
             };
 
@@ -145,7 +194,7 @@ const toneDiagram = class{
         return ctx.getImageData(0, 0, canvas.width, canvas.height);
     }
 
-    calcMaxMin = async (url, size) => {
+    getMaxMin = async (url, size) => {
         if ( !this.min ) {
             const canvas = document.createElement("canvas");
             [canvas.width, canvas.height] = [size.X, size.Y];
@@ -153,6 +202,8 @@ const toneDiagram = class{
         }
         return { min: this.min, max: this.max };
     }
+
+
 
     isTone = (t=true, f=false) => { return t; }
 

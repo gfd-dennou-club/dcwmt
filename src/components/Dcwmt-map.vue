@@ -24,7 +24,6 @@ export default {
     data: () => ({  
         tone: [],
         vector: [],
-        //projection: [ "メルカトル図法", "正距方位図法", "モルワイデ図法", "サンソン図法" ],
         layer_manager: undefined,
         viewer: undefined,
     }),
@@ -112,7 +111,7 @@ export default {
                         size: layer_info.size,
                         level: { min: 0, max: layer_info.maximumLevel },
                         clrindex: this.config.clrindex,
-                        alpha: 1.0,
+                        math_method: this.config.mathmaticalMethod,
                     };
 
                     const toneRange = this.config.toneRange;
@@ -130,6 +129,7 @@ export default {
             let layersprops = this.layer_manager.setup(this.viewer);
             layersprops = await Promise.all(layersprops);
             this.layersprops = layersprops.filter( v => v );
+            console.log(this.layersprops)
         }
     },
     watch: {

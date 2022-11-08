@@ -14,6 +14,7 @@ const state = {
             extent: undefined,
         },
         toneRange: { name: undefined, min: undefined, max: undefined },
+        mathmaticalMethod: ( datas, size ) => datas,
     },
     layersprops: [],
     selectedlayer: undefined,
