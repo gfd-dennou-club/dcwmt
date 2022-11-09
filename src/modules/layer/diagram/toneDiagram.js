@@ -9,6 +9,9 @@
 // tile:        数値データタイル (ImageData)
 // canvas:      数値データタイルを描画したcanvas(HTMLElement<canvas>)
 
+import * as contour from "d3-contour";
+import { geoPath, geoIdentity } from "d3-geo";
+
 const toneDiagram = class{
     constructor(colormap, range){
         if ( !range ) {
@@ -71,6 +74,8 @@ const toneDiagram = class{
         let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const size = {width: canvas.width, height: canvas.height};
         const datas = this.bitmap2data(imageData, size, isCalcMaxMin);
+        this.datas = datas;       
+
         for(let i = 0; i < canvas.width * canvas.height; i++){
             const bias_rgb_index = i * 4;
             const rgb = this.data2color(datas[i]);
@@ -79,6 +84,7 @@ const toneDiagram = class{
             imageData.data[bias_rgb_index +2] = rgb.b;
             imageData.data[bias_rgb_index +3] = 255;
         }
+
 
         return imageData;
     }
@@ -91,7 +97,30 @@ const toneDiagram = class{
     bitmap2canvas = (canvas, isCalcMaxMin) => {
         const ctx = canvas.getContext("2d");
         const imageData = this.bitmap2tile(canvas, isCalcMaxMin);
+        ctx.lineWidth = 1.5;
+        ctx.lineJoin = "round";
+        
         ctx.putImageData(imageData, 0, 0);
+        const projection = geoIdentity().scale(1);
+        const path = geoPath(projection, ctx);
+        const split = 10;
+        const thresholds = new Array(split).fill(0).map( 
+            (_, i) => ( this.min + ((this.max - this.min) / split ) * i )
+        );
+        for ( const threshold of thresholds ) {
+            ctx.strokeStyle =`rgb(
+                0,
+                ${threshold % 256},
+                ${threshold % 128}
+            )`; 
+            ctx.beginPath();
+            const contours = contour.contours()
+                .size([canvas.width, canvas.height])
+            path( contours.contour(this.datas, threshold) );
+            ctx.stroke();
+            ctx.closePath();
+            debugger;
+        }
     }
 
     /**
