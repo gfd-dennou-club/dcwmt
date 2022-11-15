@@ -12,8 +12,8 @@
 const toneDiagram = class{
     constructor(colormap, range){
         if ( !range ) {
-            this.min = undefined;
-            this.max = undefined;
+            this.min = Infinity;
+            this.max = -Infinity;
         } else {
             this.min = range.min;
             this.max = range.max;
@@ -31,7 +31,6 @@ const toneDiagram = class{
         const rgba = imageData.data;
         let dataView = new DataView(new ArrayBuffer(32));
         const scalarData = new Array();
-        let zeroFrag = false;
 
         for(let i = 0; i < size.width * size.height; i++){
             const bias_rgb_index = i * 4
@@ -44,15 +43,8 @@ const toneDiagram = class{
             scalarData.push(buf);
 
             if(isCalcMaxMin){
-                if(!zeroFrag && this.min == 0){
-                    zeroFrag = true;
-                }
-                if(this.min === undefined){
-                    this.min = this.max = buf;
-                }else{
-                    if(this.min > buf) this.min = buf;
-                    if(this.max < buf) this.max = buf;
-                }
+                if(this.min > buf) this.min = buf;
+                if(this.max < buf) this.max = buf;
             }
         }
        
@@ -126,7 +118,7 @@ const toneDiagram = class{
             const img = new Image();
             img.crossOrigin = "anonymous";
             [img.width, img.height] = [canvas.width, canvas.height];
-            
+           
             img.onload = () => {
                 ctx.drawImage(img, 0, 0);
                 this.bitmap2canvas(canvas, isCalcMaxMin);
@@ -146,11 +138,9 @@ const toneDiagram = class{
     }
 
     calcMaxMin = async (url, size) => {
-        if ( !this.min ) {
-            const canvas = document.createElement("canvas");
-            [canvas.width, canvas.height] = [size.X, size.Y];
-            await this.url2canvas(url, canvas, true);
-        }
+        const canvas = document.createElement("canvas");
+        [canvas.width, canvas.height] = [size.X, size.Y];
+        await this.url2canvas(url, canvas, true);
         return { min: this.min, max: this.max };
     }
 

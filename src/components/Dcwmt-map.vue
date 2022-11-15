@@ -14,8 +14,6 @@ import viewer from '../modules/viewer/viewer.js';
 import layer from '../modules/layer/layer.js';
 import layerManager from '../modules/layerManager/layerManager.js';
 
-import { recreateView } from '../modules/viewer/lib/viewerProjection.js';
-
 export default {
     components: {
         layerselecter,
@@ -24,7 +22,6 @@ export default {
     data: () => ({  
         tone: [],
         vector: [],
-        //projection: [ "メルカトル図法", "正距方位図法", "モルワイデ図法", "サンソン図法" ],
         layer_manager: undefined,
         viewer: undefined,
     }),
@@ -68,27 +65,30 @@ export default {
             const root = define.ROOT;
 
             define.TONE.forEach((pq) => {
-                const url_ary = pq.FIXED.map(fixed => root.concat(`/${pq.NAME}/${fixed}`));
+                const url_ary = root.concat(`/${pq.NAME}`);
                 this.tone.push({
                     name: pq.NAME,
-                    url: url_ary,
+                    url: new Array(url_ary),
+                    fixed: pq.FIXED,
                     size: pq.SIZE,
-                    maximumLevel: pq.MAXIMAMLEVEL,
+                    maximumLevel: pq.MAXIMUMLEVEL,
                 });
             });
 
             define.VECTOR.forEach((pq) => {
                 const pq_name = pq.NAME[0].concat("-", pq.NAME[1]);
-                const urls_ary = pq.NAME.map(name => root.concat(`/${name}/${pq.FIXED[0]}`));
+                const urls_ary = pq.NAME.map( name => root.concat(`/${name}`) );
                 this.vector.push({
                     name: pq_name,
                     url: urls_ary,
+                    fixed: pq.FIXED,
                     size: pq.SIZE,
                     maximumLevel: pq.MAXIMUMLEVEL,
                 });
             });
         },
         draw: async function() {
+
             // ビュワーの作成
             const wli = this.config.wmtsLibIdentifer;
             const viewer_obj = new viewer({ 
@@ -106,13 +106,15 @@ export default {
             const layer_types = [this.tone, this.vector];
             layer_types.forEach(layer_type => {
                 layer_type.forEach(layer_info => {
+                    
+                    const fixed = layer_info.fixed.find( v => v === this.config.fixedDim ) || layer_info.fixed[0];
+                    const url = layer_info.url.map( v => v.concat(`/${fixed}`) );
                     const layer_option = {
                         name: layer_info.name,
-                        url: layer_info.url,
+                        url: url,
                         size: layer_info.size,
                         level: { min: 0, max: layer_info.maximumLevel },
                         clrindex: this.config.clrindex,
-                        alpha: 1.0,
                     };
 
                     const toneRange = this.config.toneRange;

@@ -14,6 +14,7 @@ const state = {
             extent: undefined,
         },
         toneRange: { name: undefined, min: undefined, max: undefined },
+        fixedDim: 0, 
     },
     layersprops: [],
     selectedlayer: undefined,

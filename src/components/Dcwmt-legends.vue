@@ -2,7 +2,12 @@
     <div>
         <v-row no-gutters>
             <v-col cols="12" align="center">
-                <colorbar width="500" height="50" :clrindex="clrindex" />
+                <colorbar 
+                    width="500" 
+                    height="50" 
+                    :clrindex="clrindex" 
+                    style="width: 100%; height=100;" 
+                />
             </v-col>
         </v-row>
         <v-row no-gutters>

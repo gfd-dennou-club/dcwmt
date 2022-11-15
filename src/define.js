@@ -3,7 +3,7 @@ const DEFINE = {
 	TONE: [
 		{
 			NAME: "Ps",
-			FIXED: ["time=32112"],
+			FIXED: ["time=32112.0", "time=32113.0", "time=32114.0", "time=32115.0", "time=32116.0", "time=32117.0", "time=32118.0", "time=32119.0", "time=32120.0"],
 			SIZE: {X: 256, Y: 256},
 			MAXIMUMLEVEL: 2
 		},
@@ -33,12 +33,12 @@ const DEFINE = {
 		// 	SIZE: {X: 320, Y: 320},
 		// 	MAXIMUMLEVEL: 1,
 		// },
-		{
-			NAME: ["U", "V"],
-			FIXED: ["time=32112.0"],
-			SIZE: {X: 256, Y:256},
-			MAXIMUMLEVEL: 2,
-		}
+		//{
+		//	NAME: ["U", "V"],
+		//	FIXED: ["time=32112.0", "time=32113.0"],
+		//	SIZE: {X: 256, Y:256},
+		//	MAXIMUMLEVEL: 2,
+		//}
 	],
 };
 

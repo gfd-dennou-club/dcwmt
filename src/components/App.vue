@@ -8,7 +8,7 @@
             <dcwmt_map />
         </v-main>
         <v-footer app>
-            <dcwmt_legend />
+            <dcwmt_footer />
         </v-footer>
     </v-app>
 </template>
@@ -18,6 +18,7 @@ import dcwmt_map from './Dcwmt-map.vue';
 import dcwmt_legend from './Dcwmt-legends.vue';
 import dcwmt_navigationdrawer from './Dcwmt-navigationdrawer.vue';
 import tab from './Tab.vue';
+import dcwmt_footer from './Dcwmt-footer.vue';
 
 export default {
     components: {
@@ -25,6 +26,7 @@ export default {
         dcwmt_legend,
         dcwmt_navigationdrawer,
         tab,
+        dcwmt_footer,
     },
     data: () => ({
         canDraw: false,
