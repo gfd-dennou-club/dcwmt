@@ -31,10 +31,13 @@
 </template>
 
 <script>
-import define from "../define.js";
+import define from '../define';
+
 export default {
     data: () => ({
-        variables: []
+        variables: [],
+        intervalID: null,
+        sec_per_frame: 2,
     }),
     computed: {
         fixedDim: {
@@ -47,13 +50,29 @@ export default {
         }
     },
     methods: {
-        replay: function ( index ) {
+        replay: async function ( index ) {
             this.variables[index].clicked = !this.variables[index].clicked;
 
-            
+            if ( this.variables[index].clicked ) {
+                const delay = this.sec_per_frame * 1000;
+                this.intervalID = setInterval( this.animation, delay, index );
+            } else {
+                clearInterval(this.intervalID);
+                this.intervalID = null;
+            }
         },
         changeURL: function( value ) {
             this.fixedDim = value;
+        },
+        animation: function( index ) {
+            this.variables[index].value += 1;
+            const variable = this.variables[index];
+            if ( variable.value >= variable.max ) {
+                this.variables[index].value = 0;   
+            }
+
+            const value = `${variable.title}=${variable.tick_labels[variable.value]}`;
+            this.changeURL(value);
         }
     },
     created: function(){
@@ -78,7 +97,7 @@ export default {
                 this.variables[purpose_index]["tick_labels"].push(split[1]);
             }
        });
-    }
+    },
 }
 </script>
 

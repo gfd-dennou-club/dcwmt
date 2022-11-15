@@ -37,7 +37,6 @@ const layer = class{
     getProps = () => {
         if ( this.maxmin ){
             const maxmin = this.maxmin;
-            console.log(maxmin)
             return { name: this.options.name, max: maxmin.max, min: maxmin.min };
         } else {
             return undefined;

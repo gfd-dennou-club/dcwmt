@@ -55,7 +55,6 @@ export default {
     },
     mounted: function() {
         this.ctx = this.$el.getContext("2d");
-        console.log(this.$el)
         this.draw();
     },
     watch: {

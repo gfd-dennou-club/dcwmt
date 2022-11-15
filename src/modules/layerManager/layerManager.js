@@ -4,9 +4,6 @@ import layerManager3D from "./lib/layerManager3D";
 import layerManagerCartesian from "./lib/layerManagerCartesian";
 import layerManagerProjection from "./lib/layerManagerProjection";
 
-import layer from '../layer/layer';
-import { contourDiagram } from '../layer/diagram/diagram';
-
 const layerManager = class{
     constructor(wmtsLibIdentifer, viewer){
         this.wmtsLibIdentifer = wmtsLibIdentifer;
@@ -46,7 +43,6 @@ const layerManager = class{
 
     setup = (viewer) => {
         this.layer_manager.setup(viewer);
-        console.log(this.layer_props)
         return this.layer_props;
     }
 
