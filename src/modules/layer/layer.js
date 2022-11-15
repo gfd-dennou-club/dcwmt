@@ -15,27 +15,29 @@ const layer = class{
     // };
     constructor(options){
         this.options = options;
+    }
 
+    create = async (wmtsLibIdentifer) => {
+        const options = this.options;
         const clrmap = new colormap(options.clrindex);
         if ( !options.diagram ) {
             this.diagram = this._getDiagram(clrmap, options.range);
             if ( this.diagram.isTone() ) {
                 const url = options.url[0].concat("/0/0/0.png");
                 const size = options.size;
-                this.maxmin = this.diagram.calcMaxMin(url, size);
+                this.maxmin = await this.diagram.calcMaxMin(url, size);
             }
         } else {
             this.diagram = options.diagram;
         }
-    }
-
-    create = (wmtsLibIdentifer) => {
+        
         return this._getLayerWithSuitableLib(wmtsLibIdentifer, this.diagram);
     }
 
-    getProps = async () => {
+    getProps = () => {
         if ( this.maxmin ){
-            const maxmin = await this.maxmin;
+            const maxmin = this.maxmin;
+            console.log(maxmin)
             return { name: this.options.name, max: maxmin.max, min: maxmin.min };
         } else {
             return undefined;

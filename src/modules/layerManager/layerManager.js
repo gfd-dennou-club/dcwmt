@@ -20,30 +20,20 @@ const layerManager = class{
         this.layer_props = [];
     }
 
-    addBaseLayer = (layer, name) => {
+    addBaseLayer = async (layer, name) => {
+        const baselayer = await layer.create(this.wmtsLibIdentifer);
+        
         const layer_props = layer.getProps();
         if ( !this.layer_props.includes(layer_props) ) {
             this.layer_props.push(layer_props);
         }
 
-        const baselayer = layer.create(this.wmtsLibIdentifer);
         this.layer_manager.addBaseLayer(baselayer, name);
     }
 
-    addLayer = (_layer, name, alpha = 1.0, show = true) => {
-        const overlaylayer = _layer.create(this.wmtsLibIdentifer); 
+    addLayer = async (_layer, name, alpha = 1.0, show = true) => {
+        const overlaylayer = await _layer.create(this.wmtsLibIdentifer); 
         this.layer_manager.addLayer(overlaylayer, name, alpha, show);
-
-        // if ( _layer.diagram.isTone() ){
-        //     const options = { 
-        //         ..._layer.options, 
-        //         name: _layer.options.name.concat("_contour"),
-        //         diagram: new contourDiagram() 
-        //     };
-        //     _layer = new layer(options);
-        //     const contourlayer = _layer.create(this.wmtsLibIdentifer);
-        //     this.layer_manager.addLayer(contourlayer, options.name, alpha, show);
-        // }
     }
 
     getLayers = () => {
@@ -56,6 +46,7 @@ const layerManager = class{
 
     setup = (viewer) => {
         this.layer_manager.setup(viewer);
+        console.log(this.layer_props)
         return this.layer_props;
     }
 

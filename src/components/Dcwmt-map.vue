@@ -103,17 +103,15 @@ export default {
             this.layer_manager = new layerManager(wli, this.viewer);
 
             // レイヤの作成とマネージャへの追加
-            const layer_types = [this.tone, this.vector];
-            layer_types.forEach(layer_type => {
-                layer_type.forEach(layer_info => {
-                    
-                    const fixed = layer_info.fixed.find( v => v === this.config.fixedDim ) || layer_info.fixed[0];
-                    const url = layer_info.url.map( v => v.concat(`/${fixed}`) );
+            for ( const layer_types of [this.tone, this.vector] ) {
+                for ( const layer_type of layer_types ) {
+                    const fixed = layer_type.fixed.find( v => v === this.config.fixedDim ) || layer_type.fixed[0];
+                    const url = layer_type.url.map( v => v.concat(`/${fixed}`) );
                     const layer_option = {
-                        name: layer_info.name,
+                        name: layer_type.name,
                         url: url,
-                        size: layer_info.size,
-                        level: { min: 0, max: layer_info.maximumLevel },
+                        size: layer_type.size,
+                        level: { min: 0, max: layer_type.maximumLevel },
                         clrindex: this.config.clrindex,
                     };
 
@@ -123,10 +121,11 @@ export default {
                     }
 
                     const layer_obj = new layer(layer_option);
-                    this.layer_manager.addBaseLayer(layer_obj, layer_info.name);
-                    this.layer_manager.addLayer(layer_obj, layer_info.name);
-                })
-            });
+                  
+                    await this.layer_manager.addBaseLayer(layer_obj, layer_type.name);
+                    await this.layer_manager.addLayer(layer_obj, layer_type.name);
+                }
+            }
 
             // レイヤーマネージャのセットアップ
             let layersprops = this.layer_manager.setup(this.viewer);
