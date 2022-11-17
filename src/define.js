@@ -3,7 +3,7 @@ const DEFINE = {
 	TONE: [
 		{
 			NAME: "Ps",
-			FIXED: ["time=32112"],
+			FIXED: ["time=32112.0"],
 			SIZE: {X: 256, Y: 256},
 			MAXIMUMLEVEL: 2
 		},

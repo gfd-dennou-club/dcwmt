@@ -97,30 +97,30 @@ const toneDiagram = class{
     bitmap2canvas = (canvas, isCalcMaxMin) => {
         const ctx = canvas.getContext("2d");
         const imageData = this.bitmap2tile(canvas, isCalcMaxMin);
-        ctx.lineWidth = 1.5;
-        ctx.lineJoin = "round";
-        
         ctx.putImageData(imageData, 0, 0);
-        const projection = geoIdentity().scale(1);
-        const path = geoPath(projection, ctx);
-        const split = 10;
-        const thresholds = new Array(split).fill(0).map( 
-            (_, i) => ( this.min + ((this.max - this.min) / split ) * i )
-        );
-        for ( const threshold of thresholds ) {
-            ctx.strokeStyle =`rgb(
-                0,
-                ${threshold % 256},
-                ${threshold % 128}
-            )`; 
-            ctx.beginPath();
-            const contours = contour.contours()
-                .size([canvas.width, canvas.height])
-            path( contours.contour(this.datas, threshold) );
-            ctx.stroke();
-            ctx.closePath();
-            debugger;
-        }
+        
+       // ctx.lineWidth = 1.5;
+       // ctx.lineJoin = "round";
+       // 
+       // const projection = geoIdentity().scale(1);
+       // const path = geoPath(projection, ctx);
+       // const split = 10;
+       // const thresholds = new Array(split).fill(0).map( 
+       //     (_, i) => ( this.min + ((this.max - this.min) / split ) * i )
+       // );
+       // for ( const threshold of thresholds ) {
+       //     ctx.strokeStyle =`rgb(
+       //         0,
+       //         ${threshold % 256},
+       //         ${threshold % 128}
+       //     )`; 
+       //     ctx.beginPath();
+       //     const contours = contour.contours()
+       //         .size([canvas.width, canvas.height])
+       //     path( contours.contour(this.datas, threshold) );
+       //     ctx.stroke();
+       //     ctx.closePath();
+       // }
     }
 
     /**
