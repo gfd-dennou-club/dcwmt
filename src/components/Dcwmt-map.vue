@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import layerselecter from './Layerselecter.vue';
+import layerselecter from './LayerSelector/Layerselecter.vue';
 import ruler from './Dcwmt-ruler.vue';
 
 import define from '../define.js';

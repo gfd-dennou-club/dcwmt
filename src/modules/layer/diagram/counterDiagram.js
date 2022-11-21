@@ -1,4 +1,10 @@
+import * as contour from "d3-contour";
+import { geoPath, geoIdentity } from "d3-geo";
+
 const contourDiagram = class {
+    constructor(options) {
+        this.options = options;
+    }
     
     url2tile = async ( url, canvas ) => {
         canvas = await this.url2canvas( url, canvas );
@@ -16,7 +22,7 @@ const contourDiagram = class {
 
             img.onload = () => {
                 ctx.drawImage(img, 0, 0);
-                this.canvas2bitmap(canvas);
+                this.bitmap2tile(canvas);
                 resolve();
             }
 
@@ -27,52 +33,33 @@ const contourDiagram = class {
         return canvas;
     }
 
-    canvas2bitmap = ( canvas ) => {
-        const ctx = canvas.getContext("2d");
-        const imageData = this.bitmap2tile(canvas);
-        ctx.putImageData(imageData, 0, 0);
-    }
-
     bitmap2tile = ( canvas ) => {
         const ctx = canvas.getContext("2d");
-
+        
         let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const size = { width: canvas.width, height: canvas.height };
-        let datas = this.bitmap2data( imageData, size );
-        const meanFunc = (sum, prev, _, {length}) => sum + prev / length;
-        const mean = datas.reduce(meanFunc);
-        datas = datas.map( data => data - mean );
+        const datas = this.bitmap2data( imageData, size );
 
-        const onRightEdge = i => ( i + 1 )%size.width == 0;
-        const onBottomEdge = i => (i / size.height ) >= ( size.height - 1 );
+        const projection = geoIdentity().scale(1);
+        const path = geoPath(projection, ctx);
+        const split = 10;
+        const min = this.options.min;
+        const max = this.options.max;
+        const thresholds = new Array(split).fill(0).map((_, i) => {
+            return min + ( (max - min) / split ) * i;
+        });
 
-        const center = i => datas[i];
-        const right = i => datas[i+1];
-        const bottom = i => datas[i+size.width];
-        const rightbottom = i => datas[i+size.width + 1];
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.lineWidth = 1.5;
 
-        for (let i = 0; i < size.width * size.height; i++ ) {
-            const bias_rgb_index = i * 4;
-
-            
-            if ( onRightEdge(i) || onBottomEdge(i) ) {
-                continue;
-            }
-
-            if ( 
-                ( center(i) !== right(i)  ) ||
-                ( center(i) !== bottom(i) ) ||
-                ( center(i) !== rightbottom(i) )
-               )
-            {
-                imageData.data[ bias_rgb_index     ] = 0;
-                imageData.data[ bias_rgb_index + 1 ] = 0;
-                imageData.data[ bias_rgb_index + 2 ] = 0;
-                imageData.data[ bias_rgb_index + 3 ] = 255;
-            }
+        for ( const threshold of thresholds ) {
+            ctx.beginPath();
+            const contours = contour.contours().size([size.width, size.height]);
+            const object = contours.contour(datas, threshold);
+            path( object );
+            ctx.stroke();
+            ctx.closePath();
         }
-
-        return imageData;
     }
 
     bitmap2data = ( imageData, size ) => {

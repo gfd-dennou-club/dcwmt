@@ -4,6 +4,9 @@ import layerManager3D from "./lib/layerManager3D";
 import layerManagerCartesian from "./lib/layerManagerCartesian";
 import layerManagerProjection from "./lib/layerManagerProjection";
 
+import layer from "../layer/layer"
+import { contourDiagram } from "../layer/diagram/diagram";
+
 const layerManager = class{
     constructor(wmtsLibIdentifer, viewer){
         this.wmtsLibIdentifer = wmtsLibIdentifer;
@@ -31,6 +34,22 @@ const layerManager = class{
     addLayer = async (_layer, name, alpha = 1.0, show = true) => {
         const overlaylayer = await _layer.create(this.wmtsLibIdentifer); 
         this.layer_manager.addLayer(overlaylayer, name, alpha, show);
+
+        if ( _layer.diagram.isTone() ){
+            const diagram = new contourDiagram({
+                min: _layer.diagram.min,
+                max: _layer.diagram.max,
+            });
+
+            const options = { 
+                ..._layer.options, 
+                name: _layer.options.name.concat("_contour"),
+                diagram: diagram, 
+            };
+            _layer = new layer(options);
+            const contourlayer = await _layer.create(this.wmtsLibIdentifer);
+            this.layer_manager.addLayer(contourlayer, options.name, alpha, show);
+        }
     }
 
     getLayers = () => {
