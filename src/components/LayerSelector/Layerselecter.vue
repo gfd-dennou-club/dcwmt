@@ -16,64 +16,7 @@
                     v-on="on"
                 />
             </template>
-
             <panel :layer_manager="layer_manager" />
-            <!--
-            <div id=toolbar>
-                <table> 
-                    <tbody>
-                        <tr 
-                            v-for="(layer, index) in layers"
-                            :key="index"
-                        >
-                            <td>
-                                <input 
-                                    type="checkbox" 
-                                    :checked="layer.show" 
-                                    @click="toggleDisplay(layer)"
-                                >
-                            </td>
-                            <td>
-                                <span v-if="!layer.isBaselayer"> 
-                                    {{ layer.name }} 
-                                </span>
-                                <select 
-                                    v-if="layer.isBaselayer"
-                                    v-model="selectedlayer"
-                                >
-                                    <option 
-                                        v-for="(baselayer, index) in baselayers"
-                                        :key="index"
-                                    >
-                                        {{ baselayer.name }}
-                                    </option>
-                                </select>
-                            </td>
-                            <td>
-                                <input 
-                                    type="range" 
-                                    min="0" 
-                                    max="1" 
-                                    step="0.1" 
-                                    :value="layer.alpha" 
-                                    @change="changeLayerAlpha(layer, $event.target.value)"
-                                >
-                            </td>
-                            <td>
-                                <button type="button" @click="raise(layer)" v-show="canRaise(index)">
-                                    ▲
-                                </button>
-                            </td>
-                            <td>
-                                <button type="button" @click="lower(layer)" v-show="canLower(index)">
-                                    ▼
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            -->
         </v-dialog>
     </div>
 </template>
@@ -89,78 +32,6 @@ export default {
     data: () => ({
         fab: false,
     }),
-    // methods: {
-    //     raise: function ( layer ) {
-    //         this.layer_manager.raise(layer);
-    //     },
-    //     lower: function ( layer ) {
-    //         this.layer_manager.lower(layer);
-    //     },
-    //     isSelectablelayer: function ( layer ) {
-    //         return layer.isBaselayer;
-    //     },
-    //     canRaise: function ( layerindex ) {
-    //         return layerindex > 0;
-    //     },
-    //     canLower: function ( layerindex ) {
-    //         return layerindex >= 0 && layerindex < this.layers.length - 1;
-    //     },
-    //     toggleDisplay: function ( layer ) { 
-    //         const isLayer = _layer => layer === _layer;
-    //         const activelayer = this.layers.find(isLayer);
-    //         activelayer.setShow(!activelayer.show);
-    //         this.layer_manager.update();
-    //     },
-    //     changeLayerAlpha: function ( layer, alpha ) {
-    //         const isLayer = _layer => layer === _layer;
-    //         const activelayer = this.layers.find(isLayer);
-    //         alpha = parseFloat(alpha);
-    //         activelayer.setAlpha(alpha);
-    //         this.layer_manager.update();
-    //     }
-    // },
-    // watch: {
-    //     selectedlayer: function ( baselayer ) {
-    //         const isBaseLayer = layer => layer.name === baselayer;
-    //         baselayer = this.baselayers.find(isBaseLayer);
-
-    //         const isActiveLayer = layer => layer.isBaselayer;
-    //         const activelayerIndex = this.layers.findIndex(isActiveLayer);
-    //         const activelayer = this.layers[activelayerIndex];
-    //         
-    //         const show = activelayer.show;
-    //         const alpha = activelayer.alpha;
-    //         this.layer_manager.remove(activelayer);
-    //         this.layer_manager.add(baselayer, activelayerIndex);
-    //         baselayer.show = show;
-    //         baselayer.alpha = alpha;
-    //         this.layer_manager.update();
-    //     },
-    // },
-    // computed: {
-    //     baselayers: function () {
-    //         if ( !this.layer_manager ) {
-    //             return [];
-    //         } else {
-    //             return this.layer_manager.getBaseLayers();
-    //         }
-    //     },
-    //     layers: function () {
-    //         if ( !this.layer_manager ){
-    //             return [];
-    //         } else {
-    //             return this.layer_manager.getLayers();
-    //         }
-    //     },
-    //     selectedlayer: {
-    //         get: function () {
-    //             return this.$store.getters.selectedlayer;
-    //         },
-    //         set: function ( value ) {
-    //             this.$store.commit("setSelectedLayer", value);
-    //         }
-    //     }
-    // }
 }
 </script>
 
