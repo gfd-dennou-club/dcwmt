@@ -71,6 +71,8 @@ const toneDiagram = class{
         let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const size = {width: canvas.width, height: canvas.height};
         const datas = this.bitmap2data(imageData, size, isCalcMaxMin);
+        this.datas = datas;       
+
         for(let i = 0; i < canvas.width * canvas.height; i++){
             const bias_rgb_index = i * 4;
             const rgb = this.data2color(datas[i]);
@@ -79,6 +81,7 @@ const toneDiagram = class{
             imageData.data[bias_rgb_index +2] = rgb.b;
             imageData.data[bias_rgb_index +3] = 255;
         }
+
 
         return imageData;
     }

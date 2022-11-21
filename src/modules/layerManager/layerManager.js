@@ -34,16 +34,22 @@ const layerManager = class{
         const overlaylayer = _layer.create(this.wmtsLibIdentifer); 
         this.layer_manager.addLayer(overlaylayer, name, alpha, show);
 
-        // if ( _layer.diagram.isTone() ){
-        //     const options = { 
-        //         ..._layer.options, 
-        //         name: _layer.options.name.concat("_contour"),
-        //         diagram: new contourDiagram() 
-        //     };
-        //     _layer = new layer(options);
-        //     const contourlayer = _layer.create(this.wmtsLibIdentifer);
-        //     this.layer_manager.addLayer(contourlayer, options.name, alpha, show);
-        // }
+        if ( _layer.diagram.isTone() ){
+            debugger;
+            const diagram = new contourDiagram({
+                min: _layer.diagram.min,
+                max: _layer.diagram.max,
+            });
+
+            const options = { 
+                ..._layer.options, 
+                name: _layer.options.name.concat("_contour"),
+                diagram: diagram, 
+            };
+            _layer = new layer(options);
+            const contourlayer = _layer.create(this.wmtsLibIdentifer);
+            this.layer_manager.addLayer(contourlayer, options.name, alpha, show);
+        }
     }
 
     getLayers = () => {
