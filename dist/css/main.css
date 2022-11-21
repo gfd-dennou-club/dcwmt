@@ -1,20 +1,38 @@
-/*!********************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/lib/index.js??vue-loader-options!./src/components/Layerselecter.vue?vue&type=style&index=0&id=f80c440c&scoped=true&lang=css& ***!
-  \********************************************************************************************************************************************************************************************************************************************************************************************************/
-.v-speed-dial[data-v-f80c440c] {
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/lib/index.js??vue-loader-options!./src/components/LayerSelector/panel.vue?vue&type=style&index=0&id=1508a9f6&scoped=true&lang=css& ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************/
+.v-card[data-v-1508a9f6] {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-radius: 4px;
+}
+
+/*!**********************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/lib/index.js??vue-loader-options!./src/components/LayerSelector/Layerselecter.vue?vue&type=style&index=0&id=71cde3db&scoped=true&lang=css& ***!
+  \**********************************************************************************************************************************************************************************************************************************************************************************************************************/
+.fab-button[data-v-71cde3db] {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 2;
+}
+.v-dialog[data-v-71cde3db] {
+  position: absolute;
+  left: 0;
+}
+.v-speed-dial[data-v-71cde3db] {
   position: absolute !important;
 }
-#toolbar[data-v-f80c440c] {
+#toolbar[data-v-71cde3db] {
   background: rgba(255, 255, 255, 0.8);
   padding: 4px;
   border-radius: 4px;
 }
-#toolbar input[data-v-f80c440c] {
+#toolbar input[data-v-71cde3db] {
   vertical-align: middle;
   padding-top: 2px;
   padding-bottom: 2px;
 }
-#toolbar table tr[data-v-f80c440c] {
+#toolbar table tr[data-v-71cde3db] {
   transform: translateY(0);
   transition: transform 0.4s ease-out;
 }
@@ -33,7 +51,7 @@ div#vertical[data-v-771ae728] {
   /* for test */
   top: 0;
 }
-div#horizonal[data-v-771ae728] {
+div#holizonal[data-v-771ae728] {
   background-color: yellow;
   /* for test */
   left: 0;

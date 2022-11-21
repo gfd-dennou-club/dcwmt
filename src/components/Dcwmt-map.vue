@@ -6,15 +6,13 @@
 </template>
 
 <script>
-import layerselecter from './Layerselecter.vue';
+import layerselecter from './LayerSelector/Layerselecter.vue';
 import ruler from './Dcwmt-ruler.vue';
 
 import define from '../define.js';
 import viewer from '../modules/viewer/viewer.js';
 import layer from '../modules/layer/layer.js';
 import layerManager from '../modules/layerManager/layerManager.js';
-
-import { recreateView } from '../modules/viewer/lib/viewerProjection.js';
 
 export default {
     components: {
@@ -24,7 +22,6 @@ export default {
     data: () => ({  
         tone: [],
         vector: [],
-        //projection: [ "メルカトル図法", "正距方位図法", "モルワイデ図法", "サンソン図法" ],
         layer_manager: undefined,
         viewer: undefined,
     }),
@@ -73,7 +70,7 @@ export default {
                     name: pq.NAME,
                     url: url_ary,
                     size: pq.SIZE,
-                    maximumLevel: pq.MAXIMAMLEVEL,
+                    maximumLevel: pq.MAXIMUMLEVEL,
                 });
             });
 

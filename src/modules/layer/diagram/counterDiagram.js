@@ -53,15 +53,10 @@ const contourDiagram = class {
         ctx.lineWidth = 1.5;
 
         for ( const threshold of thresholds ) {
-            // ctx.strokeStyle = `rgb(
-            //     0,
-            //     ${threshold % 256},
-            //     ${threshold % 128}
-            // )`;
-
             ctx.beginPath();
             const contours = contour.contours().size([size.width, size.height]);
-            path( contours.contour(datas, threshold) );
+            const object = contours.contour(datas, threshold);
+            path( object );
             ctx.stroke();
             ctx.closePath();
         }

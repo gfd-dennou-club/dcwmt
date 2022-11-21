@@ -65,6 +65,7 @@ const layerManagerProjection = class {
 
     raise = (layer) => {
         const ary = this.original_layer.getLayers();
+        console.log(ary)
         ary.getArray().some( (_layer, index) => {
             if ( index > 0 && _layer === layer) {
                 ary.remove(layer);
