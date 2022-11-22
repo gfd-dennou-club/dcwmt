@@ -83,42 +83,42 @@ export default {
             this.changeURL();
         },
         update: function() {
-            console.log(this.layers.map( v => v.name ))
-            if ( this.layers.length < this.length ) {
-                return;
-            }
+            // if ( this.layers.length < this.length ) {
+            //     return;
+            // }
 
-            this.length = this.layers.length;
+            // this.length = this.layers.length;
 
-            let fixed = define.TONE[0].FIXED || define.VECTOR[0].FIXED;
-            if ( this.layers.length == 0 ) {}
-            else {
-                const top = this.layers.length - 1;
-                const diagrams = this.layers[top].options.diagram.isTone()
-                                    ? define.TONE : define.VECTOR;
-                for ( const diagram of diagrams ) {
-                    let dname = "";
-                    if ( typeof diagram.NAME == "object") {
-                        diagram.NAME.forEach( v => {
-                            dname = dname.concat(`${v}-`);
-                        });
-                        dname = dname.slice(0, -1);
-                    } else {
-                        dname = diagram.NAME;
-                    }
+            // let fixed = define.TONE[0].FIXED || define.VECTOR[0].FIXED;
+            let fixed = define.VECTOR[0].FIXED;
+            // if ( this.layers.length == 0 ) {}
+            // else {
+            //     const top = this.layers.length - 1;
+            //     const diagrams = this.layers[top].options.diagram.isTone()
+            //                         ? define.TONE : define.VECTOR;
+            //     for ( const diagram of diagrams ) {
+            //         let dname = "";
+            //         if ( typeof diagram.NAME == "object") {
+            //             diagram.NAME.forEach( v => {
+            //                 dname = dname.concat(`${v}-`);
+            //             });
+            //             dname = dname.slice(0, -1);
+            //         } else {
+            //             dname = diagram.NAME;
+            //         }
 
-                    const lname = this.layers[top].options.name.split("_")[0];
-                    if ( dname == lname ) {
-                        fixed = diagram.FIXED;
-                        if ( this.name == lname ) { return; }
-                        this.name = lname;
-                        break;
-                    }
-                }
-            }
+            //         const lname = this.layers[top].options.name.split("_")[0];
+            //         if ( dname == lname ) {
+            //             fixed = diagram.FIXED;
+            //             if ( this.name == lname ) { return; }
+            //             this.name = lname;
+            //             break;
+            //         }
+            //     }
+            // }
 
 
-           this.variables.splice(0) 
+            // this.variables.splice(0) 
 
             const dims = fixed.map( v => v.split('/') ).flat();
             dims.forEach( dim => {

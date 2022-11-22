@@ -65,26 +65,23 @@ const layerManager = class{
     setup = (viewer) => {
         this.layer_manager.setup(viewer);
 
-        if( this.layers.length != 0 ) {
-            const layers = this.layer_manager.getLayers();
-            for ( let i = 0; i < layers.length; i++ ) {
-                this.layer_manager.remove(layer[i]);
-            }
-            console.log(this.layer_manager.getLayers())
-            for ( let i = 0 ; i < layers.length; i++ ) {
-                for ( let j = 0; j < layers.length; j++) {
-                    if ( 
-                        ( this.layers[i].name == layers[j].name ) && 
-                        ( this.layers[i].isBaselayer == layers[j].isBaselayer ) 
-                    ){
-                        this.layer_manager.add(layers[j], 0);
-                        break;
-                    } 
-                }
-            }
-            console.log(original_layer)
-            console.log(this.layer_manager.getLayers().map(v=>v.name))
-        }
+        // if( this.layers.length != 0 ) {
+        //     const layers = this.layer_manager.getLayers();
+        //     for ( let i = 0; i < layers.length; i++ ) {
+        //         this.layer_manager.remove(layer[i]);
+        //     }
+        //     for ( let i = 0 ; i < layers.length; i++ ) {
+        //         for ( let j = 0; j < layers.length; j++) {
+        //             if ( 
+        //                 ( this.layers[i].name == layers[j].name ) && 
+        //                 ( this.layers[i].isBaselayer == layers[j].isBaselayer ) 
+        //             ){
+        //                 this.layer_manager.add(layers[j], 0);
+        //                 break;
+        //             } 
+        //         }
+        //     }
+        // }
 
         
         return this.layer_props;

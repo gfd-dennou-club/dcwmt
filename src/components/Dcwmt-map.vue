@@ -108,7 +108,7 @@ export default {
 
             // レイヤマネージャーを作成
             const layers = this.$store.getters.layers;
-            console.log(layers)
+            // console.log(layers)
             this.layer_manager = new layerManager(wli, this.viewer, layers);
 
             // レイヤの作成とマネージャへの追加
