@@ -41,6 +41,7 @@ const layerManager = class{
             const diagram = new contourDiagram({
                 min: _layer.diagram.min,
                 max: _layer.diagram.max,
+                math_method: _layer.diagram.math_method,
             });
 
             const options = { 

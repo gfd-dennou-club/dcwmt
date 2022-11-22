@@ -48,7 +48,7 @@
             colorbar,
         },
         data: () => ({
-            updatedlayerProp: undefined,
+            updatedlayerProp: { name: undefined },
         }),
         computed: {
             clrindex: function() {
@@ -99,8 +99,8 @@
                 const isUpdatedlayer = layer => layer.name === this.updatedlayerProp.name;
                 const updatedlayerProp = this.layersprops.find(isUpdatedlayer);
                 if ( 
-                    updatedlayerProp 
-                    && (updatedlayerProp.min !== this.updatedlayerProp.min 
+                    updatedlayerProp && 
+                    (updatedlayerProp.min !== this.updatedlayerProp.min 
                     || updatedlayerProp.max !== this.updatedlayerProp.max)
                 ) {
                     this.toneRange = this.updatedlayerProp;

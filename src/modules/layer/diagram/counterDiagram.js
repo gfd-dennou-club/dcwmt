@@ -74,7 +74,9 @@ const contourDiagram = class {
             const blue  = rgba[ bias_rgb_index + 2 ] << 8;
 
             dataView.setUint32(0, red + green + blue );
-            scalarData.push(dataView.getFloat32(0));
+            let buf = dataView.getFloat32(0);
+            buf = this.options.math_method(buf);
+            scalarData.push(buf);
         }
 
         return scalarData;

@@ -15,6 +15,7 @@ const state = {
         },
         toneRange: { name: undefined, min: undefined, max: undefined },
         fixedDim: null, 
+        mathMethod: ( datas ) => datas,
     },
     layersprops: [],
     selectedlayer: undefined,
@@ -52,7 +53,7 @@ const mutations = {
     },
     setLayers: (state, layers) => {
         state.layers = layers;
-    }
+    },
 }
 
 const actions = {

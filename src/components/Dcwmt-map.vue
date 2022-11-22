@@ -139,6 +139,7 @@ export default {
                         size: layer_type.size,
                         level: { min: 0, max: layer_type.maximumLevel },
                         clrindex: this.config.clrindex,
+                        math_method: this.config.mathMethod,
                     };
 
                     const toneRange = this.config.toneRange;

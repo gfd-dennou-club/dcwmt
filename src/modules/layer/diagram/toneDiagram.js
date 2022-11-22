@@ -10,15 +10,17 @@
 // canvas:      数値データタイルを描画したcanvas(HTMLElement<canvas>)
 
 const toneDiagram = class{
-    constructor(colormap, range){
+    constructor(colormap, range, math_method){
         if ( !range ) {
             this.min = Infinity;
             this.max = -Infinity;
         } else {
             this.min = range.min;
             this.max = range.max;
-        }
+        };
+
         this.colormap = colormap;
+        this.math_method = math_method;
     }
 
     /**
@@ -39,9 +41,10 @@ const toneDiagram = class{
             const blue  = rgba[ bias_rgb_index + 2 ] << 8;
 
             dataView.setUint32(0, red + green + blue);
-            const buf = dataView.getFloat32(0);
+            let buf = dataView.getFloat32(0);
+            buf = this.math_method(buf);
             scalarData.push(buf);
-
+            
             if(isCalcMaxMin){
                 if(this.min > buf) this.min = buf;
                 if(this.max < buf) this.max = buf;
@@ -50,6 +53,7 @@ const toneDiagram = class{
        
         return scalarData;
     }
+
 
     /**
      * キャンバス要素からカラーマップを元に色をつけて, imageDataに変換する
@@ -63,8 +67,6 @@ const toneDiagram = class{
         let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const size = {width: canvas.width, height: canvas.height};
         const datas = this.bitmap2data(imageData, size, isCalcMaxMin);
-        this.datas = datas;       
-
         for(let i = 0; i < canvas.width * canvas.height; i++){
             const bias_rgb_index = i * 4;
             const rgb = this.data2color(datas[i]);
@@ -86,6 +88,7 @@ const toneDiagram = class{
     bitmap2canvas = (canvas, isCalcMaxMin) => {
         const ctx = canvas.getContext("2d");
         const imageData = this.bitmap2tile(canvas, isCalcMaxMin);
+        if ( !imageData ) return;
         ctx.putImageData(imageData, 0, 0);
     }
 
@@ -141,11 +144,16 @@ const toneDiagram = class{
     }
 
     calcMaxMin = async (url, size) => {
+        if ( isFinite(this.min) ) { 
+            return { min: this.min, max: this.max };
+        }
         const canvas = document.createElement("canvas");
         [canvas.width, canvas.height] = [size.X, size.Y];
         await this.url2canvas(url, canvas, true);
         return { min: this.min, max: this.max };
     }
+
+
 
     isTone = (t=true, f=false) => { return t; }
 

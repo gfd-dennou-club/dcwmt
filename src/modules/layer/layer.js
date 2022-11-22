@@ -21,7 +21,7 @@ const layer = class{
         const options = this.options;
         const clrmap = new colormap(options.clrindex);
         if ( !options.diagram ) {
-            this.diagram = this._getDiagram(clrmap, options.range);
+            this.diagram = this._getDiagram(clrmap);
             if ( this.diagram.isTone() ) {
                 const url = options.url[0].concat("/0/0/0.png");
                 const size = options.size;
@@ -43,11 +43,16 @@ const layer = class{
         }
     }
 
-    _getDiagram = (clrmap, range) => {
+    _getDiagram = (clrmap) => {
         if(this.options.url.length === 2){
             return new vectorDiagram(clrmap.getClrmap());
         }else{
-            return new toneDiagram(clrmap.getClrmap(), range);
+            console.log(this.options.range)
+            return new toneDiagram(
+                clrmap.getClrmap(), 
+                this.options.range,
+                this.options.math_method
+            );
         }
     }
 
