@@ -34,13 +34,13 @@ export default {
         oldlink: undefined,
     }),
     methods: {
-        selectMenu(link) {
+        selectMenu: function(link) {
             if(!this.oldlink || this.oldlink === link) {
                 this.canDraw = !this.canDraw;
             }
             this.nowlink = link;
-            this.oldlink = link; 
+            this.oldlink = link;
         },
-    }
+    },
 };
 </script>

@@ -87,7 +87,6 @@ export default {
     }),
     methods: {
         raise: function ( layer ) {
-        console.log(layer)
             this.layer_manager.raise(layer);
         },
         lower: function ( layer ) {
@@ -156,7 +155,7 @@ export default {
             set: function ( value ) {
                 this.$store.commit("setSelectedLayer", value);
             }
-        }
+        },
     }
 }
 </script>

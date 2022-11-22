@@ -14,12 +14,13 @@ const state = {
             extent: undefined,
         },
         toneRange: { name: undefined, min: undefined, max: undefined },
-        fixedDim: 0, 
+        fixedDim: null, 
     },
     layersprops: [],
     selectedlayer: undefined,
     zoom: 0,
     center: [0, 0],
+    layers: [],
 };
 
 const getters = {
@@ -28,6 +29,7 @@ const getters = {
     selectedlayer: state => state.selectedlayer,
     zoom: state => state.zoom,
     center: state => state.center,
+    layers: state => state.layers,
 };
 
 const mutations = {
@@ -48,6 +50,9 @@ const mutations = {
     setCenter: (state, center) => {
         state.center = center; 
     },
+    setLayers: (state, layers) => {
+        state.layers = layers;
+    }
 }
 
 const actions = {

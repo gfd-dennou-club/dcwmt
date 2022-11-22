@@ -58,7 +58,14 @@ export default {
             set: function ( value ) {
                 this.$store.commit("setCenter", value); 
             }
-        }
+        },
+        layers: function(){
+            if ( !this.layer_manager ){
+               return [];
+            } else {
+               return this.layer_manager.getLayers();
+            }
+        },
     },
     methods: {
         read_deinejs: function() {
@@ -100,12 +107,31 @@ export default {
             this.viewer = viewer_obj.getSuitableViewer();
 
             // レイヤマネージャーを作成
-            this.layer_manager = new layerManager(wli, this.viewer);
+            const layers = this.$store.getters.layers;
+            console.log(layers)
+            this.layer_manager = new layerManager(wli, this.viewer, layers);
 
             // レイヤの作成とマネージャへの追加
             for ( const layer_types of [this.tone, this.vector] ) {
                 for ( const layer_type of layer_types ) {
-                    const fixed = layer_type.fixed.find( v => v === this.config.fixedDim ) || layer_type.fixed[0];
+
+                    // 指定していない次元であっても, 次元名と値が一致していれば変更する.
+                    let fixed = "";
+                    if ( typeof this.config.fixedDim != "string" ) {
+                        fixed = layer_type.fixed[0];
+                    } else {
+                        const ary_fixedDim = this.config.fixedDim.split('/');
+                        fix: for ( const fix of ary_fixedDim ) {
+                            for ( const ltf of layer_type.fixed ) {
+                                if ( ltf.includes(fix) ) {
+                                    fixed = fixed.concat(`${fix}/`);
+                                    continue fix;
+                                }
+                            }
+                        }
+                        fixed = fixed.slice( 0, -1 );
+                    }
+
                     const url = layer_type.url.map( v => v.concat(`/${fixed}`) );
                     const layer_option = {
                         name: layer_type.name,
@@ -145,6 +171,9 @@ export default {
             },
             deep: true,
         },
+        layers: function(){
+            this.$store.commit("setLayers", this.layers); 
+        }
     }
 }
 </script>

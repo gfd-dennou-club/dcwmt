@@ -17,7 +17,7 @@ export default {
     components: { 
         dcwmt_legends,
         dcwmt_animation
-   } 
+    },
 }
 </script>
 
