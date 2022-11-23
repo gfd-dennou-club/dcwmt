@@ -76,7 +76,6 @@ const toneDiagram = class{
             imageData.data[bias_rgb_index +3] = 255;
         }
 
-
         return imageData;
     }
 
@@ -144,7 +143,9 @@ const toneDiagram = class{
     }
 
     calcMaxMin = async (url, size) => {
-        if ( isFinite(this.min) ) { 
+        if ( isFinite(this.min) ) {
+            this.min = this.math_method(this.min);
+            this.max = this.math_method(this.max);
             return { min: this.min, max: this.max };
         }
         const canvas = document.createElement("canvas");

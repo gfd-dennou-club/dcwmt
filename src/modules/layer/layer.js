@@ -47,7 +47,6 @@ const layer = class{
         if(this.options.url.length === 2){
             return new vectorDiagram(clrmap.getClrmap());
         }else{
-            console.log(this.options.range)
             return new toneDiagram(
                 clrmap.getClrmap(), 
                 this.options.range,
