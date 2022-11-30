@@ -47,7 +47,6 @@
     "webpack-remove-empty-scripts": "^0.8.4"
   },
   "dependencies": {
-    "@mdi/font": "^7.0.96",
     "cesium": "^1.97.0",
     "d3-contour": "^4.0.0",
     "d3-geo": "^3.0.1",

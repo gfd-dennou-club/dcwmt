@@ -108,7 +108,6 @@ export default {
 
             // レイヤマネージャーを作成
             const layers = this.$store.getters.layers;
-            // console.log(layers)
             this.layer_manager = new layerManager(wli, this.viewer, layers);
 
             // レイヤの作成とマネージャへの追加
@@ -157,7 +156,6 @@ export default {
             // レイヤーマネージャのセットアップ
             let layersprops = this.layer_manager.setup(this.viewer);
             layersprops = await Promise.all(layersprops);
-            console.log(layersprops)
             this.layersprops = layersprops.filter( v => v );
         }
     },
