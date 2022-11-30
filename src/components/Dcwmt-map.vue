@@ -157,6 +157,7 @@ export default {
             // レイヤーマネージャのセットアップ
             let layersprops = this.layer_manager.setup(this.viewer);
             layersprops = await Promise.all(layersprops);
+            console.log(layersprops)
             this.layersprops = layersprops.filter( v => v );
         }
     },

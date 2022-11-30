@@ -18,7 +18,7 @@ const state = {
         mathMethod: ( datas ) => datas,
     },
     layersprops: [],
-    selectedlayer: undefined,
+    // selectedlayer: undefined,
     zoom: 0,
     center: [0, 0],
     layers: [],
