@@ -6,6 +6,7 @@ import wmtsLibIdentifer from "../modules/utility/wmtsLibIdentifer";
 Vue.use(Vuex);
 
 const state = {
+    drawingOptions: {},
     config: {
         clrindex: 3,
         wmtsLibIdentifer: new wmtsLibIdentifer("OpenLayers"),
@@ -18,13 +19,13 @@ const state = {
         mathMethod: ( datas ) => datas,
     },
     layersprops: [],
-    // selectedlayer: undefined,
     zoom: 0,
     center: [0, 0],
     layers: [],
 };
 
 const getters = {
+    drawingOptions: state => state.drawingOptions,
     config: state => state.config,
     layersprops: state => state.layersprops,
     selectedlayer: state => state.selectedlayer,
@@ -34,6 +35,9 @@ const getters = {
 };
 
 const mutations = {
+    setDrawingOptions: (state, drawingOptions) => {
+        state.drawingOptions = { ...state.drawingOptions, ...drawingOptions };
+    },
     setConfig: (state, config) => {
         for ( const props in config ) {
             state.config[props] = config[props];

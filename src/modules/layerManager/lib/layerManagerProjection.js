@@ -18,12 +18,12 @@ const layerManagerProjection = class {
         this.baselayers.push(layer);
     }
 
-    addLayer = (layer, name, alpha, show) => {
+    addLayer = (layer, name) => {
         layer.name = name;
         layer.setAlpha = this._setAlpha;
         layer.setShow = this._setShow;
-        layer.setAlpha(alpha);
-        layer.setShow(show);
+        layer.setAlpha(1.0);
+        layer.setShow(true);
 
         layer.isBaselayer = false;
         this.original_layer.addLayer(layer);

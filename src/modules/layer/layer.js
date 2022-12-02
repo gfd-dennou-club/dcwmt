@@ -20,6 +20,7 @@ const layer = class{
     create = async (wmtsLibIdentifer) => {
         const options = this.options;
         const clrmap = new colormap(options.clrindex);
+        console.log(options.diagram)
         if ( !options.diagram ) {
             this.diagram = this._getDiagram(clrmap);
             if ( this.diagram.isTone() ) {

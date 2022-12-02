@@ -18,13 +18,13 @@ const viewerProjection = (viewer_ele, options) => {
     proj4.defs("ESRI:54008","+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs");
     register(proj4);
 
-    const projection = getProjection(options.projection.code);
+    const projection = getProjection(options.projection);
     projection.setExtent( projection.getExtent() || options.projection.extent );
 
     const tileGrid = createXYZ({
         extent: projection.getExtent(),
-        maxZoom: options.maxZoom,
-        minZoom: options.minZoom,
+        maxZoom: options.zoomNativeLevel.max,
+        minZoom: options.zoomNativeLevel.min,
     });
 
     const view = new View({

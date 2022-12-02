@@ -17,13 +17,15 @@ const viewer = class{
         const map_obj = new map("map");
         map_obj.create();
         const map_ele = map_obj.getElement();
-        return this._getViewerWithSuitableLib(map_ele, 2);
+
+        const zoomNativeLevel = this.options.zoomNativeLevel;
+        return this._getViewerWithSuitableLib(map_ele, zoomNativeLevel);
     }
 
-    _getViewerWithSuitableLib = (map_ele, maximumLevel) => {
+    _getViewerWithSuitableLib = (map_ele, zoomNativeLevel) => {
         const ceisum = () => this._for3D(map_ele);
-        const leaflet = () => this._forCartesian(map_ele, maximumLevel);
-        const openlayers = () => this._forProjection(map_ele, maximumLevel);
+        const leaflet = () => this._forCartesian(map_ele, zoomNativeLevel);
+        const openlayers = () => this._forProjection(map_ele, zoomNativeLevel);
         const suitableFunc = this.options.wmtsLibIdentifer.whichLib(ceisum, leaflet, openlayers);
         return suitableFunc();
     }
@@ -37,11 +39,10 @@ const viewer = class{
         return viewerCartesian(map_ele, options); 
     }
 
-    _forProjection = (map_ele, maximumLevel) => {
+    _forProjection = (map_ele, zoomNativeLevel) => {
         const options = { 
             projection: this.options.projection, 
-            maxZoom: maximumLevel, 
-            minZoom: 0,
+            zoomNativeLevel: zoomNativeLevel,
             zoom: this.options.zoom,
             center: this.options.center
         }; 

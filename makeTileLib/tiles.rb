@@ -79,11 +79,9 @@ end
 # countAry: Hash{ :name: String, :length: 0, ...}
 def makeTileForPlane(dimInfo, fp, count, xindex, yindex, otherindex, dirPath, msg_header, msg, tempindex = 0)
 	if otherindex.instance_of?(Array) then
-		# index = otherindex
 		index = otherindex[tempindex]
 		tempindex += 1
 		for i in 0...dimInfo[index][:length] do
-			# if otherindex.empty? then
 			cnt = dimInfo[index][:length] == 1 ? dimInfo[index][:start] : i
 			if tempindex >= otherindex.length then
 				makeTileForPlane(dimInfo, fp, cnt, xindex, yindex, index, dirPath, msg_header, msg, tempindex)
