@@ -1,67 +1,114 @@
 <template>
-    <canvas :width="width" :height="height"></canvas>
+  <canvas :width="width" :height="height"></canvas>
 </template>
-<script>
-import clrmap_ary from "./colormap_lib"; 
+
+<script lang="ts">
+import { clrmap } from './colormap_lib';
+import type { ClrmapType } from './colormap_lib';
 
 export default {
-    props: ["width", "height", "clrindex"],
-    data: () => ({
-        ctx: undefined,
-    }),
-    methods: {
-        draw: function() {
-            this._drawTriangle(this.clrmap[0], this.width, this.height, true);
-            const rect_width = (this.width - Math.sqrt(3) * this.height) / (this.clrmap.length);
-            let rect_xpos =  Math.sqrt(3) * this.height / 2;
-            for(let i = 0; i < this.clrmap.length; i++){
-                this._drawRect(this.clrmap[i], rect_xpos, 0, rect_width, this.height);
-                rect_xpos += rect_width;
-            }
-            this._drawTriangle(this.clrmap[this.clrmap.length - 1], this.width, this.height, false);
-        },
-        _drawTriangle: function(color, width, height, isLeft) {
-            const context = this.ctx;
+  props: {
+    width: Number,
+    height: Number,
+    clrindex: Number,
+  },
+  methods: {
+    draw: function () {
+      if (!this.width || !this.height) {
+        throw new Error('width/height of colorbar is undefined');
+      }
 
-            context.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
+      // prepare a canvas dom for getting a context in each drawing methods,
+      const canvas = this.$el as HTMLCanvasElement;
 
-            context.beginPath();
-            if(isLeft){
-                context.moveTo(0, height / 2);
-                context.lineTo(Math.sqrt(3) * height / 2, 0);
-                context.lineTo(Math.sqrt(3) * height / 2, height);
-                context.moveTo(0, height / 2);
-                context.lineTo(Math.sqrt(3) * height / 2, height);
-            }else{
-                context.moveTo(width, height / 2);
-                context.lineTo(width - Math.sqrt(3) * height / 2, 0);
-                context.lineTo(width - Math.sqrt(3) * height / 2, height);
-                context.moveTo(width, height / 2);
-                context.lineTo(width - Math.sqrt(3) * height / 2, height);
-            }
+      // draw a triangle on the left.
+      this._drawTriangle(canvas, this.clrmap[0], this.width, this.height, true);
 
-            context.fill();
-        },
-        _drawRect: function(color, x, y, width, height) {
-            const context = this.ctx;
-            context.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
-            context.fillRect(x, y, width, height);
-        } 
+      // draw rectangles colored following colormap.
+      const rect_width =
+        (this.width - Math.sqrt(3) * this.height) / this.clrmap.length;
+      let rect_xpos = (Math.sqrt(3) * this.height) / 2;
+      for (let i = 0; i < this.clrmap.length; i++) {
+        this._drawRect(
+          canvas,
+          this.clrmap[i],
+          rect_xpos,
+          0,
+          rect_width,
+          this.height
+        );
+        rect_xpos += rect_width;
+      }
+
+      // draw a triangle on the right.
+      this._drawTriangle(
+        canvas,
+        this.clrmap[this.clrmap.length - 1],
+        this.width,
+        this.height,
+        false
+      );
     },
-    computed: {
-        clrmap: function() {
-            return clrmap_ary[this.clrindex];
-        },
+
+    _drawTriangle: function (
+      canvas: HTMLCanvasElement,
+      color: ClrmapType,
+      width: number,
+      height: number,
+      isLeft: boolean
+    ) {
+      const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+
+      context.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
+
+      context.beginPath();
+      if (isLeft) {
+        context.moveTo(0, height / 2);
+        context.lineTo((Math.sqrt(3) * height) / 2, 0);
+        context.lineTo((Math.sqrt(3) * height) / 2, height);
+        context.moveTo(0, height / 2);
+        context.lineTo((Math.sqrt(3) * height) / 2, height);
+      } else {
+        context.moveTo(width, height / 2);
+        context.lineTo(width - (Math.sqrt(3) * height) / 2, 0);
+        context.lineTo(width - (Math.sqrt(3) * height) / 2, height);
+        context.moveTo(width, height / 2);
+        context.lineTo(width - (Math.sqrt(3) * height) / 2, height);
+      }
+
+      context.fill();
     },
-    mounted: function() {
-        this.ctx = this.$el.getContext("2d");
-        this.draw();
+    _drawRect: function (
+      canvas: HTMLCanvasElement,
+      color: ClrmapType,
+      x: number,
+      y: number,
+      width: number,
+      height: number
+    ) {
+      const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+      context.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
+      context.fillRect(x, y, width, height);
     },
-    watch: {
-        clrindex: function() {
-            this.draw();
-        }
-    }
-}
+  },
+
+  computed: {
+    clrmap: function () {
+      if (!this.clrindex) {
+        throw new Error('this.clrindex should be number');
+      }
+      return clrmap[this.clrindex];
+    },
+  },
+
+  mounted: function () {
+    this.draw();
+  },
+
+  watch: {
+    clrindex: function () {
+      this.draw();
+    },
+  },
+};
 </script>
-

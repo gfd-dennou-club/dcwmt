@@ -1,46 +1,46 @@
 <template>
-    <v-list subheader tile>
-		<v-subheader>カラーマップの切り替え</v-subheader>
-		<v-list-item-group v-model="selected">
-    		<v-list-item
-    			v-for="(clrmap_name, i) in clrmap_names"
-    			:key="i"
-    			link
-    		>
-    			<v-list-item-content>
-    				<v-list-item-title>{{ clrmap_name }}</v-list-item-title>
-    		    	<colorbar width="100" height="20" :clrindex="i" />
-    		  	</v-list-item-content>
-    		</v-list-item>
-		</v-list-item-group>
-    </v-list>
+  <v-list subheader tile>
+    <v-subheader>カラーマップの切り替え</v-subheader>
+    <v-list-item-group v-model="selected">
+      <v-list-item v-for="(clrmap_name, i) in clrmap_names" :key="i" link>
+        <v-list-item-content>
+          <v-list-item-title>{{ clrmap_name }}</v-list-item-title>
+          <colorbar width="100" height="20" :clrindex="i" />
+        </v-list-item-content>
+      </v-list-item>
+    </v-list-item-group>
+  </v-list>
 </template>
 
-<script>
-import colorbar from "./Colorbar.vue";
+<script lang="ts">
+import colorbar from './Colorbar.vue';
+
+type DrawerColormapDataType = {
+  selected: number,
+  clrmap_names: Array<string>
+}
 
 export default {
-    components: {
-      colorbar,
+  components: {
+    colorbar,
+  },
+  data(): DrawerColormapDataType {
+    return {
+      selected: 1,
+      clrmap_names: new Array(78).fill(""),
+    };
+  },
+  created: function () {
+    for (let i = 0; i < this.clrmap_names.length; i++) {
+      const clrindex = i + 1;
+      const clrmapname = clrindex < 10 ? `clrmap_0${clrindex}` : `clrmap_${clrindex}`;
+      this.clrmap_names[i] = clrmapname;
+    }
+  },
+  watch: {
+    selected: function (clrindex: number) {
+      this.$store.commit('setConfig', { clrindex: clrindex });
     },
-    data: () => ({
-		selected: 1,
-		clrmap_names: [],
-	}),
-    created: function(){
-        this.clrmap_names = Array(78).fill(undefined).map(
-            (_, index) => {
-				const _clrindex = index + 1;
-                return (_clrindex < 10 ? "clrmap_0" + _clrindex : "clrmap_" + _clrindex);
-            }
-        );
-    },
-	watch: {
-		selected: function(clrindex) {
-			if (clrindex) {
-				this.$store.commit("setConfig", { clrindex: clrindex });
-			}
-		}
-	},
-}
+  },
+};
 </script>

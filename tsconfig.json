@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+        "sourceMap": true,
+        "target": "ESNext",
+        "module": "ESNext",
+        "lib": ["DOM", "ESNext"],
+        "strict": true,
+        "moduleResolution": "node",
+        "compilerOptions": {
+            "types": [
+                "vuetify"
+            ]
+        },
+        "include": [
+            "src/**/*.ts",
+            "src/**/*.vue"
+        ],
+        "exclude": [
+            "node_modules"
+        ],
+        "forceConsistentCasingInFileNames": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUnusedLocals": true,
+        "noImplicitReturns": true,
+        "noUnusedParameters": true
+    }
+}

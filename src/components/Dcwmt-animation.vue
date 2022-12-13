@@ -30,7 +30,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import define from '../define';
 
 export default {

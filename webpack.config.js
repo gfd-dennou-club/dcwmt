@@ -13,7 +13,7 @@ const cesiumSouece = "./node_modules/cesium/Source";
 const cesiumWorkers = "../Build/Cesium/Workers";
 
 module.exports = {
-  entry: "./src/index.js",
+  entry: "./src/index.ts",
 
   output: {
     publicPath: "/",
@@ -39,6 +39,25 @@ module.exports = {
         loader: "vue-loader",
       },
       {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: "babel-loader",
+        options: {
+          presets: ["@babel/preset-env"],
+        },
+      },
+      {
+        test: /\.ts$/,
+        use: [
+          {
+            loader: "ts-loader",
+            options: {
+              appendTsSuffixTo: [/\.vue$/],
+            },
+          },
+        ],
+      },
+      {
         test: /\.(sass|scss|css)$/i,
         use: [
           {
@@ -51,14 +70,6 @@ module.exports = {
             loader: "sass-loader",
           },
         ],
-      },
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        loader: "babel-loader",
-        options: {
-          presets: ["@babel/preset-env"],
-        },
       },
     ],
   },
@@ -90,7 +101,7 @@ module.exports = {
     alias: {
       vue$: "vue/dist/vue.esm.js",
     },
-    extensions: ["*", ".js", ".vue", ".json"],
+    extensions: ["*", ".js", ".ts", ".vue", ".json"],
     fallback: {
       url: require.resolve("url/"),
       zlib: require.resolve("browserify-zlib"),
