@@ -1,7 +1,6 @@
 const MODE = "development";
 
-// const path = require("path");
-import path from "path";
+const path = require("path");
 
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const RemoveEmptyScriptsPlugin = require("webpack-remove-empty-scripts");
@@ -9,7 +8,7 @@ const { VueLoaderPlugin } = require("vue-loader");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const webpack = require("webpack");
 
-const cesiumSouece = "./node_modules/cesium/Source";
+const cesiumSource = "./node_modules/cesium/Source";
 const cesiumWorkers = "../Build/Cesium/Workers";
 
 module.exports = {
@@ -35,6 +34,17 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.ts$/,
+        use: [
+          {
+            loader: "ts-loader",
+            options: {
+              appendTsSuffixTo: [/\.vue$/],
+            },
+          },
+        ],
+      },
+      {
         test: /\.vue$/,
         loader: "vue-loader",
       },
@@ -45,17 +55,6 @@ module.exports = {
         options: {
           presets: ["@babel/preset-env"],
         },
-      },
-      {
-        test: /\.ts$/,
-        use: [
-          {
-            loader: "ts-loader",
-            options: {
-              appendTsSuffixTo: [/\.vue$/],
-            },
-          },
-        ],
       },
       {
         test: /\.(sass|scss|css)$/i,
@@ -83,11 +82,11 @@ module.exports = {
     // for cesium
     new CopyWebpackPlugin({
       patterns: [
-        { from: path.join(cesiumSouece, cesiumWorkers), to: "Workers" },
-        { from: path.join(cesiumSouece, "Assets"), to: "Assets" },
-        { from: path.join(cesiumSouece, "Widgets"), to: "Widgets" },
+        { from: path.join(cesiumSource, cesiumWorkers), to: "Workers" },
+        { from: path.join(cesiumSource, "Assets"), to: "Assets" },
+        { from: path.join(cesiumSource, "Widgets"), to: "Widgets" },
         {
-          from: path.join(cesiumSouece, "ThirdParty/Workers"),
+          from: path.join(cesiumSource, "ThirdParty/Workers"),
           to: "ThirdParty/Workers",
         },
       ],

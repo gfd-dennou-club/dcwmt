@@ -1,11 +1,9 @@
 {
   "definedOptions": {
     "root": "../tile",
-    "title": "test",
-    "axis": ["lon", "lat"],
     "variables": [
       {
-        "name": "Ps",
+        "name": ["Ps"],
         "type": "tone",
         "tileSize": [256, 256],
         "minZoom": 0,
@@ -60,32 +58,42 @@
     ]
   },
   "drawingOptions": {
+    "title": "test",
+    "sumneil": "base64",
     "zoom": 0,
     "center": [0, 0],
-    "projection": "ESRI:54032",
+    "projCode": "EPSG:3857",
     "mathMethods": 0,
     "layers": [
       {
         "name": "U-V",
         "type": "vector",
         "minmax": [0, 0],
+        "show": true,
+        "opacity": 1.0,
         "varindex": 1,
-        "fixedindex": 0
+        "fixedindex": 0,
+        "vecinterval": { "x": 10, "y": 10 }
+      },
+      {
+        "name": "Ps",
+        "type": "tone",
+        "minmax": [50918, 105908],
+        "show": true,
+        "opacity": 1.0,
+        "varindex": 0,
+        "fixedindex": 0,
+        "clrindex": 3
       },
       {
         "name": "Ps_contour",
         "type": "contour",
         "minmax": [50918, 105908],
+        "show": true,
+        "opacity": 1.0,
         "varindex": 0,
-        "fixedindex": 0
-      },
-      {
-        "name": "Ps",
-        "type": "tone",
-        "clrindex": 3,
-        "minmax": [50918, 105908],
-        "varindex": 0,
-        "fixedindex": 0
+        "fixedindex": 0,
+        "thretholdinterval": 10
       }
     ]
   }

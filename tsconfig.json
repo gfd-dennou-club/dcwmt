@@ -1,27 +1,24 @@
 {
-    "compilerOptions": {
-        "sourceMap": true,
-        "target": "ESNext",
-        "module": "ESNext",
-        "lib": ["DOM", "ESNext"],
-        "strict": true,
-        "moduleResolution": "node",
-        "compilerOptions": {
-            "types": [
-                "vuetify"
-            ]
-        },
-        "include": [
-            "src/**/*.ts",
-            "src/**/*.vue"
-        ],
-        "exclude": [
-            "node_modules"
-        ],
-        "forceConsistentCasingInFileNames": true,
-        "noFallthroughCasesInSwitch": true,
-        "noUnusedLocals": true,
-        "noImplicitReturns": true,
-        "noUnusedParameters": true
-    }
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "sourceMap": true,
+    "target": "ES2020",
+    "module": "es2020",
+    "lib": ["DOM", "ESNext"],
+    "strict": true,
+    "moduleResolution": "node",
+    "types": ["vuetify"],
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noImplicitReturns": true,
+    "noUnusedParameters": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.vue", "src/**/*.d.ts"],
+  "exclude": ["node_modules"]
 }

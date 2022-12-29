@@ -1,11 +1,17 @@
 import { UrlTemplateImageryProvider } from 'cesium';
 import { Diagram } from '../diagram/diagram';
+import { LayerInterface } from './LayerInterface';
 
-export class Layer3D extends UrlTemplateImageryProvider {
+export class Layer3D extends UrlTemplateImageryProvider implements LayerInterface{
+  public minmax: [number, number] | undefined;
+
   constructor(
+    public readonly name: string,
     private readonly urls: string[],
     tileSize: { x: number; y: number },
-    zoomLevel: { max: number; min: number },
+    zoomLevel: { min: number; max: number },
+    public show: boolean,
+    opacity: number,
     private readonly diagram: Diagram
   ) {
     const options: UrlTemplateImageryProvider.ConstructorOptions = {
@@ -16,18 +22,31 @@ export class Layer3D extends UrlTemplateImageryProvider {
       minimumLevel: zoomLevel.min,
     };
     super(options);
+
+    this.opacity = opacity;
   }
 
-  public async requestImage(x: number, y: number, level: number) {
+  public requestImage(x: number, y: number, level: number) {
     const urls = new Array<string>();
     for (const url of this.urls) {
       urls.push(url.concat(`/${level}/${x}/${y}.png`));
     }
 
     const canvas = document.createElement('canvas');
-    [canvas.width, canvas.height] = [this.tileWidth, this.tileHeight];
+    [canvas.width, canvas.height] = [this.tileWidth, super.tileHeight];
 
-    return this.diagram.draw(urls, canvas);
+    const drawnCanvas = this.diagram.draw(urls, canvas);
+    return drawnCanvas;
+  }
+
+  set opacity(value: number){
+    this.defaultAlpha = value;
+  }
+
+  get opacity(): number {
+    if(!this.defaultAlpha) {
+      throw new Error("Don't has alpha channel this layer");
+    }
+    return this.defaultAlpha;
   }
 }
-

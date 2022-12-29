@@ -1,11 +1,11 @@
 export abstract class Diagram {
-  protected range: { min: number; max: number };
+  protected minmax: [number, number];
 
-  constructor(range?: { min: number; max: number }) {
-    if (!range) {
-      this.range = { min: Infinity, max: -Infinity };
+  constructor(minmax?: [number, number]) {
+    if (!minmax) {
+      this.minmax = [Infinity, -Infinity];
     } else {
-      this.range = range;
+      this.minmax = minmax;
     }
   }
 
@@ -19,28 +19,28 @@ export abstract class Diagram {
    */
   private async fetchImages(
     urls: string[],
-    canvas: HTMLCanvasElement
+    size: { width: number; height: number }
   ): Promise<HTMLCanvasElement[]> {
+    const canvases = new Array<HTMLCanvasElement>(urls.length);
     const promises = new Array<Promise<HTMLCanvasElement>>();
 
-    for (const url of urls) {
-      const canvasEle = document.createElement('canvas');
-      const context = canvasEle.getContext('2d');
-      if (!context) {
-        throw new Error('Get null contex from getContext method!');
-      }
+    for (let i = 0; i < urls.length; i++) {
+      canvases[i] = document.createElement('canvas');
+      canvases[i].width = size.width;
+      canvases[i].height = size.height;
+      const context = canvases[i].getContext('2d')!;
+
       const promise = new Promise<HTMLCanvasElement>((resolve, reject) => {
         try {
           const img = new Image();
-
           img.crossOrigin = 'anonymous';
-          img.width = canvas.width;
-          img.height = canvas.height;
+          img.width = size.width;
+          img.height = size.height;
           img.onload = () => {
             context.drawImage(img, 0, 0);
-            resolve(canvasEle);
+            resolve(canvases[i]);
           };
-          img.src = url;
+          img.src = urls[i];
         } catch (err) {
           reject(err);
         }
@@ -49,8 +49,7 @@ export abstract class Diagram {
       promises.push(promise);
     }
 
-    const canvases = await Promise.all(promises);
-    return canvases;
+    return await Promise.all(promises);
   }
 
   /**
@@ -77,12 +76,12 @@ export abstract class Diagram {
       const data = dataView.getFloat32(0);
 
       // Calculate minmax, if this.range is not specified.
-      if (!isFinite(this.range.min)) {
-        if (data < this.range.min) {
-          this.range.min = data;
+      if (!isFinite(this.minmax[0])) {
+        if (data < this.minmax[0]) {
+          this.minmax[0] = data;
         }
-        if (data > this.range.max) {
-          this.range.max = data;
+        if (data > this.minmax[1]) {
+          this.minmax[1] = data;
         }
       }
 
@@ -110,7 +109,8 @@ export abstract class Diagram {
     urls: string[],
     canvas: HTMLCanvasElement
   ): Promise<HTMLCanvasElement> {
-    const imgs = await this.fetchImages(urls, canvas);
+    const size = { width: canvas.width, height: canvas.height };
+    const imgs = await this.fetchImages(urls, size);
 
     const datas = imgs.map((img) => this.getNumData(img));
 
@@ -122,8 +122,15 @@ export abstract class Diagram {
     return visualizedDiagram;
   }
 
-  public calcMinMax = (urls: string[], canvas: HTMLCanvasElement): void => {
-    this.draw(urls, canvas);
+  public calcMinMax = async (
+    urls: string[],
+    canvas: HTMLCanvasElement
+  ): Promise<[number, number]> => {
+    if (isFinite(this.minmax[0])) {
+      return new Promise((resolve) => resolve(this.minmax));
+    }
+    await this.draw(urls, canvas);
+    return new Promise((resolve) => resolve(this.minmax));
   };
 
   public abstract whichDiagram<T, U, V>(

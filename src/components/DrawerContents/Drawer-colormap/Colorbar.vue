@@ -3,10 +3,11 @@
 </template>
 
 <script lang="ts">
+import Vue from 'vue';
 import { clrmap } from './colormap_lib';
 import type { ClrmapType } from './colormap_lib';
 
-export default {
+export default Vue.extend({
   props: {
     width: Number,
     height: Number,
@@ -93,7 +94,7 @@ export default {
   },
 
   computed: {
-    clrmap: function () {
+    clrmap: function (): ClrmapType[] {
       if (!this.clrindex) {
         throw new Error('this.clrindex should be number');
       }
@@ -110,5 +111,5 @@ export default {
       this.draw();
     },
   },
-};
+});
 </script>

@@ -2,34 +2,37 @@ import { Diagram } from './diagram';
 
 export class VectorDiagram extends Diagram {
   constructor(
-    private readonly mathMethod: (x: number) => number,
-    private readonly numOfVectorInCanvas: { x: number; y: number }
+    private readonly numOfVectorInCanvas: { x: number; y: number },
+    private readonly mathMethod: (x: number) => number
   ) {
-    super();
+    super(undefined);
   }
 
   protected drawVisualizedDiagramBasedONNumData = (
     datas: number[][],
     canvas: HTMLCanvasElement
   ): HTMLCanvasElement => {
-    datas = datas.map((data) => data.map(this.mathMethod));
+    //datas = datas.map((data) => data.map(this.mathMethod));
+    this.mathMethod(1);
 
     const Direction = {
-      Horizonal: 0,
+      Horizontal: 0,
       Vertical: 1,
     } as const;
 
+    const canvasSize = { width: canvas.width, height: canvas.height };
+
     const blockSizeToDrawingOneVector = this.BlockSizeToDrawingOneVector(
-      { width: canvas.width, height: canvas.height },
+      canvasSize,
       this.numOfVectorInCanvas
     );
 
     let arraysCalculatedToMeanPerBlock = new Array<Array<number>>(2);
-    // Calculate mean of horizonal direction tile per blocks.
-    arraysCalculatedToMeanPerBlock[Direction.Horizonal] =
+    // Calculate mean of horizontal direction tile per blocks.
+    arraysCalculatedToMeanPerBlock[Direction.Horizontal] =
       this.ArrayCalculatedToMeanPerBlock(
-        datas[Direction.Horizonal],
-        { width: canvas.width, height: canvas.height },
+        datas[Direction.Horizontal],
+        canvasSize,
         blockSizeToDrawingOneVector,
         this.numOfVectorInCanvas.x * this.numOfVectorInCanvas.y
       );
@@ -37,7 +40,7 @@ export class VectorDiagram extends Diagram {
     arraysCalculatedToMeanPerBlock[Direction.Vertical] =
       this.ArrayCalculatedToMeanPerBlock(
         datas[Direction.Vertical],
-        { width: canvas.width, height: canvas.height },
+        canvasSize,
         blockSizeToDrawingOneVector,
         this.numOfVectorInCanvas.x * this.numOfVectorInCanvas.y
       );
@@ -56,12 +59,12 @@ export class VectorDiagram extends Diagram {
     const context = canvas.getContext('2d')!;
     for (let y = 0; y < this.numOfVectorInCanvas.y; y++) {
       for (let x = 0; x < this.numOfVectorInCanvas.x; x++) {
+        context.beginPath();
         const halfOfBlockSize = {
           x: blockSizeToDrawingOneVector.x / 2,
           y: blockSizeToDrawingOneVector.y / 2,
         };
 
-        context.beginPath();
         const arrow = {
           length: 3,
           bold: 1,
@@ -75,7 +78,7 @@ export class VectorDiagram extends Diagram {
         const endPointOfVector = {
           x:
             startPointOfVector.x +
-            arraysOfNormalizedMeanBlock[Direction.Horizonal][
+            arraysOfNormalizedMeanBlock[Direction.Horizontal][
               x + y * this.numOfVectorInCanvas.x
             ] *
               halfOfBlockSize.x,
@@ -126,7 +129,7 @@ export class VectorDiagram extends Diagram {
     blockSizeToDrawingOneVector: { x: number; y: number },
     totalNumOfBlocksInCanvas: number
   ) => {
-    return new Array<number>(totalNumOfBlocksInCanvas).map((_, i) => {
+    return new Array<number>(totalNumOfBlocksInCanvas).fill(0).map((_, i) => {
       // Slice Array to get needed section,
       // (Too Complication)
       let applicable_array = new Array<number>();
@@ -164,4 +167,3 @@ export class VectorDiagram extends Diagram {
     return vector;
   }
 }
-

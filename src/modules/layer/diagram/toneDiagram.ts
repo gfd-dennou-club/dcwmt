@@ -2,12 +2,18 @@ import { Diagram } from './diagram';
 import { Clrmap } from '../../utility/colormap/colormap';
 
 export class ToneDiagram extends Diagram {
+  private readonly colormap: Clrmap[];
+  private readonly mathMethod: (x: number) => number;
+
   constructor(
-    private readonly colormap: Clrmap[],
-    private readonly mathMethod: (x: number) => number,
-    range?: { min: number; max: number }
+    colormap: Clrmap[],
+    mathMethod: (x: number) => number,
+    minmax?: [number, number]
   ) {
-    super(range);
+    super(minmax);
+
+    this.colormap = colormap;
+    this.mathMethod = mathMethod;
   }
 
   protected drawVisualizedDiagramBasedONNumData = (
@@ -18,7 +24,7 @@ export class ToneDiagram extends Diagram {
 
     for (let i = 0; i < canvas.height * canvas.width; i++) {
       const bias_index = i * 4;
-      const data = this.mathMethod(datas[0][1]);
+      const data = this.mathMethod(datas[0][i]);
       const clrmap = this.getClrMap(data);
       imageData.data[bias_index + 0] = clrmap.r;
       imageData.data[bias_index + 1] = clrmap.g;
@@ -34,9 +40,9 @@ export class ToneDiagram extends Diagram {
 
   private getClrMap = (data: number): Clrmap => {
     const colormap_per_scalardata =
-      this.colormap.length / (this.range.max - this.range.min);
+      this.colormap.length / (this.minmax[1] - this.minmax[0]);
     const colormap_index = Math.round(
-      colormap_per_scalardata * (data - this.range.min)
+      colormap_per_scalardata * (data - this.minmax[0])
     );
 
     // 読み込み失敗時は白を返す
@@ -51,7 +57,7 @@ export class ToneDiagram extends Diagram {
     }
   };
 
-  // @ts-ignore
+  //@ts-ignore
   public whichDiagram<T, U, V>(tone: T, contour: U, vector: V): T | U | V {
     return tone;
   }

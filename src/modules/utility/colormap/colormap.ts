@@ -1,4 +1,4 @@
-import { clrmap } from '../../../components/DrawerContents/Drawer-colormap/colormap_lib.js';
+import { clrmap } from '../../../components/DrawerContents/Drawer-colormap/colormap_lib';
 
 export type Clrmap = {
   r: number;
@@ -6,7 +6,7 @@ export type Clrmap = {
   b: number;
 };
 
-export class colormap {
+export class ColorMap {
   private clrindex: number;
 
   constructor(clrindex: number) {

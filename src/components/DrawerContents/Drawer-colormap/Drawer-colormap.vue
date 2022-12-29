@@ -13,27 +13,29 @@
 </template>
 
 <script lang="ts">
+import Vue from 'vue';
 import colorbar from './Colorbar.vue';
 
 type DrawerColormapDataType = {
-  selected: number,
-  clrmap_names: Array<string>
-}
+  selected: number;
+  clrmap_names: Array<string>;
+};
 
-export default {
+export default Vue.extend({
   components: {
     colorbar,
   },
   data(): DrawerColormapDataType {
     return {
       selected: 1,
-      clrmap_names: new Array(78).fill(""),
+      clrmap_names: new Array(78).fill(''),
     };
   },
   created: function () {
     for (let i = 0; i < this.clrmap_names.length; i++) {
       const clrindex = i + 1;
-      const clrmapname = clrindex < 10 ? `clrmap_0${clrindex}` : `clrmap_${clrindex}`;
+      const clrmapname =
+        clrindex < 10 ? `clrmap_0${clrindex}` : `clrmap_${clrindex}`;
       this.clrmap_names[i] = clrmapname;
     }
   },
@@ -42,5 +44,5 @@ export default {
       this.$store.commit('setConfig', { clrindex: clrindex });
     },
   },
-};
+});
 </script>

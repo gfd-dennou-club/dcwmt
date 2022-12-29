@@ -4,13 +4,15 @@ export type ReturnedTypeInCartesian = Map;
 
 export const viewerCartesian = (
   mapEl: HTMLDivElement,
-  zoomNativeLevel: { min: number; max: number }
+  zoomNativeLevel: { min: number; max: number },
+  zoom: number,
+  center: [number, number]
 ): Map =>
   map(mapEl, {
     preferCanvas: true, // Canvasレンダラーを選択
-    center: [0, 0],
+    center: center,
     crs: CRS.Simple,
     maxZoom: zoomNativeLevel.max,
     minZoom: zoomNativeLevel.min,
-    zoom: 0,
+    zoom: zoom
   });

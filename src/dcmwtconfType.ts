@@ -4,52 +4,55 @@ const types = ['tone', 'vector', 'contour'] as const;
 export type DiagramTypes = typeof types[number];
 
 export type Variable = {
-  name: string | [string, string];
+  name: [string, string];
   type: DiagramTypes;
-  tileSize: [number, number];
+  tileSize: { x: number; y: number };
+  zoomLevel: { min: number; max: number };
   minZoom: number;
   maxZoom: number;
   fixed: Array<string>;
 };
 
-type LayerTone = {
+type Layer = {
   name: string;
+  show: boolean,
+  opacity: number,
+  varindex: number;
+  fixedindex: number;
+  minmax: [number, number] | undefined;
+}
+
+type LayerTone = Layer & {
   type: 'tone';
   clrindex: number;
-  minmax: [number, number];
-  varindex: number;
-  fixedindex: number;
 };
 
-type LayerVector = {
-  name: string;
+type LayerVector = Layer & {
   type: 'vector';
-  minmax: [number, number];
-  varindex: number;
-  fixedindex: number;
+  vecinterval: {
+    x: number;
+    y: number;
+  };
 };
 
-type LayerContour = {
-  name: string;
+type LayerContour = Layer & {
   type: 'contour';
-  minmax: [number, number];
-  varindex: number;
-  fixedindex: number;
+  thretholdinterval: number;
 };
 
 export type LayerTypes = LayerTone | LayerVector | LayerContour;
 
 export type DefinedOptions = Readonly<{
   root: string;
-  title: string;
-  axis: [string, string];
   variables: Array<Variable>;
 }>;
 
 export type DrawingOptions = {
+  title: string;
+  sumneil: string;
   zoom: number;
   center: [number, number];
-  projection: ProjCodes;
+  projCode: ProjCodes;
   mathMethods: number;
   layers: Array<LayerTypes>;
 };

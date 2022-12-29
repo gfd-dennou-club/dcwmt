@@ -1,75 +1,90 @@
 import TileLayer from 'ol/layer/Tile';
-import XYZ from 'ol/source/XYZ';
+import XYZ, { Options } from 'ol/source/XYZ';
 import { get } from 'ol/proj';
 import { createXYZ } from 'ol/tilegrid';
-import WMTS from 'ol/tilegrid/WMTS';
-import { DiagramTypes } from '../../../dcmwtconfType';
+import { Diagram } from '../diagram/diagram';
+import { TileCoord } from 'ol/tilecoord';
+import Tile, { LoadFunction, UrlFunction } from 'ol/Tile';
+import { ImageTile } from 'ol';
+import { LayerInterface } from './LayerInterface';
 
-const layerProjection = class extends TileLayer<XYZ> {
+export class LayerProjection extends TileLayer<XYZ> implements LayerInterface {
+  public minmax: [number, number] | undefined;
+
   constructor(
+    public readonly name: string,
     private readonly urls: string[],
     private readonly tileSize: { x: number; y: number },
-    private readonly zoomLevel: { min: number; max: number },
-    private readonly diagram: DiagramTypes
+    zoomLevel: { min: number; max: number },
+    show: boolean,
+    opacity: number,
+    private readonly diagram: Diagram
   ) {
+    super({
+      visible: show,
+      opacity: opacity,
+    });
 
     const projection = get('EPSG:3857');
 
+    if (!projection) {
+      throw new Error('projection is null');
+    }
+
     const defaultTileGrid = createXYZ({
       extent: projection.getExtent(),
-      minZoom: this.options.minZoom,
-      maxZoom: this.options.maxZoom,
+      minZoom: zoomLevel.min,
+      maxZoom: zoomLevel.max,
+      //@ts-ignore
+      tileSize: this.tileSize
     });
 
-    const tilegrid_options = {
-      origin: defaultTileGrid.getOrigin(0),
-      resolutions: defaultTileGrid.getResolutions(),
-      tileSize: [this.options.size.X, this.options.size.Y],
-    };
-
-    const tileGrid = new WMTS(tilegrid_options);
-
-    const xyz_options = {
-      tileUrlFunction: this._tileUrlFunction,
-      tileLoadFunction: this._tileLoadFunction,
-      projection: projection.getCode(),
-      tileGrid: tileGrid,
+    const xyz_options: Options = {
+      url: '',
+      tileUrlFunction: this.tileUrlFunction,
+      tileLoadFunction: this.tileLoadFunction,
+      tileGrid: defaultTileGrid,
+      crossOrigin: "Anonymous",
       wrapX: true,
     };
+    const xyz = new XYZ(xyz_options);
 
-    super({
-        minZoom: zoomLevel.min,
-        maxZoom: zoomLevel.max,
-        extent: projection?.getExtent(),
-        source: new XYZ(xyz_options)
-    });
+    this.setExtent(projection.getExtent());
+    this.setSource(xyz);
   }
 
-  _tileUrlFunction = (coord) => {
-    const Z = 0,
-      X = 1,
-      Y = 2;
-    const url = this.options.url.map((v) =>
-      v.concat(`/${coord[Z]}/${coord[X]}/${coord[Y]}.png`)
-    );
-    return url;
+  private tileUrlFunction: UrlFunction = (coord: TileCoord) => {
+    const [Z, X, Y] = [0, 1, 2];
+    return `/${coord[Z]}/${coord[X]}/${coord[Y]}.png`;
   };
 
-  _tileLoadFunction = async (imageTile, url) => {
+  private tileLoadFunction: LoadFunction = async (
+    imageTile: Tile,
+    url: string
+  ) => {
     const canvas = document.createElement('canvas');
-    [canvas.width, canvas.height] = [this.options.size.X, this.options.size.Y];
+    // @ts-ignore
+    [canvas.width, canvas.height] = this.tileSize;
 
-    const toneFunc = async () => {
-      await this.options.diagram.url2canvas(url[0], canvas);
-    };
-
-    const vectorFunc = async () => {
-      await this.options.diagram.urls2canvas(url, canvas);
-    };
-
-    await this.options.diagram.isTone(toneFunc, vectorFunc)();
-    imageTile.getImage().src = canvas.toDataURL();
+    const url_ary = this.urls.map((v) => v.concat(url));
+    await this.diagram.draw(url_ary, canvas);
+    const image = (imageTile as ImageTile).getImage() as HTMLImageElement;
+    image.src = canvas.toDataURL();
   };
-};
 
-export default layerProjection;
+  set opacity(value: number){
+    this.setOpacity(value);
+  }
+
+  get opacity(): number {
+    return this.getOpacity();
+  }
+
+  set show(value: boolean){
+    this.setVisible(value);
+  }
+
+  get show(): boolean {
+    return this.getVisible();
+  }
+}

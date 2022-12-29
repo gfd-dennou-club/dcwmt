@@ -3,34 +3,40 @@ import { geoPath, geoIdentity } from 'd3-geo';
 import { Diagram } from './diagram';
 
 export class ContourDiagram extends Diagram {
+  private readonly split: number;
+  protected readonly mathMethod: (x: number) => number;
+
   constructor(
-    private readonly split: number,
-    protected readonly mathMethod: (x: number) => number,
-    range?: { min: number; max: number }
+    split: number,
+    mathMethod: (x: number) => number,
+    minmax: [number, number] | undefined
   ) {
-    super(range);
+    super(minmax);
+
+    this.split = split;
+    this.mathMethod = mathMethod;
   }
 
   protected drawVisualizedDiagramBasedONNumData = (
-    datas: number[][],
+    data: number[][],
     canvas: HTMLCanvasElement
   ): HTMLCanvasElement => {
     const context = canvas.getContext('2d')!;
 
-    const processedData = datas[0].map(this.mathMethod);
+    const processedData = data[0].map(this.mathMethod);
 
     const projection = geoIdentity().scale(1);
     const path = geoPath(projection, context);
 
-    const thretholds = new Array<number>(this.split).map(
+    const thresholds = new Array<number>(this.split).fill(0).map(
       (_, i) =>
-        this.range.min + ((this.range.max - this.range.min) / this.split) * i
+        this.minmax[0] + ((this.minmax[1] - this.minmax[0]) / this.split) * i
     );
 
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.lineWidth = 1.5;
 
-    for (const threshold of thretholds) {
+    for (const threshold of thresholds) {
       context.beginPath();
       const contours = contour.contours().size([canvas.width, canvas.height]);
       const object = contours.contour(processedData, threshold);

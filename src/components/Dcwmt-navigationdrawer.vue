@@ -7,18 +7,23 @@
 </template>
 
 <script lang="ts">
+import Vue from 'vue';
 import drawer_math from './DrawerContents/Drawer-math/Drawer-math.vue';
 import drawer_colormap from './DrawerContents/Drawer-colormap/Drawer-colormap.vue';
 import drawer_figure from './DrawerContents/Drawer-figure/Drawer-figure.vue';
 
-export default {
-    components: {
-        drawer_colormap,
-        drawer_figure,
-        drawer_math,
-    },
-    props: {
-        nowlink: String,
-        canDraw: Boolean
-    }
+export default Vue.extend({
+  components: {
+    drawer_colormap,
+    drawer_figure,
+    drawer_math,
+  },
+  props: {
+    nowlink: String,
+    canDraw: Boolean,
+  },
+  data() {
+    return {};
+  },
+});
 </script>
