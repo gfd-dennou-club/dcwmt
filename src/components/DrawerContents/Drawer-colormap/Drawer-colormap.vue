@@ -1,11 +1,10 @@
 <template>
   <v-list subheader tile>
-    <v-subheader>カラーマップの切り替え</v-subheader>
-    <v-list-item-group v-model="selected">
+    <v-list-item-group v-model="selected" color="primary">
       <v-list-item v-for="(clrmap_name, i) in clrmap_names" :key="i" link>
         <v-list-item-content>
           <v-list-item-title>{{ clrmap_name }}</v-list-item-title>
-          <colorbar width="100" height="20" :clrindex="i" />
+          <colorbar :width="200" :height="25" :clrindex="i" />
         </v-list-item-content>
       </v-list-item>
     </v-list-item-group>
@@ -27,7 +26,7 @@ export default Vue.extend({
   },
   data(): DrawerColormapDataType {
     return {
-      selected: 1,
+      selected: Infinity,
       clrmap_names: new Array(78).fill(''),
     };
   },
@@ -39,10 +38,12 @@ export default Vue.extend({
       this.clrmap_names[i] = clrmapname;
     }
   },
-  watch: {
-    selected: function (clrindex: number) {
-      this.$store.commit('setConfig', { clrindex: clrindex });
-    },
-  },
+  //watch: {
+  //  selected: function (clrindex: number) {
+  //    console.log(clrindex);
+  //    this.$parent.bufColorIndex = clrindex;
+  //    console.log(this.$parent)
+  //  },
+  //},
 });
 </script>

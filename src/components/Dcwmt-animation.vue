@@ -69,104 +69,10 @@ export default Vue.extend({
     },
   },
   methods: {
-    replay: async function (index: number) {
-      this.sliders[index].clicked = !this.sliders[index].clicked;
-
-      if (this.sliders[index].clicked) {
-        const delay = this.sec_per_frame * 1000;
-        this.intervalID = setInterval(this.animation, delay, index);
-      } else {
-        clearInterval(this.intervalID);
-        this.intervalID = 0;
-      }
-    },
-    changeURL: function () {
-      let buf = '';
-      this.sliders.forEach((slider) => {
-        buf = buf.concat(`${slider.title}=${slider.tick_label[slider.value]}/`);
-      });
-      this.fixedDim = buf.slice(0, -1);
-    },
-    animation: function (index: number) {
-      this.sliders[index].value += 1;
-      const slider = this.sliders[index];
-      if (slider.value >= slider.max) {
-        this.sliders[index].value = 0;
-      }
-
-      this.changeURL();
-    },
-    update: function () {
-      // if ( this.layers.length < this.length ) {
-      //     return;
-      // }
-
-      // this.length = this.layers.length;
-
-      // let fixed = define.TONE[0].FIXED || define.VECTOR[0].FIXED;
-      let fixed = define.VECTOR[0].FIXED;
-      // if ( this.layers.length == 0 ) {}
-      // else {
-      //     const top = this.layers.length - 1;
-      //     const diagrams = this.layers[top].options.diagram.isTone()
-      //                         ? define.TONE : define.VECTOR;
-      //     for ( const diagram of diagrams ) {
-      //         let dname = "";
-      //         if ( typeof diagram.NAME == "object") {
-      //             diagram.NAME.forEach( v => {
-      //                 dname = dname.concat(`${v}-`);
-      //             });
-      //             dname = dname.slice(0, -1);
-      //         } else {
-      //             dname = diagram.NAME;
-      //         }
-
-      //         const lname = this.layers[top].options.name.split("_")[0];
-      //         if ( dname == lname ) {
-      //             fixed = diagram.FIXED;
-      //             if ( this.name == lname ) { return; }
-      //             this.name = lname;
-      //             break;
-      //         }
-      //     }
-      // }
-
-      // this.variables.splice(0)
-
-      const dims = fixed.map((v) => v.split('/')).flat();
-      dims.forEach((dim) => {
-        const split = dim.split('=');
-        const purpose_index = this.variables.findIndex(
-          (v) => v.title === split[0]
-        );
-        if (purpose_index == -1) {
-          this.variables.push({
-            title: split[0],
-            value: 0,
-            min: 0,
-            max: 0,
-            step: 1,
-            tick_labels: [split[1]],
-            clicked: false,
-          });
-        } else if (
-          !this.variables[purpose_index]['tick_labels'].find(
-            (v) => v === split[1]
-          )
-        ) {
-          this.variables[purpose_index]['max'] += 1;
-          this.variables[purpose_index]['tick_labels'].push(split[1]);
-        }
-      });
-    },
   },
   created: function () {
-    this.update();
   },
   watch: {
-    layers: function () {
-      this.update();
-    },
   },
 });
 </script>

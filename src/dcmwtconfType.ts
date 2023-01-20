@@ -20,6 +20,7 @@ type Layer = {
   varindex: number;
   fixedindex: number;
   minmax: [number, number] | undefined;
+  id?: string, 
 }
 
 type LayerTone = Layer & {
@@ -55,4 +56,5 @@ export type DrawingOptions = {
   projCode: ProjCodes;
   mathMethods: number;
   layers: Array<LayerTypes>;
+  id?: string,
 };

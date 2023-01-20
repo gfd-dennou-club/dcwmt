@@ -95,9 +95,6 @@ export default Vue.extend({
 
   computed: {
     clrmap: function (): ClrmapType[] {
-      if (!this.clrindex) {
-        throw new Error('this.clrindex should be number');
-      }
       return clrmap[this.clrindex];
     },
   },

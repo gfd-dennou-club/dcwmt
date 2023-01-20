@@ -15,45 +15,13 @@ import type {
   Variable,
 } from '../dcmwtconfType';
 import { Map } from '../modules/viewer/map';
-import { ViewerController } from '../modules/viewer/ViewerContoller';
+import { ViewerController } from '../modules/viewer/ViewerController';
 import { LayerController } from '../modules/layerManager/LayerController';
-import { ConfFileReader } from './ConfFileReader';
-
-type DcwmtMapData = {
-  viewerController: ViewerController | undefined;
-  definedOptions: DefinedOptions | undefined;
-};
 
 export default Vue.extend({
   components: {
     layerselecter,
     //    ruler,
-  },
-  data(): DcwmtMapData {
-    return {
-      viewerController: undefined,
-      definedOptions: undefined,
-    };
-  },
-  mounted: async function () {
-    const configData = await new ConfFileReader('./dcwmtconf.json').read();
-    this.definedOptions = configData.definedOptions;
-    this.drawingOptions = configData.drawingOptions;
-
-    const zoomNativeLevel = this.getZoomNativeLevel(this.definedOptions);
-
-    this.viewerController = new ViewerController(
-      this.drawingOptions.projCode,
-      zoomNativeLevel,
-      this.drawingOptions.zoom,
-      this.drawingOptions.center
-    );
-    const layerController = new LayerController(
-      this.definedOptions.root,
-      this.drawingOptions.projCode
-    );
-
-    await this.draw(this.viewerController, layerController);
   },
   computed: {
     drawingOptions: {
@@ -64,8 +32,25 @@ export default Vue.extend({
         this.$store.commit('setDrawingOptions', value);
       },
     },
+    definedOptions: function () {
+      return this.$store.getters.definedOptions;
+    },
+    viewerController: {
+      get: function () {
+        return this.$store.getters.viewerController;
+      },
+      set: function (value: ViewerController) {
+        this.$store.commit('setViewerController', value);
+      },
+    },
   },
   methods: {
+    initialize: async function () {
+      const controller = this.createController();
+      this.viewerController = controller.viewerController;
+      const layerController = controller.layerController;
+      await this.draw(this.viewerController, layerController);
+    },
     getZoomNativeLevel: function (definedOptions: DefinedOptions) {
       return {
         min: Math.max(...definedOptions.variables.map((v) => v.minZoom)),
@@ -94,6 +79,25 @@ export default Vue.extend({
       }
 
       viewer.register(layerController);
+    },
+    createController() {
+      if (!this.definedOptions) {
+        throw new Error('definedOptions is undefined');
+      }
+      const zoomNativeLevel = this.getZoomNativeLevel(this.definedOptions);
+
+      const viewerController = new ViewerController(
+        this.drawingOptions.projCode,
+        zoomNativeLevel,
+        this.drawingOptions.zoom,
+        this.drawingOptions.center
+      );
+      const layerController = new LayerController(
+        this.definedOptions.root,
+        this.drawingOptions.projCode
+      );
+
+      return { viewerController, layerController };
     },
     createPropsForCreateLayerMethod(layer: LayerTypes, variables: Variable[]) {
       const variable = variables[layer.varindex];
@@ -127,30 +131,35 @@ export default Vue.extend({
     },
   },
   watch: {
-    'drawingOptions.layers': {
-      //@ts-ignore
-      handler: function (layer: LayerTypes[]) {
-        const viewer = this.viewerController?.get();
-        if (viewer) {
-          viewer.updateLayers(layer);
+    drawingOptions: {
+      handler: async function (
+        newOptions: DrawingOptions,
+        oldOptions: DrawingOptions | undefined
+      ) {
+        if (!oldOptions || newOptions.id !== oldOptions.id) {
+          await this.initialize();
+        } else if (newOptions.projCode !== oldOptions.projCode) {
+          const zoom = Math.round(this.viewerController?.get()?.zoom);
+          const center = this.viewerController?.get()?.center;
+          if (zoom === undefined || !center) {
+            throw new Error('zoom / center is undefined');
+          }
+          //@ts-ignore
+          this.drawingOptions = { ...this.drawingOptions, zoom, center };
+
+          const controller = this.createController();
+          this.viewerController = controller.viewerController;
+          const layerController = controller.layerController;
+          await this.draw(this.viewerController, layerController);
+        } else {
+          const viewer = this.viewerController?.get();
+          if (viewer) {
+            viewer.updateLayers(newOptions.layers);
+          }
         }
       },
       deep: true,
     },
-    // config: {
-    // handler: function () {
-    // if (this.viewer.getView) {
-    // const view = this.viewer.getView();
-    // this.zoom = view.getZoom();
-    // this.center = view.getCenter();
-    // }
-    // this.draw();
-    // },
-    // deep: true,
-    // },
-    // layers: function () {
-    // this.$store.commit('setLayers', this.layers);
-    // },
   },
 });
 </script>

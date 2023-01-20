@@ -1,20 +1,27 @@
 import { Diagram } from './diagram';
-import { Clrmap } from '../../utility/colormap/colormap';
+import { Clrmap, ColorMap } from '../../utility/colormap/colormap';
 
 export class ToneDiagram extends Diagram {
-  private readonly colormap: Clrmap[];
+  public colorIndex: number;
+  private colormap: Clrmap[];
   private readonly mathMethod: (x: number) => number;
 
   constructor(
-    colormap: Clrmap[],
+    colorIndex: number,
     mathMethod: (x: number) => number,
     minmax?: [number, number]
   ) {
     super(minmax);
 
-    this.colormap = colormap;
+    this.colorIndex = colorIndex;
+    this.colormap = new ColorMap(colorIndex).getClrmap();
     this.mathMethod = mathMethod;
   }
+
+  public changeColorMap(colorIndex: number) {
+    this.colorIndex = colorIndex;
+    this.colormap = new ColorMap(colorIndex).getClrmap();
+  } 
 
   protected drawVisualizedDiagramBasedONNumData = (
     datas: number[][],

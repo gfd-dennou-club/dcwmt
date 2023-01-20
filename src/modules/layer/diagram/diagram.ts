@@ -1,5 +1,7 @@
 export abstract class Diagram {
   protected minmax: [number, number];
+  public colorIndex?: number;
+  public thresholdInterval?: number;
 
   constructor(minmax?: [number, number]) {
     if (!minmax) {

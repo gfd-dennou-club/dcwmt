@@ -8,7 +8,7 @@
       <dcwmt_map />
     </v-main>
     <v-footer app>
-      <!-- <dcwmt_footer /> -->
+      <dcwmt_footer :viewerController="viewerController" />
     </v-footer>
   </v-app>
 </template>
@@ -19,37 +19,41 @@ import dcwmt_map from './Dcwmt-map.vue';
 //import dcwmt_legend from './Dcwmt-legends.vue';
 import dcwmt_navigationdrawer from './Dcwmt-navigationdrawer.vue';
 import tab from './Tab.vue';
-// import dcwmt_footer from './Dcwmt-footer.vue';
+import dcwmt_footer from './Dcwmt-footer.vue';
+import { ViewerController } from '@/modules/viewer/ViewerController';
 
 type AppDataType = {
   canDraw: boolean;
   nowlink: string;
-  oldlink: string;
 };
 
 export default Vue.extend({
   components: {
     dcwmt_map,
-    //    dcwmt_legend,
+    // dcwmt_legend,
     dcwmt_navigationdrawer,
     tab,
-    //    dcwmt_footer,
+    dcwmt_footer,
   },
   data(): AppDataType {
     return {
       canDraw: false,
       nowlink: '',
-      oldlink: '',
     };
   },
   methods: {
     selectMenu: function (link: string) {
-      if (!this.oldlink || this.oldlink === link) {
+      if (!this.nowlink || this.nowlink === link) {
         this.canDraw = !this.canDraw;
       }
       this.nowlink = link;
-      this.oldlink = link;
     },
   },
+  computed: {
+    viewerController: function(): ViewerController | undefined {
+      // @ts-ignore
+      return this.$refs.map?.viewerController;
+    }
+  }
 });
 </script>

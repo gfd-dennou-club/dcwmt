@@ -42,11 +42,21 @@ export class Layer3D extends UrlTemplateImageryProvider implements LayerInterfac
   set opacity(value: number){
     this.defaultAlpha = value;
   }
-
   get opacity(): number {
     if(!this.defaultAlpha) {
       throw new Error("Don't has alpha channel this layer");
     }
     return this.defaultAlpha;
+  }
+
+  set colorIndex(value: number) {
+    //@ts-ignore
+    this.diagram.changeColorMap(value);
+  }
+  get colorIndex() {
+    if(!this.diagram.colorIndex){
+      throw new Error("Shouldn't call to this layer");
+    }
+    return this.diagram.colorIndex;
   }
 }

@@ -4,11 +4,7 @@
     <v-list-item
       v-for="projection in projections"
       :key="projection.title"
-      @click="
-        () => {
-          selected = projection.code;
-        }
-      "
+      @click="onClick(projection)"
     >
       <v-list-item-title>
         {{ projection.title }}
@@ -18,9 +14,9 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
 import { DrawingOptions } from '@/dcmwtconfType';
-import { Projection, projections } from './projection_lib';
+import Vue from 'vue';
+import { ProjCodes, Projection, projections } from './projection_lib';
 
 type DrawerFigureDataType = {
   selected: Projection;
@@ -33,8 +29,11 @@ export default Vue.extend({
     };
   },
   computed: {
+    projections: function () {
+      return projections;
+    },
     drawingOptions: {
-      get: function () {
+      get: function (): DrawingOptions {
         return this.$store.getters.drawingOptions;
       },
       set: function (value: DrawingOptions) {
@@ -42,10 +41,11 @@ export default Vue.extend({
       },
     },
   },
-  watch: {
-    selected: function (proj: Projection) {
-      const param = { projCode: proj.code };
-      this.drawingOptions = { ...this.drawingOptions, ...param };
+  methods: {
+    onClick: function (projection: Projection) {
+      const codeObj = { projCode: projection.code as ProjCodes };
+      const storeObj = this.drawingOptions;
+      this.drawingOptions = { ...storeObj, ...codeObj };
     },
   },
 });

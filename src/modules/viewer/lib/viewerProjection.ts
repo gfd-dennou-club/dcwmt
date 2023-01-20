@@ -14,6 +14,7 @@ import TileGrid from 'ol/tilegrid/TileGrid';
 import { LayerController } from '@/modules/layerManager/LayerController';
 import { LayerProjection } from '@/modules/layer/lib/layerProjection';
 import { LayerTypes } from '@/dcmwtconfType';
+import { Coordinate } from 'ol/coordinate';
 
 export class ViewerProjection extends Map implements ViewerInterface {
   constructor(
@@ -51,7 +52,7 @@ export class ViewerProjection extends Map implements ViewerInterface {
       if (!projection.proj4) {
         continue;
       }
-      proj4.defs(projection.title, projection.proj4);
+      proj4.defs(projection.code, projection.proj4);
     }
     register(proj4);
 
@@ -110,17 +111,29 @@ export class ViewerProjection extends Map implements ViewerInterface {
       return;
     }
     for (let i = 0; i < baseLayers.length; i++) {
-      if (baseLayers[i].name === layers[i].name) {
-        if (baseLayers[i].show !== layers[i].show) {
-          baseLayers[i].show = layers[i].show;
+      const layer = layers[i];
+      if (baseLayers[i].name === layer.name) {
+        if (baseLayers[i].show !== layer.show) {
+          baseLayers[i].show = layer.show;
           break;
         }
-        if (baseLayers[i].opacity !== layers[i].opacity) {
-          baseLayers[i].opacity = layers[i].opacity;
+        if (baseLayers[i].opacity !== layer.opacity) {
+          baseLayers[i].opacity = layer.opacity;
           break;
+        }
+        if (layer.type === 'tone') {
+          if (baseLayers[i].colorIndex !== layer.clrindex) {
+            baseLayers[i].colorIndex = layer.clrindex;
+            break;
+          }
+        } else if (layer.type === 'contour') {
+          if (baseLayers[i].thresholdInterval !== layer.thretholdinterval) {
+            baseLayers[i].thresholdInterval = layer.thretholdinterval;
+            break;
+          }
         }
       } else {
-        const j = baseLayers.map((l) => l.name).indexOf(layers[i].name);
+        const j = baseLayers.map((l) => l.name).indexOf(layer.name);
         const updateLayer = baseLayers[i];
         if (i < j) {
           this.raise(updateLayer);
@@ -160,5 +173,27 @@ export class ViewerProjection extends Map implements ViewerInterface {
       }
     }
     this.setLayers(layers);
+  }
+
+  get zoom(): number {
+    const zoom = this.getView().getZoom();
+    if (zoom === undefined) {
+      throw new Error('zoom is undefined');
+    }
+    return zoom;
+  }
+  set zoom(value: number) {
+    this.getView().setZoom(value);
+  }
+
+  get center(): [number, number] {
+    const center = this.getView().getCenter();
+    if (!center) {
+      throw new Error('center is undefined');
+    }
+    return center as [number, number];
+  }
+  set center(value: [number, number]) {
+    this.getView().setCenter(value as Coordinate);
   }
 }

@@ -36,7 +36,7 @@ export class LayerProjection extends TileLayer<XYZ> implements LayerInterface {
       minZoom: zoomLevel.min,
       maxZoom: zoomLevel.max,
       //@ts-ignore
-      tileSize: this.tileSize
+      tileSize: this.tileSize,
     });
 
     const xyz_options: Options = {
@@ -44,7 +44,7 @@ export class LayerProjection extends TileLayer<XYZ> implements LayerInterface {
       tileUrlFunction: this.tileUrlFunction,
       tileLoadFunction: this.tileLoadFunction,
       tileGrid: defaultTileGrid,
-      crossOrigin: "Anonymous",
+      crossOrigin: 'Anonymous',
       wrapX: true,
     };
     const xyz = new XYZ(xyz_options);
@@ -72,19 +72,48 @@ export class LayerProjection extends TileLayer<XYZ> implements LayerInterface {
     image.src = canvas.toDataURL();
   };
 
-  set opacity(value: number){
+  set opacity(value: number) {
     this.setOpacity(value);
   }
-
   get opacity(): number {
     return this.getOpacity();
   }
 
-  set show(value: boolean){
+  set show(value: boolean) {
     this.setVisible(value);
   }
-
   get show(): boolean {
     return this.getVisible();
+  }
+
+  set colorIndex(value: number) {
+    if (!this.diagram.colorIndex) {
+      throw new Error("Shouldn't adapt to this layer");
+    }
+    //@ts-ignore
+    this.diagram.changeColorMap(value);
+    const source = this.getSource();
+    source?.refresh();
+  }
+  get colorIndex() {
+    if (!this.diagram.colorIndex) {
+      throw new Error("Shouldn't call to this layer");
+    }
+    return this.diagram.colorIndex;
+  }
+
+  set thresholdInterval(value: number) {
+    if(!this.diagram.thresholdInterval) {
+      throw new Error("Shouldn't call to this layer");
+    }
+    this.diagram.thresholdInterval = value;
+    const source = this.getSource();
+    source?.refresh();
+  }
+  get thresholdInterval() {
+    if(!this.diagram.thresholdInterval) {
+      throw new Error("Shouldn't call to this layer");
+    }
+    return this.diagram.thresholdInterval; 
   }
 }

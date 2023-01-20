@@ -3,17 +3,17 @@ import { geoPath, geoIdentity } from 'd3-geo';
 import { Diagram } from './diagram';
 
 export class ContourDiagram extends Diagram {
-  private readonly split: number;
+  public thresholdInterval: number;
   protected readonly mathMethod: (x: number) => number;
 
   constructor(
-    split: number,
+    thresholdInterval: number,
     mathMethod: (x: number) => number,
     minmax: [number, number] | undefined
   ) {
     super(minmax);
 
-    this.split = split;
+    this.thresholdInterval = thresholdInterval;
     this.mathMethod = mathMethod;
   }
 
@@ -28,10 +28,13 @@ export class ContourDiagram extends Diagram {
     const projection = geoIdentity().scale(1);
     const path = geoPath(projection, context);
 
-    const thresholds = new Array<number>(this.split).fill(0).map(
-      (_, i) =>
-        this.minmax[0] + ((this.minmax[1] - this.minmax[0]) / this.split) * i
-    );
+    const thresholds = new Array<number>(this.thresholdInterval)
+      .fill(0)
+      .map(
+        (_, i) =>
+          this.minmax[0] +
+          ((this.minmax[1] - this.minmax[0]) / this.thresholdInterval) * i
+      );
 
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.lineWidth = 1.5;

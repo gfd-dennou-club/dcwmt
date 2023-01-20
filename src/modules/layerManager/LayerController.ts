@@ -1,5 +1,4 @@
 import { ProjCodes } from '../../components/DrawerContents/Drawer-figure/projection_lib';
-import { ColorMap } from '../utility/colormap/colormap';
 import { WmtsLibIdentifer } from '../utility/wmtsLibIdentifer';
 
 import { Layer3D } from '../layer/lib/layer3D';
@@ -47,8 +46,7 @@ export class LayerController {
     let diagramObj: Diagram;
     if (type === 'tone') {
       const clrindex = diagramProp as number;
-      const clrmap = new ColorMap(clrindex).getClrmap();
-      diagramObj = new ToneDiagram(clrmap, mathMethod, minmax);
+      diagramObj = new ToneDiagram(clrindex, mathMethod, minmax);
       minmax = await this.getMinMax(url_ary, tileSize, diagramObj);
     } else if (type === 'contour') {
       const thretholdinterval = diagramProp as number;

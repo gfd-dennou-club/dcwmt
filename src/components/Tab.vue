@@ -4,7 +4,7 @@
       {{ link }}
     </v-tab>
   </v-tabs>
-</template>>
+</template>
 
 <script lang="ts">
 import Vue from 'vue';
@@ -13,9 +13,8 @@ export default Vue.extend({
   data() {
     return {
       links: [
-        'HOME',
+        'ロード',
         '数学的操作',
-        'カラーマップの切り替え',
         '断面切り替え',
         '描画方法の切り替え',
       ],

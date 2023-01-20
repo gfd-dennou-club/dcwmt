@@ -41,8 +41,8 @@ export class ViewerController {
       this.zoom,
       this.center,
     ] as const;
-    const cesium = () => new Viewer3D(mapEl);
-    const leaflet = () => new Viewer3D(mapEl);
+    const cesium = () => new Viewer3D(mapEl, this.center);
+    const leaflet = () => new Viewer3D(mapEl, this.center);
     const openlayers = () => new ViewerProjection(...prop);
     const suitableFunc = this.wli.whichLib(cesium, leaflet, openlayers);
     return suitableFunc();

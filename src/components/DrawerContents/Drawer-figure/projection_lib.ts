@@ -24,7 +24,7 @@ export const projections: readonly Projection[] = [
     code: 'ESRI:54009',
     extent: [-18e6, -9e6, 18e6, 9e6],
     proj4:
-      '+proj=aeqd +lat_0=90 +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs',
+      '+proj=moll +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs',
   },
   {
     title: 'サンソン図法',
@@ -38,12 +38,12 @@ export const projections: readonly Projection[] = [
     extent: undefined,
     proj4: undefined,
   },
-  {
-    title: 'デカルト座標平面への投影',
-    code: 'XY',
-    extent: undefined,
-    proj4: undefined,
-  },
+  // {
+  //   title: 'デカルト座標平面への投影',
+  //   code: 'XY',
+  //   extent: undefined,
+  //   proj4: undefined,
+  // },
 ];
 
 const codes = [
@@ -52,6 +52,6 @@ const codes = [
   'ESRI:54009',
   'ESRI:54008',
   '3d Sphere',
-  'XY'
+  'XY',
 ] as const;
 export type ProjCodes = typeof codes[number];

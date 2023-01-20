@@ -1,5 +1,8 @@
 import { LayerTypes } from '@/dcmwtconfType';
 import { Viewer, TileCoordinatesImageryProvider, Color } from 'cesium';
+import Cartesian2 from 'cesium/Source/Core/Cartesian2';
+import Cartesian3 from 'cesium/Source/Core/Cartesian3';
+import Ellipsoid from 'cesium/Source/Core/Ellipsoid';
 import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
 import { Layer3D } from '../../layer/lib/layer3D';
 import { LayerController } from '../../layerManager/LayerController';
@@ -8,7 +11,7 @@ import { ViewerInterface } from './ViewerInterface';
 export type ReturnedTypeIn3D = Viewer;
 
 export class Viewer3D extends Viewer implements ViewerInterface {
-  constructor(mapEl: HTMLDivElement) {
+  constructor(mapEl: HTMLDivElement, center: [number, number]) {
     super(mapEl, {
       imageryProvider: new TileCoordinatesImageryProvider(),
       baseLayerPicker: false,
@@ -25,8 +28,9 @@ export class Viewer3D extends Viewer implements ViewerInterface {
       skyBox: false,
       skyAtmosphere: false,
     });
-    super.scene.backgroundColor = Color.WHITE;
-    super.scene.globe.showGroundAtmosphere = false;
+    this.scene.backgroundColor = Color.WHITE;
+    this.scene.globe.showGroundAtmosphere = false;
+    this.center = center;
   }
 
   public register = (layerController: LayerController) => {
@@ -71,8 +75,20 @@ export class Viewer3D extends Viewer implements ViewerInterface {
           baseLayers.add(purposeLayer, i);
           break;
         }
+        if (layer.type === 'tone') {
+          if (
+            (purposeLayer.imageryProvider as Layer3D).colorIndex !==
+            layer.clrindex
+          ) {
+            baseLayers.remove(purposeLayer, false);
+            (purposeLayer.imageryProvider as Layer3D).colorIndex =
+              layer.opacity;
+            baseLayers.add(purposeLayer, i);
+            break;
+          }
+        }
       } else {
-        // swapping layers. 
+        // swapping layers.
         const j = layers.map((l) => l.name).indexOf(baseLayer.name);
         const upLayer = baseLayers.get(i);
         if (i < j) {
@@ -85,4 +101,37 @@ export class Viewer3D extends Viewer implements ViewerInterface {
     }
     this.render();
   };
+
+  get zoom(): number {
+    return 0;
+  }
+  set zoom(value: number) {
+    value;
+  }
+
+  get center(): [number, number] {
+    const windowCenter = new Cartesian2(
+      this.container.clientWidth / 2,
+      this.container.clientHeight / 2
+    );
+    const pickRay = this.scene.camera.getPickRay(windowCenter)!;
+    const pickPosition = this.scene.globe.pick(pickRay, this.scene)!;
+    const pickPositionCartographic =
+      this.scene.globe.ellipsoid.cartesianToCartographic(pickPosition);
+    const coord: [number, number] = [
+      pickPositionCartographic.longitude * (180 / Math.PI),
+      pickPositionCartographic.latitude * (180 / Math.PI),
+    ];
+    return coord;
+  }
+
+  set center(value: [number, number]) {
+    this.camera.setView({
+      destination: Cartesian3.fromDegrees(
+        value[0],
+        value[1],
+        Ellipsoid.WGS84.cartesianToCartographic(this.camera.position).height
+      ),
+    });
+  }
 }
