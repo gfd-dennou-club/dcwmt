@@ -5,7 +5,7 @@ import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 import Ellipsoid from 'cesium/Source/Core/Ellipsoid';
 import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
 import { Layer3D } from '../../layer/lib/layer3D';
-import { LayerController } from '../../layerManager/LayerController';
+import { LayerController } from '../../layer/LayerController';
 import { ViewerInterface } from './ViewerInterface';
 
 export type ReturnedTypeIn3D = Viewer;

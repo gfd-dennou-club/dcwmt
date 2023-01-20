@@ -11,7 +11,7 @@ import {
   projections,
 } from '../../../components/DrawerContents/Drawer-figure/projection_lib';
 import TileGrid from 'ol/tilegrid/TileGrid';
-import { LayerController } from '@/modules/layerManager/LayerController';
+import { LayerController } from '@/modules/layer/LayerController';
 import { LayerProjection } from '@/modules/layer/lib/layerProjection';
 import { LayerTypes } from '@/dcmwtconfType';
 import { Coordinate } from 'ol/coordinate';

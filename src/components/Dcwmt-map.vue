@@ -16,7 +16,7 @@ import type {
 } from '../dcmwtconfType';
 import { Map } from '../modules/viewer/map';
 import { ViewerController } from '../modules/viewer/ViewerController';
-import { LayerController } from '../modules/layerManager/LayerController';
+import { LayerController } from '../modules/layer/LayerController';
 
 export default Vue.extend({
   components: {

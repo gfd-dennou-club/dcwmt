@@ -1,14 +1,14 @@
 import { ProjCodes } from '../../components/DrawerContents/Drawer-figure/projection_lib';
 import { WmtsLibIdentifer } from '../utility/wmtsLibIdentifer';
 
-import { Layer3D } from '../layer/lib/layer3D';
+import { Layer3D } from './lib/layer3D';
 //import { LayerCartesian } from '../layer/lib/layerCartesian';
-import { LayerProjection } from '../layer/lib/layerProjection';
+import { LayerProjection } from './lib/layerProjection';
 
-import { ToneDiagram } from '../layer/diagram/toneDiagram';
-import { ContourDiagram } from '../layer/diagram/counterDiagram';
-import { VectorDiagram } from '../layer/diagram/vectorDiagram';
-import { Diagram } from '../layer/diagram/diagram';
+import { ToneDiagram } from './diagram/toneDiagram';
+import { ContourDiagram } from './diagram/counterDiagram';
+import { VectorDiagram } from './diagram/vectorDiagram';
+import { Diagram } from './diagram/diagram';
 import { DiagramTypes } from '../../dcmwtconfType';
 
 export class LayerController {
