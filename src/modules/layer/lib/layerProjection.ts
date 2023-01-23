@@ -103,7 +103,7 @@ export class LayerProjection extends TileLayer<XYZ> implements LayerInterface {
   }
 
   set thresholdInterval(value: number) {
-    if(!this.diagram.thresholdInterval) {
+    if (!this.diagram.thresholdInterval) {
       throw new Error("Shouldn't call to this layer");
     }
     this.diagram.thresholdInterval = value;
@@ -111,9 +111,24 @@ export class LayerProjection extends TileLayer<XYZ> implements LayerInterface {
     source?.refresh();
   }
   get thresholdInterval() {
-    if(!this.diagram.thresholdInterval) {
+    if (!this.diagram.thresholdInterval) {
       throw new Error("Shouldn't call to this layer");
     }
-    return this.diagram.thresholdInterval; 
+    return this.diagram.thresholdInterval;
+  }
+
+  set vectorInterval(value: { x: number; y: number }) {
+    if (!this.diagram.vectorInterval) {
+      throw new Error("Shouldn't call to this layer");
+    }
+    this.diagram.vectorInterval = value;
+    const source = this.getSource();
+    source?.refresh();
+  }
+  get vectorInterval() {
+    if (!this.diagram.vectorInterval) {
+      throw new Error("Shouldn't call to this layer");
+    }
+    return this.diagram.vectorInterval;
   }
 }

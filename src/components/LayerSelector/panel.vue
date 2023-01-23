@@ -165,10 +165,10 @@ export default Vue.extend({
       },
       set: function (value: LayerTypes[]) {
         const drawingOptions = this.$store.getters.drawingOptions;
-        const layers = { layers: value };
+        const layers = value;
         this.$store.commit('setDrawingOptions', {
           ...drawingOptions,
-          ...layers,
+          layers,
         });
       },
     },

@@ -51,8 +51,6 @@ export default Vue.extend({
     onSave: async function () {
       // Take a sum nail image
       const sumneil = this.getSumNailImageData();
-      const sumneilObj = { sumneil };
-      this.drawingOptions = { ...this.drawingOptions, ...sumneilObj };
 
       const viewer = this.viewerController.get();
       if (!viewer) {
@@ -65,7 +63,8 @@ export default Vue.extend({
         alert('タイトルを入力してください.');
         return;
       }
-      const drawingOptions = { ...this.drawingOptions, title, center, zoom };
+
+      const drawingOptions = { ...this.drawingOptions, sumneil, title, center, zoom };
       const definedOptions = this.definedOptions;
       const confFile = { definedOptions, drawingOptions };
 

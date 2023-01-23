@@ -1,11 +1,13 @@
 import { Diagram } from './diagram';
 
 export class VectorDiagram extends Diagram {
+  public vectorInterval: { x: number; y: number; };
   constructor(
-    private readonly numOfVectorInCanvas: { x: number; y: number },
+    vectorInterval: { x: number; y: number },
     private readonly mathMethod: (x: number) => number
   ) {
     super(undefined);
+    this.vectorInterval = vectorInterval;
   }
 
   protected drawVisualizedDiagramBasedONNumData = (
@@ -24,7 +26,7 @@ export class VectorDiagram extends Diagram {
 
     const blockSizeToDrawingOneVector = this.BlockSizeToDrawingOneVector(
       canvasSize,
-      this.numOfVectorInCanvas
+      this.vectorInterval
     );
 
     let arraysCalculatedToMeanPerBlock = new Array<Array<number>>(2);
@@ -34,7 +36,7 @@ export class VectorDiagram extends Diagram {
         datas[Direction.Horizontal],
         canvasSize,
         blockSizeToDrawingOneVector,
-        this.numOfVectorInCanvas.x * this.numOfVectorInCanvas.y
+        this.vectorInterval.x * this.vectorInterval.y
       );
     // Calculate mean of vertical direction tile per blocks.
     arraysCalculatedToMeanPerBlock[Direction.Vertical] =
@@ -42,7 +44,7 @@ export class VectorDiagram extends Diagram {
         datas[Direction.Vertical],
         canvasSize,
         blockSizeToDrawingOneVector,
-        this.numOfVectorInCanvas.x * this.numOfVectorInCanvas.y
+        this.vectorInterval.x * this.vectorInterval.y
       );
 
     // Get max value to normalize.
@@ -57,8 +59,8 @@ export class VectorDiagram extends Diagram {
 
     // rendering vector
     const context = canvas.getContext('2d')!;
-    for (let y = 0; y < this.numOfVectorInCanvas.y; y++) {
-      for (let x = 0; x < this.numOfVectorInCanvas.x; x++) {
+    for (let y = 0; y < this.vectorInterval.y; y++) {
+      for (let x = 0; x < this.vectorInterval.x; x++) {
         context.beginPath();
         const halfOfBlockSize = {
           x: blockSizeToDrawingOneVector.x / 2,
@@ -79,13 +81,13 @@ export class VectorDiagram extends Diagram {
           x:
             startPointOfVector.x +
             arraysOfNormalizedMeanBlock[Direction.Horizontal][
-              x + y * this.numOfVectorInCanvas.x
+              x + y * this.vectorInterval.x
             ] *
               halfOfBlockSize.x,
           y:
             startPointOfVector.y +
             arraysOfNormalizedMeanBlock[Direction.Vertical][
-              x + y * this.numOfVectorInCanvas.x
+              x + y * this.vectorInterval.x
             ] *
               halfOfBlockSize.y,
         };

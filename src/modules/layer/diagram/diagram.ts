@@ -2,6 +2,7 @@ export abstract class Diagram {
   protected minmax: [number, number];
   public colorIndex?: number;
   public thresholdInterval?: number;
+  public vectorInterval?: { x: number; y: number };
 
   constructor(minmax?: [number, number]) {
     if (!minmax) {

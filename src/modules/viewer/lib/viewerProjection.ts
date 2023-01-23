@@ -131,6 +131,14 @@ export class ViewerProjection extends Map implements ViewerInterface {
             baseLayers[i].thresholdInterval = layer.thretholdinterval;
             break;
           }
+        } else if (layer.type === 'vector') {
+          if (
+            baseLayers[i].vectorInterval.x !== layer.vecinterval.x ||
+            baseLayers[i].vectorInterval.y !== layer.vecinterval.y
+          ) {
+            baseLayers[i].vectorInterval = layer.vecinterval;
+            break;
+          }
         }
       } else {
         const j = baseLayers.map((l) => l.name).indexOf(layer.name);

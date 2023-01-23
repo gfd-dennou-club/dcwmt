@@ -86,6 +86,29 @@ export class Viewer3D extends Viewer implements ViewerInterface {
             baseLayers.add(purposeLayer, i);
             break;
           }
+        } else if (layer.type === 'contour') {
+          if (
+            (purposeLayer.imageryProvider as Layer3D).thresholdInterval !==
+            layer.thretholdinterval
+          ) {
+            baseLayers.remove(purposeLayer, false);
+            (purposeLayer.imageryProvider as Layer3D).thresholdInterval =
+              layer.thretholdinterval;
+            baseLayers.add(purposeLayer, i);
+            break;
+          }
+        } else if (layer.type === 'vector') {
+          if (
+            (purposeLayer.imageryProvider as Layer3D).vectorInterval.x !==
+              layer.vecinterval.x ||
+            (purposeLayer.imageryProvider as Layer3D).vectorInterval.y !==
+              layer.vecinterval.y
+          ) {
+            baseLayers.remove(purposeLayer, false);
+            (purposeLayer.imageryProvider as Layer3D).vectorInterval = layer.vecinterval;
+            baseLayers.add(purposeLayer, i);
+            break;
+          }
         }
       } else {
         // swapping layers.

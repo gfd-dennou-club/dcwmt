@@ -59,4 +59,24 @@ export class Layer3D extends UrlTemplateImageryProvider implements LayerInterfac
     }
     return this.diagram.colorIndex;
   }
+
+  set thresholdInterval(value: number) {
+    this.diagram.thresholdInterval = value;
+  }
+  get thresholdInterval() {
+    if(!this.diagram.thresholdInterval) {
+      throw new Error("Shouldn't call to this layer");
+    }
+    return this.diagram.thresholdInterval;
+  }
+
+  set vectorInterval(value: {x: number, y: number}) {
+    this.diagram.vectorInterval = value;
+  }
+  get vectorInterval() {
+    if(!this.diagram.vectorInterval) {
+      throw new Error("Shouldn't call to this layer");
+    }
+    return this.diagram.vectorInterval;
+  }
 }
