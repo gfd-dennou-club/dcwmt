@@ -35,6 +35,12 @@ export default Vue.extend({
     definedOptions: function () {
       return this.$store.getters.definedOptions;
     },
+    fixedIndex: function (): number | undefined {
+      const layers = this.$store.getters.drawingOptions?.layers;
+      if (!layers) return layers;
+      const lastLayer = layers[layers.length - 1];
+      return lastLayer.fixedindex;
+    },
     viewerController: {
       get: function () {
         return this.$store.getters.viewerController;
@@ -103,7 +109,7 @@ export default Vue.extend({
       const variable = variables[layer.varindex];
       const fixed = variable.fixed[layer.fixedindex];
       const url_ary = variable.name.map(
-        (v) => `${this.definedOptions?.root}/${v}/${fixed}`
+        (v) => `${this.definedOptions?.root}/${v}`
       );
       const diagramProps = (() => {
         switch (layer.type) {
@@ -120,6 +126,7 @@ export default Vue.extend({
         layer.type,
         layer.name,
         url_ary,
+        fixed,
         variable.tileSize,
         { min: variable.minZoom, max: variable.maxZoom },
         (x: number) => x,
@@ -159,6 +166,17 @@ export default Vue.extend({
         }
       },
       deep: true,
+    },
+    fixedIndex: function (newIndex: number) {
+      const viewer = this.viewerController?.get();
+      const layers = this.drawingOptions.layers;
+      if (viewer && layers) {
+        const lastLayer = layers[layers.length - 1];
+        const variable = this.definedOptions?.variables[lastLayer.varindex];
+        const fixed = variable.fixed[newIndex];
+
+        viewer.changeFixed(fixed);
+      }
     },
   },
 });

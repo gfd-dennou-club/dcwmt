@@ -94,7 +94,7 @@ end
 
 def getOtherDimVar(name, index)
 	option = { "start" => [0], "end" => [-1], "stride" => [1] }
-	allvalues = @netCDF.var(name).get(option)
+	allvalues = @firstNetCDF.var(name).get(option)
 
 	diff = 6 - index.to_i.abs.to_s.length
 

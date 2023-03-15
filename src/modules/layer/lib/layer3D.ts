@@ -2,12 +2,16 @@ import { UrlTemplateImageryProvider } from 'cesium';
 import { Diagram } from '../diagram/diagram';
 import { LayerInterface } from './LayerInterface';
 
-export class Layer3D extends UrlTemplateImageryProvider implements LayerInterface{
+export class Layer3D
+  extends UrlTemplateImageryProvider
+  implements LayerInterface
+{
   public minmax: [number, number] | undefined;
 
   constructor(
     public readonly name: string,
     private readonly urls: string[],
+    public fixed: string,
     tileSize: { x: number; y: number },
     zoomLevel: { min: number; max: number },
     public show: boolean,
@@ -29,7 +33,7 @@ export class Layer3D extends UrlTemplateImageryProvider implements LayerInterfac
   public requestImage(x: number, y: number, level: number) {
     const urls = new Array<string>();
     for (const url of this.urls) {
-      urls.push(url.concat(`/${level}/${x}/${y}.png`));
+      urls.push(url.concat(`/${this.fixed}/${level}/${x}/${y}.png`));
     }
 
     const canvas = document.createElement('canvas');
@@ -39,11 +43,11 @@ export class Layer3D extends UrlTemplateImageryProvider implements LayerInterfac
     return drawnCanvas;
   }
 
-  set opacity(value: number){
+  set opacity(value: number) {
     this.defaultAlpha = value;
   }
   get opacity(): number {
-    if(!this.defaultAlpha) {
+    if (!this.defaultAlpha) {
       throw new Error("Don't has alpha channel this layer");
     }
     return this.defaultAlpha;
@@ -54,7 +58,7 @@ export class Layer3D extends UrlTemplateImageryProvider implements LayerInterfac
     this.diagram.changeColorMap(value);
   }
   get colorIndex() {
-    if(!this.diagram.colorIndex){
+    if (!this.diagram.colorIndex) {
       throw new Error("Shouldn't call to this layer");
     }
     return this.diagram.colorIndex;
@@ -64,17 +68,17 @@ export class Layer3D extends UrlTemplateImageryProvider implements LayerInterfac
     this.diagram.thresholdInterval = value;
   }
   get thresholdInterval() {
-    if(!this.diagram.thresholdInterval) {
+    if (!this.diagram.thresholdInterval) {
       throw new Error("Shouldn't call to this layer");
     }
     return this.diagram.thresholdInterval;
   }
 
-  set vectorInterval(value: {x: number, y: number}) {
+  set vectorInterval(value: { x: number; y: number }) {
     this.diagram.vectorInterval = value;
   }
   get vectorInterval() {
-    if(!this.diagram.vectorInterval) {
+    if (!this.diagram.vectorInterval) {
       throw new Error("Shouldn't call to this layer");
     }
     return this.diagram.vectorInterval;

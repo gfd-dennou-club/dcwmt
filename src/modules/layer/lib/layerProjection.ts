@@ -14,6 +14,7 @@ export class LayerProjection extends TileLayer<XYZ> implements LayerInterface {
   constructor(
     public readonly name: string,
     private readonly urls: string[],
+    public fixed: string,
     private readonly tileSize: { x: number; y: number },
     zoomLevel: { min: number; max: number },
     show: boolean,
@@ -55,7 +56,7 @@ export class LayerProjection extends TileLayer<XYZ> implements LayerInterface {
 
   private tileUrlFunction: UrlFunction = (coord: TileCoord) => {
     const [Z, X, Y] = [0, 1, 2];
-    return `/${coord[Z]}/${coord[X]}/${coord[Y]}.png`;
+    return `/${this.fixed}/${coord[Z]}/${coord[X]}/${coord[Y]}.png`;
   };
 
   private tileLoadFunction: LoadFunction = async (
@@ -67,9 +68,9 @@ export class LayerProjection extends TileLayer<XYZ> implements LayerInterface {
     [canvas.width, canvas.height] = this.tileSize;
 
     const url_ary = this.urls.map((v) => v.concat(url));
-    await this.diagram.draw(url_ary, canvas);
+    const drawnCanvas = await this.diagram.draw(url_ary, canvas);
     const image = (imageTile as ImageTile).getImage() as HTMLImageElement;
-    image.src = canvas.toDataURL();
+    image.src = drawnCanvas.toDataURL();
   };
 
   set opacity(value: number) {

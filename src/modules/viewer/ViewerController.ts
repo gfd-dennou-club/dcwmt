@@ -15,12 +15,10 @@ export class ViewerController {
     private readonly zoom: number,
     private readonly center: [number, number]
   ) {
-    if (this.projCode === 'XY') {
-      this.wli = new WmtsLibIdentifer('Leaflet');
-    } else if (this.projCode === '3d Sphere') {
-      this.wli = new WmtsLibIdentifer('Cesium');
+    if (this.projCode !== 'XY' && this.projCode !== '3d Sphere') {
+      this.wli = new WmtsLibIdentifer('Projections');
     } else {
-      this.wli = new WmtsLibIdentifer('OpenLayers');
+      this.wli = new WmtsLibIdentifer(this.projCode);
     }
   }
 
@@ -29,9 +27,9 @@ export class ViewerController {
     return this.get();
   };
 
-  public get = () => {
+  public get = (): Viewer3D | ViewerProjection | undefined => {
     return this.viewer;
-  }
+  };
 
   private getViewerWithSuitableLib = (mapEl: HTMLDivElement) => {
     const prop = [
@@ -41,10 +39,10 @@ export class ViewerController {
       this.zoom,
       this.center,
     ] as const;
-    const cesium = () => new Viewer3D(mapEl, this.center);
-    const leaflet = () => new Viewer3D(mapEl, this.center);
-    const openlayers = () => new ViewerProjection(...prop);
-    const suitableFunc = this.wli.whichLib(cesium, leaflet, openlayers);
+    const xy = () => new ViewerProjection(...prop);
+    const sphere = () => new Viewer3D(mapEl, this.center);
+    const projections = () => new ViewerProjection(...prop);
+    const suitableFunc = this.wli.whichLib(xy, sphere, projections);
     return suitableFunc();
   };
 }

@@ -112,6 +112,7 @@ export class ViewerProjection extends Map implements ViewerInterface {
     }
     for (let i = 0; i < baseLayers.length; i++) {
       const layer = layers[i];
+      // [TODO] layer id で切り替え
       if (baseLayers[i].name === layer.name) {
         if (baseLayers[i].show !== layer.show) {
           baseLayers[i].show = layer.show;
@@ -151,6 +152,14 @@ export class ViewerProjection extends Map implements ViewerInterface {
         break;
       }
     }
+  };
+
+  public changeFixed = (fixed: string) => {
+    const baseLayer = this.getLayers().getArray() as LayerProjection[];
+    const lenOfLayers = baseLayer.length;
+    const lastLayer = baseLayer[lenOfLayers - 1];
+    lastLayer.fixed = fixed;
+    lastLayer.getSource()?.refresh();
   };
 
   private lower(layer: LayerProjection) {

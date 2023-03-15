@@ -7,7 +7,7 @@ export type Variable = {
   name: [string, string];
   type: DiagramTypes;
   tileSize: { x: number; y: number };
-  zoomLevel: { min: number; max: number };
+  //zoomLevel: { min: number; max: number };
   minZoom: number;
   maxZoom: number;
   fixed: Array<string>;

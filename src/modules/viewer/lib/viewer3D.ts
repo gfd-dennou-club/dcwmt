@@ -47,10 +47,6 @@ export class Viewer3D extends Viewer implements ViewerInterface {
     }
   };
 
-  public set renderingCompleted(eventListener: () => void) {
-    super.scene.postRender.addEventListener(eventListener);
-  }
-
   public updateLayers = (layers: LayerTypes[]) => {
     const baseLayers = this.imageryLayers;
     if (baseLayers.length !== layers.length) {
@@ -105,7 +101,8 @@ export class Viewer3D extends Viewer implements ViewerInterface {
               layer.vecinterval.y
           ) {
             baseLayers.remove(purposeLayer, false);
-            (purposeLayer.imageryProvider as Layer3D).vectorInterval = layer.vecinterval;
+            (purposeLayer.imageryProvider as Layer3D).vectorInterval =
+              layer.vecinterval;
             baseLayers.add(purposeLayer, i);
             break;
           }
@@ -122,6 +119,16 @@ export class Viewer3D extends Viewer implements ViewerInterface {
         break;
       }
     }
+    this.render();
+  };
+
+  public changeFixed = (fixed: string) => {
+    const baseLayers = this.imageryLayers;
+    const lenOfLayers = baseLayers.length;
+    const lastLayer = baseLayers.get(lenOfLayers - 1);
+    baseLayers.remove(lastLayer, false);
+    (lastLayer.imageryProvider as Layer3D).fixed = fixed;
+    baseLayers.add(lastLayer, lenOfLayers - 1);
     this.render();
   };
 
@@ -147,7 +154,6 @@ export class Viewer3D extends Viewer implements ViewerInterface {
     ];
     return coord;
   }
-
   set center(value: [number, number]) {
     this.camera.setView({
       destination: Cartesian3.fromDegrees(

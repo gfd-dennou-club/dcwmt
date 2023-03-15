@@ -1,17 +1,17 @@
-const wmtsLibTypes = ['Leaflet', 'Cesium', 'OpenLayers'] as const;
+const wmtsLibTypes = ['XY', '3d Sphere', 'Projections'] as const;
 export type WMTSLibType = typeof wmtsLibTypes[number];
 
 export class WmtsLibIdentifer {
   constructor(private readonly libtype: WMTSLibType) {}
 
-  whichLib = <T, U, V>(cesium: T, leaflet: U, openlayers: V): T | U | V => {
+  whichLib = <T, U, V>(xy: T, sphere: U, projection: V): T | U | V => {
     switch (this.libtype) {
-      case 'Leaflet':
-        return leaflet;
-      case 'Cesium':
-        return cesium;
-      case 'OpenLayers':
-        return openlayers;
+      case 'XY':
+        return xy;
+      case '3d Sphere':
+        return sphere;
+      case 'Projections':
+        return projection;
     }
   };
 }

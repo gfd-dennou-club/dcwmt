@@ -5,7 +5,7 @@ export abstract class Diagram {
   public vectorInterval?: { x: number; y: number };
 
   constructor(minmax?: [number, number]) {
-    if (!minmax) {
+    if (!minmax || (minmax[0] === 0 && minmax[1] === 0)) {
       this.minmax = [Infinity, -Infinity];
     } else {
       this.minmax = minmax;

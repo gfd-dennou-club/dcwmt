@@ -1,5 +1,6 @@
 require "numru/netcdf"
 require 'optparse'
+require 'json'
 
 require './makeTileLib/pnm.rb'
 require './makeTileLib/getter.rb'
@@ -83,14 +84,6 @@ option.on('-b', '--baumkuchen', 'Whether to create a map of shape such as baumku
 	@warp_dim = true
 }
 
-option.on('-v', '--vector PHYSICALQUANTITYS', Array, 'Whether to create a vector graph'){|pqs|
-
-}
-
-# option.on('-c', '--clrmap CLRMAP', 'color map'){|color|
-# 	@clrmap = color
-# }
-
 # オプション以外のコマンドラインの情報を取得
 option.parse!(ARGV)
 
@@ -101,88 +94,168 @@ if !ARGV[0].gsub(/^.\//, "").match(/@.*/) then
 end
 
 # 物理量を格納しておく配列
-physicalQuantity = ARGV[0].gsub(/^.\//, "").match(/@.*/)[0].delete("@").split(",")
+physicalQuantity = ARGV[0].split(',').map {|q| q.match(/@.*/)[0].delete("@") }
 
 # ファイルを開く
-@netCDF = NumRu::NetCDF.open(
-	ARGV[0].match(/.*\.nc/)[0], 	# ファイル名
-	"r",   				# 読み込みモード
-	false  				# sharedモードをオフ
-)
+netCDF = ARGV[0].split(',').map {|pq| 
+	NumRu::NetCDF.open(
+		pq.match(/.*\.nc/)[0], 	# ファイル名
+		"r",   				# 読み込みモード
+		false  				# sharedモードをオフ
+	)
+} 
+@firstNetCDF = netCDF[0]
 
 # ディレクトリツリーを作成
 @dirname += '/' if @dirname[-1] != '/'
 
-# 定義ファイルを作成
-# file = File.open("./define.js", "w")
-# file.puts("const DEFINE = {")
-# file.puts("\tROOT: \"#{@dirname}tile\",")
-# file.puts("\tTONE: [")
-msg = ""
-msg_header = ""
+# 定義オブジェクトを作成
+dcwmtConf = {"definedOptions" => {}, "drawingOptions" => {}}
+dcwmtConf["definedOptions"]["root"] = "#{@dirname}tile"
+dcwmtConf["definedOptions"]["variables"]  = []
 
-# 物理量の数だけ回す
-physicalQuantity.each{|fp|
-	# file.puts("\t\t{")
-	# file.puts("\t\t\tNAME: \"#{fp}\",")
-	# file.puts("\t\t\tFIXED: #{@fixname},")
-	msg_header << "{\n"
-	msg_header << "\tNAME: \"#{fp}\",\n"
-	msg_header << "\tFIXED: [\""
+variable = {}
+variable["name"] = physicalQuantity
 
-	# 物理量のディレクトリツリーを作成
-	dirPath = "#{@dirname}tile/#{@netCDF.var(fp).name}/"
-	mkdir(dirPath)
+if variable["name"].length == 1 then
+	variable["type"] = "tone"
+elsif variable["name"].length == 2 then
+	variable["type"] = "vector"
+else
+	raise(RuntimeError, "コマンドライン引数で渡された物理量が多すぎます")
+end
+
+# 次元を取得
+physDim = netCDF[0].var(physicalQuantity[0]).dims
+# データを取り出す際の範囲や間隔を設定
+dimInfo = physDim.map.with_index{|dim, index| 
+	getDimInfo(dim, index)
+}
+
+# ===== 数値データタイルを作成する際に必要なデータを用意 =====
+
+# 各次元のデータを走査する変数
+countAry = Array.new(dimInfo.length).map{0}
 	
-	# 次元を取得
-	physDim = @netCDF.var(fp).dims
-	# データを取り出す際の範囲や間隔を設定
-	dimInfo = physDim.map.with_index{|dim, index| 
-		getDimInfo(dim, index)
-	}
+# x軸を決定						
+xindex = dimInfo.select{|info| info[:name].include?(@axis[:x]) }[0][:index]
+throwError(!xindex, "Sorry... x axis can't set correctly, please set x axis by using options such as \'-a x:lon,y:lat\'")
 
-	# ===== 数値データタイルを作成する際に必要なデータを用意 =====
-
-	# 各次元のデータを走査する変数
-	# countAry = Array.new(dimInfo.length).map{0}
+# y軸を決定
+yindex = dimInfo.select{|info| info[:name].include?(@axis[:y]) }[0][:index]
+throwError(!yindex, "Sorry... y axis can't set correctly, please set y axis by using options such as \'-a x:lon,y:lat\'")
 	
-	# x軸を決定						
-	xindex = dimInfo.select{|info| info[:name].include?(@axis[:x]) }[0][:index]
-	throwError(!xindex, "Sorry... x axis can't set correctly, please set x axis by using options such as \'-a x:lon,y:lat\'")
+# 軸として選ばれなかった次元を取得
+otherindex = dimInfo.select{|info| !info[:name].include?(@axis[:x]) && !info[:name].include?(@axis[:y])}.map{|info| info[:index]}.reverse
 
-	# y軸を決定
-	yindex = dimInfo.select{|info| info[:name].include?(@axis[:y]) }[0][:index]
-	throwError(!yindex, "Sorry... y axis can't set correctly, please set y axis by using options such as \'-a x:lon,y:lat\'")
-	
-	# 軸として選ばれなかった次元を取得
-	otherindex = dimInfo.select{|info| !info[:name].include?(@axis[:x]) && !info[:name].include?(@axis[:y])}.map{|info| info[:index]}.reverse
+# 軸として選ばれなかった次元についてnetCDFからの取り出し方を選択
+otherindex.each{|o|
+	dimInfo[o] = getDimInfo(dimInfo[o], dimInfo[o][:index])
+}
 
-	# 軸として選ばれなかった次元についてnetCDFからの取り出し方を選択
-	otherindex.each{|o|
-		# 固定される次元が空だったら
-		if @fix.empty? then
-			# 配列の0番目の要素を取得
-			# dimInfo[o] = getDimInfo(dimInfo[o], dimInfo[o][:index], dimInfo[o][:name], 0, 0)
-		else
-			# 空でなければ, getDimInfoメソッドに任せる
-			dimInfo[o] = getDimInfo(dimInfo[o], dimInfo[o][:index])
-		end
-		# countAry[dimInfo[o][:index]] = dimInfo[o][:start]
-	}
+# 拡大率を算出
+zoomLevel = getMaxZoomLevel(dimInfo[xindex][:length], dimInfo[yindex][:length], 256)
 
+variable["tileSize"] = [256, 256]
+variable["minZoom"] = 0
+variable["maxZoom"] = zoomLevel
+variable["axis"] = [dimInfo[xindex][:name], dimInfo[yindex][:name]]
+variable["fixed"] = []
+dcwmtConf["drawingOptions"]["title"] = ""
+dcwmtConf["drawingOptions"]["sumneil"] = ""
+dcwmtConf["drawingOptions"]["zoom"] = 0
+dcwmtConf["drawingOptions"]["center"] = [0, 0]
+dcwmtConf["drawingOptions"]["projCode"] = "" 
+dcwmtConf["drawingOptions"]["mathMethod"] = 0
+dcwmtConf["drawingOptions"]["layers"] = []
+
+# タイルの作成
+physicalQuantity.each.with_index {|fp, index|
 	if @warp_dim then
 		# makeTileForBaumkuchen(dimInfo, fp, countAry, xindex, yindex, otherindex, dirPath) 
 	end
-	makeTileForPlane(dimInfo, fp, 0, xindex, yindex, otherindex, dirPath, msg_header, msg)
-	# file.puts("\t\t}")
+	makeTileForPlane(netCDF[index], dimInfo, fp, 0, xindex, yindex, otherindex, "#{@dirname}tile", variable)
 }
 
-puts "\n\n数値データタイルの作成が終了しました."
-puts "以下の文字列を「define.js」に追加してください."
-puts ""
-puts msg
-puts ""
-# file.puts("\t],")
-# file.puts("\tVECTOR: [],")
-# file.puts("}")
-# file.close()
+# 次元でソートする
+if variable["fixed"][0].include?('/') then
+	2.times {|i|
+		variable["fixed"].sort! {|a, b|
+			_a = a.split('/')[i]
+			_b = b.split('/')[i]
+			_a[1].split('=')[1].to_f <=> _b[1].split('=')[1].to_f
+		}
+	}
+else
+	variable["fixed"].sort! {|a, b|
+		a[1].split('=')[1].to_f <=> b[1].split('=')[1].to_f
+	}
+end
+
+variable["fixed"].uniq!()
+dcwmtConf["definedOptions"]["variables"].push(variable)
+
+if variable["type"] === "tone" then
+	dcwmtConf["drawingOptions"]["layers"].push(
+		{
+			"name" => variable["name"][0], 
+			"type" => "tone",
+			"show" => true,
+			"opacity" => 1.0,
+			"varinidex" => dcwmtConf["definedOptions"]["variables"].length - 1,
+			"fixedindex" => 0,
+			"clrindex" => 5,
+		}
+	)
+	dcwmtConf["drawingOptions"]["layers"].push(
+		{
+			"name" => "#{variable["name"][0]}_contour", 
+			"type" => "contour",
+			"show" => true,
+			"opacity" => 1.0,
+			"varinidex" => dcwmtConf["definedOptions"]["variables"].length - 1,
+			"fixedindex" => 0,
+			"thretholdinterval" => 5,
+		}
+	)
+else
+	dcwmtConf["drawingOptions"]["layers"].push(
+		{
+			"name" => "#{variable["name"][0]}-#{variable["name"][1]}", 
+			"type" => "vector",
+			"show" => true,
+			"opacity" => 1.0,
+			"varinidex" => dcwmtConf["definedOptions"]["variables"].length - 1,
+			"fixedindex" => 0,
+			"vecinterval" => { "x" => 10, "y" => 10 },
+		}
+	)
+end
+
+dcwmtConfPath = "#{@dirname}dcwmtConf.json" 
+
+if File.exist?(dcwmtConfPath) then
+	existedFile = File.open(dcwmtConfPath, "r")
+	existedDcwmtConf = JSON.load(existedFile.read)
+	existedFile.close()
+	# ルートディレクトリが一致している
+	if existedDcwmtConf["definedOptions"]["root"] == dcwmtConf["definedOptions"]["root"] then
+		varNames = existedDcwmtConf["definedOptions"]["variables"].map { |v| v["name"][0] }
+		newVar = dcwmtConf["definedOptions"]["variables"][0]
+		p varNames
+		p newVar["name"][0]
+		# 変数名が一致していない
+		if !varNames.include?(newVar["name"][0]) then
+			existedDcwmtConf["definedOptions"]["variables"].push(newVar)  
+			existedDcwmtConf["drawingOptions"]["layers"] += dcwmtConf["drawingOptions"]["layers"]
+			file = File.open(dcwmtConfPath, "w")
+			JSON.dump(existedDcwmtConf, file)
+			file.close()
+			exit()
+		end
+	end
+end	
+	
+File.open(dcwmtConfPath, "w") { |file|
+	JSON.dump(dcwmtConf, file)
+}

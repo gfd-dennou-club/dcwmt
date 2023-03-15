@@ -77,54 +77,36 @@ end
 #
 # dimInfo: Hash{ :name: String, :length: Number, :start: Number, :end: Number, :stride: Number}
 # countAry: Hash{ :name: String, :length: 0, ...}
-def makeTileForPlane(dimInfo, fp, count, xindex, yindex, otherindex, dirPath, msg_header, msg, tempindex = 0)
+def makeTileForPlane(netCDF, dimInfo, fp, count, xindex, yindex, otherindex, root, variable, tempindex = 0, header="")
 	if otherindex.instance_of?(Array) then
 		index = otherindex[tempindex]
 		tempindex += 1
 		for i in 0...dimInfo[index][:length] do
 			cnt = dimInfo[index][:length] == 1 ? dimInfo[index][:start] : i
 			if tempindex >= otherindex.length then
-				makeTileForPlane(dimInfo, fp, cnt, xindex, yindex, index, dirPath, msg_header, msg, tempindex)
+				makeTileForPlane(netCDF, dimInfo, fp, cnt, xindex, yindex, index, root, variable, tempindex, header)
 			else
 				option = { "start" => [cnt], "end" => [cnt], "stride" => [1] }
-				value = @netCDF.var(dimInfo[index][:name]).get(option)[0]
-				temppath = "#{dirPath}#{dimInfo[index][:name]}=#{value}/"
-				header = "#{msg_header}#{dimInfo[index][:name]}=#{value}/"
-				makeTileForPlane(dimInfo, fp, cnt, xindex, yindex, otherindex, temppath, header, msg, tempindex)
+				value = netCDF.var(dimInfo[index][:name]).get(option)[0]
+				header = "#{dimInfo[index][:name]}=#{value}/"
+				makeTileForPlane(netCDF, dimInfo, fp, cnt, xindex, yindex, otherindex, root, variable, tempindex, header)
 			end
-
 		end
 		return
 	end
 
-	# 拡大率を計算
-	zoomLevel = getMaxZoomLevel(dimInfo[xindex][:length], dimInfo[yindex][:length], 256)
-
-	# タイルサイズを計算 dimInfo[xindex][:length]/(2**zoomLevel)
-	# tileSize = { :x => dimInfo[xindex][:length]/(2**zoomLevel), :y => dimInfo[yindex][:length]/(2**zoomLevel)}
-	tileSize = { :x => 256, :y => 256 }
-	p "tileSize : #{tileSize[:x]} * #{tileSize[:y]}, maxZoomLevel : #{zoomLevel}でタイルを作ります"
-
-	# file.puts("\t\t\tSIZE: {X: #{tileSize[:x]}, Y: #{tileSize[:y]}},")
-	# file.puts("\t\t\tMAXIMUMLEVEL: #{zoomLevel},")
-	# file.puts("\t\t\tAXIS: {X: \"#{dimInfo[xindex][:name]}\", Y: \"#{dimInfo[yindex][:name]}\"},")
+	zoomLevel = variable["maxZoom"] - variable["minZoom"]
+	tileSize = { :x => variable["tileSize"][0], :y => variable["tileSize"][1]}
 
 	# ベースとなるタイルのディレクトリパスを作成 および ディレクトリ作成
 	option = { "start" => [count], "end" => [count], "stride" => [1] }
-	othervalue = @netCDF.var(dimInfo[otherindex][:name]).get(option)[0]
-	tempDirPath_base = "#{dirPath}#{dimInfo[otherindex][:name]}=#{othervalue}/"
-	mkdir(tempDirPath_base)
+	othervalue = netCDF.var(dimInfo[otherindex][:name]).get(option)[0]
+	p "#{header}#{dimInfo[otherindex][:name]}=#{othervalue}"
+	variable["fixed"].push("#{header}#{dimInfo[otherindex][:name]}=#{othervalue}")
 
-	msg << msg_header
-	msg << "#{dimInfo[otherindex][:name]}=#{othervalue}\"],\n"
-	msg << "\tSIZE: {X: #{tileSize[:x]}, Y: #{tileSize[:y]}},\n"
-	msg << "\tMAXIMUMLEVEL: #{zoomLevel},\n"
-	msg << "\tAXIS: {X: \"#{dimInfo[xindex][:name]}\", Y: \"#{dimInfo[yindex][:name]}\"},\n"
-	msg << "},\n"
-	
 	# 軸の変数を取得
-	xAxisAry = @netCDF.var(dimInfo[xindex][:name]).get("start" => [0], "end" => [-1], "stride" => [1])
-	yAxisAry = @netCDF.var(dimInfo[yindex][:name]).get("start" => [0], "end" => [-1], "stride" => [1])
+	xAxisAry = netCDF.var(dimInfo[xindex][:name]).get("start" => [0], "end" => [-1], "stride" => [1])
+	yAxisAry = netCDF.var(dimInfo[yindex][:name]).get("start" => [0], "end" => [-1], "stride" => [1])
 
 	min, max = nil, nil
 
@@ -158,10 +140,6 @@ def makeTileForPlane(dimInfo, fp, count, xindex, yindex, otherindex, dirPath, ms
 
 		# x軸方向の分割数だけ回す
 		numOfDevision.times{|devide_x|
-			# タイルを保存しておくディレクトリパスを作成 および ディレクトリの作成	
-			tempDirPath_x = tempDirPath_base + "#{zindex}/#{devide_x}/"
-			mkdir(tempDirPath_x)
-
 			# 分割されたタイルをまたいだx座標値
 			offset_x = tileSize[:x]*devide_x
 			tempMercatorX = mercatorX[tileSize[:x]*devide_x ... tileSize[:x]*(devide_x+1)]
@@ -174,11 +152,13 @@ def makeTileForPlane(dimInfo, fp, count, xindex, yindex, otherindex, dirPath, ms
 				tempMercatorY = mercatorY[tileSize[:y]*devide_y ... tileSize[:y]*(devide_y+1)]
 
 				# タイルを保存しておくディレクトリパスを作成
-				tempDirPath_y = tempDirPath_x + "#{numOfDevision - devide_y - 1}"
+				dirPath = "#{root}/#{fp}/#{variable["fixed"][-1]}/#{zindex}/#{devide_x}/"
+				mkdir(dirPath)
+				tempDirPath = dirPath + "#{numOfDevision - devide_y - 1}"
 
 				# pnmファイルを作成
 				options = { :tileSize => {:x => tileSize[:x], :y => tileSize[:y]} }
-				pnm = PNM.new(tempDirPath_y, options)
+				pnm = PNM.new(tempDirPath, options)
 
 				p "---------( #{devide_x}, #{numOfDevision - devide_y - 1} )---------"
 
@@ -207,7 +187,7 @@ def makeTileForPlane(dimInfo, fp, count, xindex, yindex, otherindex, dirPath, ms
 												end
 											end
 										}
-										value += @netCDF.var(fp).get(getVariableRule(tempInfo))[0] * xinfo[:weight] * yinfo[:weight]
+										value += netCDF.var(fp).get(getVariableRule(tempInfo))[0] * xinfo[:weight] * yinfo[:weight]
 									}
 								}
 
@@ -240,8 +220,8 @@ def makeTileForPlane(dimInfo, fp, count, xindex, yindex, otherindex, dirPath, ms
 				# PNMファイルの書き込み終了
 				pnm.end()
 
-				system("pnmtopng #{tempDirPath_y}.ppm > #{tempDirPath_y}.png")
-      		 	system("rm -f #{tempDirPath_y}.ppm")
+				system("pnmtopng #{tempDirPath}.ppm > #{tempDirPath}.png")
+    		 	system("rm -f #{tempDirPath}.ppm")
 			}
 		}
 	}
