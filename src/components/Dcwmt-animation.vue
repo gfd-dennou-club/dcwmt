@@ -97,18 +97,29 @@ export default Vue.extend({
       const newFixed = `${slider.title}=${slider.tick_label[slider.value]}`;
       const lenOfLayers = this.drawingOptions.layers.length;
       const lastLayer = this.drawingOptions.layers[lenOfLayers - 1];
-      const fixedIndex = this.definedOptions?.variables[
-        lastLayer.varindex
-      ].fixed.findIndex((v) => v === newFixed);
+      const fixed = this.definedOptions?.variables[lastLayer.varindex].fixed;
+      if (!fixed) throw Error("Can't get fixed");
+      const shapedFixed = fixed.map((v) => v.split('/'));
+      let fixedIndex = Infinity;
+      if (shapedFixed[0].length === 1) {
+        fixedIndex = fixed.findIndex((v) => v === newFixed);
+      } else {
+        const fixedNames = shapedFixed[0].map((v) => v.split('=')[0]);
+        const fixedNamesIndex = fixedNames.findIndex((v) => v === slider.title);
+        console.log(shapedFixed);
+        fixedIndex = shapedFixed.findIndex(
+          (v) => v[fixedNamesIndex] === newFixed  
+        );
+        console.log(fixedIndex);
+      }
       if (fixedIndex === undefined) {
         throw new Error("Can't use URL");
       }
 
       if (hasIncrement) {
         const value = lastLayer.fixedindex + 1;
-        const lenOfFixedVariables = this.definedOptions?.variables[
-          lastLayer.varindex
-        ].fixed.length;
+        const lenOfFixedVariables =
+          this.definedOptions?.variables[lastLayer.varindex].fixed.length;
         if (lenOfFixedVariables && value < lenOfFixedVariables) {
           lastLayer.fixedindex = value;
           this.sliders[sliderIndex].value = value;

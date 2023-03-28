@@ -33,6 +33,7 @@ export class Layer3D
   public requestImage(x: number, y: number, level: number) {
     const urls = new Array<string>();
     for (const url of this.urls) {
+      console.log(this.fixed);
       urls.push(url.concat(`/${this.fixed}/${level}/${x}/${y}.png`));
     }
 

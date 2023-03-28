@@ -7,21 +7,22 @@ export type Variable = {
   name: [string, string];
   type: DiagramTypes;
   tileSize: { x: number; y: number };
-  //zoomLevel: { min: number; max: number };
   minZoom: number;
   maxZoom: number;
+  axis: [number, number];
   fixed: Array<string>;
+  extent: [number, number, number, number];
 };
 
 type Layer = {
   name: string;
-  show: boolean,
-  opacity: number,
+  show: boolean;
+  opacity: number;
   varindex: number;
   fixedindex: number;
   minmax: [number, number] | undefined;
-  id?: string, 
-}
+  id?: string;
+};
 
 type LayerTone = Layer & {
   type: 'tone';
@@ -56,5 +57,5 @@ export type DrawingOptions = {
   projCode: ProjCodes;
   mathMethods: number;
   layers: Array<LayerTypes>;
-  id?: string,
+  id?: string;
 };

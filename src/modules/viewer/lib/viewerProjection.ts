@@ -157,6 +157,7 @@ export class ViewerProjection extends Map implements ViewerInterface {
   public changeFixed = (fixed: string) => {
     const baseLayer = this.getLayers().getArray() as LayerProjection[];
     const lenOfLayers = baseLayer.length;
+    if (lenOfLayers === 0) return;
     const lastLayer = baseLayer[lenOfLayers - 1];
     lastLayer.fixed = fixed;
     lastLayer.getSource()?.refresh();

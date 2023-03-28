@@ -108,6 +108,8 @@ def makeTileForPlane(netCDF, dimInfo, fp, count, xindex, yindex, otherindex, roo
 	xAxisAry = netCDF.var(dimInfo[xindex][:name]).get("start" => [0], "end" => [-1], "stride" => [1])
 	yAxisAry = netCDF.var(dimInfo[yindex][:name]).get("start" => [0], "end" => [-1], "stride" => [1])
 
+	variable["extent"] = [xAxisAry[0], yAxisAry[0], xAxisAry[-1], yAxisAry[-1]]
+
 	min, max = nil, nil
 
 	# 拡大率の値だけ回す

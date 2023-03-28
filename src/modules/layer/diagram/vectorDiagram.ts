@@ -1,7 +1,7 @@
 import { Diagram } from './diagram';
 
 export class VectorDiagram extends Diagram {
-  public vectorInterval: { x: number; y: number; };
+  public vectorInterval: { x: number; y: number };
   constructor(
     vectorInterval: { x: number; y: number },
     private readonly mathMethod: (x: number) => number

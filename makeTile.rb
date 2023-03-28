@@ -165,7 +165,7 @@ dcwmtConf["drawingOptions"]["title"] = ""
 dcwmtConf["drawingOptions"]["sumneil"] = ""
 dcwmtConf["drawingOptions"]["zoom"] = 0
 dcwmtConf["drawingOptions"]["center"] = [0, 0]
-dcwmtConf["drawingOptions"]["projCode"] = "" 
+dcwmtConf["drawingOptions"]["projCode"] = "EPSG:3857" 
 dcwmtConf["drawingOptions"]["mathMethod"] = 0
 dcwmtConf["drawingOptions"]["layers"] = []
 
@@ -194,6 +194,7 @@ end
 
 variable["fixed"].uniq!()
 dcwmtConf["definedOptions"]["variables"].push(variable)
+lengthOfLayers = dcwmtConf["drawingOptions"]["layers"].length
 
 if variable["type"] === "tone" then
 	dcwmtConf["drawingOptions"]["layers"].push(
@@ -202,9 +203,10 @@ if variable["type"] === "tone" then
 			"type" => "tone",
 			"show" => true,
 			"opacity" => 1.0,
-			"varinidex" => dcwmtConf["definedOptions"]["variables"].length - 1,
+			"varindex" => dcwmtConf["definedOptions"]["variables"].length - 1,
 			"fixedindex" => 0,
 			"clrindex" => 5,
+			"id" => lengthOfLayers
 		}
 	)
 	dcwmtConf["drawingOptions"]["layers"].push(
@@ -213,9 +215,10 @@ if variable["type"] === "tone" then
 			"type" => "contour",
 			"show" => true,
 			"opacity" => 1.0,
-			"varinidex" => dcwmtConf["definedOptions"]["variables"].length - 1,
+			"varindex" => dcwmtConf["definedOptions"]["variables"].length - 1,
 			"fixedindex" => 0,
 			"thretholdinterval" => 5,
+			"id" => lengthOfLayers
 		}
 	)
 else
@@ -225,9 +228,10 @@ else
 			"type" => "vector",
 			"show" => true,
 			"opacity" => 1.0,
-			"varinidex" => dcwmtConf["definedOptions"]["variables"].length - 1,
+			"varindex" => dcwmtConf["definedOptions"]["variables"].length - 1,
 			"fixedindex" => 0,
 			"vecinterval" => { "x" => 10, "y" => 10 },
+			"id" => lengthOfLayers
 		}
 	)
 end

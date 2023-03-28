@@ -84,6 +84,10 @@ export default Vue.extend({
         layerController.add(layer);
       }
 
+      //const extent = this.definedOptions.variables[0].extent;
+      //const graticule = layerController.graticule(extent);
+      //layerController.add(graticule);
+
       viewer.register(layerController);
     },
     createController() {

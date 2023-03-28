@@ -68,6 +68,7 @@ export abstract class Diagram {
     const rgba = context.getImageData(0, 0, canvas.width, canvas.height).data;
     const dataView = new DataView(new ArrayBuffer(32));
     const datas = new Array<number>();
+    const isCalcMinMax = !isFinite(this.minmax[0]);
 
     for (let i = 0; i < canvas.width * canvas.height; i++) {
       // Get RGB value of each pixel from Numerical Data Tile
@@ -79,7 +80,7 @@ export abstract class Diagram {
       const data = dataView.getFloat32(0);
 
       // Calculate minmax, if this.range is not specified.
-      if (!isFinite(this.minmax[0])) {
+      if (isCalcMinMax) {
         if (data < this.minmax[0]) {
           this.minmax[0] = data;
         }
@@ -132,7 +133,10 @@ export abstract class Diagram {
     if (isFinite(this.minmax[0])) {
       return new Promise((resolve) => resolve(this.minmax));
     }
-    await this.draw(urls, canvas);
+    const size = { width: canvas.width, height: canvas.height };
+    const imgs = await this.fetchImages(urls, size);
+
+    imgs.map((img) => this.getNumData(img));
     return new Promise((resolve) => resolve(this.minmax));
   };
 

@@ -21,7 +21,7 @@ export class ToneDiagram extends Diagram {
   public changeColorMap(colorIndex: number) {
     this.colorIndex = colorIndex;
     this.colormap = new ColorMap(colorIndex).getClrmap();
-  } 
+  }
 
   protected drawVisualizedDiagramBasedONNumData = (
     datas: number[][],
